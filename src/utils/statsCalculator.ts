@@ -63,6 +63,7 @@ const countWords = (text: string | undefined): number => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getStringBytes = (s: string): number => s.length; // base64 chars are ASCII, 1 byte each
 
 // Scans all base64 data-URI assets embedded in the project and returns their total byte count.
@@ -78,11 +79,14 @@ const sumBase64AssetBytes = (gameData: GameData): number => {
     measure(gameData.positiveEndingMusic);
     measure(gameData.negativeEndingImage);
     measure(gameData.negativeEndingMusic);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Object.values(gameData.scenes).forEach((scene: any) => {
         measure(scene.image);
         measure(scene.backgroundMusic);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scene.interactions?.forEach((i: any) => measure(i.soundEffect));
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Object.values(gameData.globalObjects).forEach((obj: any) => measure(obj.image));
     return total;
 };

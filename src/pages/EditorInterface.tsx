@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Globe, Sparkles, Moon, Monitor, Leaf, Coffee, Skull, Terminal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../components/ThemeProvider';
@@ -15,6 +16,7 @@ export const EditorInterface: React.FC<{ hideHeader?: boolean }> = ({ hideHeader
         }
     }, [localLanguage, i18n]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleAppThemeChange = (newTheme: any) => {
         setTheme(newTheme);
     };

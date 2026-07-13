@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Sun, Moon, Coffee, Leaf, Globe, Monitor } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';

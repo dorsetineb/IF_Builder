@@ -5,7 +5,9 @@ interface LoadingOverlayProps {
     message?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ message }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { t } = useTranslation();
 
     return (

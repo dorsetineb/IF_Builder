@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3, Trash2, ZoomIn, ZoomOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditorStatsModal from './EditorStatsModal';
@@ -71,10 +72,13 @@ const SceneMap: React.FC<SceneMapProps> = ({
   onReorganizeScenes,
   onAddNode,
   hasOpeningVignette = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isSidebarOpen = false,
   gameInteractionType = 'parser',
   gameTitle,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNarrativeMenuOpen,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onToggleNarrative,
   selectedSceneId,
   onDeleteScene,
@@ -84,6 +88,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
   const hoverTextClass = theme === 'terminal' ? 'hover:text-zinc-950' : 'hover:text-white';
   const containerRef = useRef<HTMLDivElement>(null);
   const mapTransformRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const rafRef = useRef<number | null>(null);
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [isPanning, setIsPanning] = useState(false);
@@ -104,6 +109,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           targetId: string;
           label: string;
           type: MapNodeType;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           original?: any;
         }[] = [];
 

@@ -1,4 +1,4 @@
-window.embeddedGameData = {"gameTitle":"Fuja da Masmorra","cena_inicial":"VNT_OPENING","cenas":{"scn_bh0":{"id":"scn_bh0","name":"DARK CELL","image":"assets/scene_image_scn_bh0.jpeg","description":"You awake in a damp, cramped <cell>. \nA locked <door> blocks the exit. \nIn the corner, a rusty <bucket>.\nA <brick> catches your attention on the wall.","backgroundMusic":"assets/scene_bgm_scn_bh0.mpeg","interactions":[{"id":"inter_hsq","verbs":["pull","push","move","remove","take out","fiddle","touch","press","slide","poke","grope"],"target":"obj_seh","successMessage":"","goToScene":"scn_hja","removesTargetFromScene":true,"transitionType":"zoom","transitionSpeed":4,"soundEffect":"assets/sfx_scn_bh0_0.mpeg","icon":"star","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_ggc","verbs":["kick","hit","break open","smash","punch"],"target":"obj_abe","successMessage":"","goToScene":"scn_3br","transitionType":"blur","transitionSpeed":4,"soundEffect":"assets/sfx_scn_bh0_1.mpeg","icon":"skull","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_yui","verbs":["fiddle","rummage","kick","pick up","lift","move","ransack","search","poke around","grab","drag","flip"],"target":"obj_5fj","successMessage":"","goToScene":"scn_1o5","transitionType":"zoom","transitionSpeed":4,"soundEffect":"assets/sfx_scn_bh0_2.mpeg","icon":"skull","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_x1p","verbs":["use","open","unlock","insert","shove in"],"target":"obj_abe","requiresInInventory":"obj_f2n","consumesItem":true,"goToScene":"VNT_VICTORY","soundEffect":"assets/sfx_scn_bh0_3.mpeg","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_ajm","verbs":["shout","yell","call out","speak","roar"],"target":"","successMessage":"Você grita por ajuda, mas o silêncio permanece absoluto. Ninguém te ouve do lado de fora da cela..","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_4i9","verbs":["open","push","unlock","force"],"target":"","successMessage":"A porta está trancada. Você precisa de uma <chave> para abri-la.","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":["obj_5fj","obj_abe","obj_seh"],"choices":[],"overlayEffect":"grain","isDefeatOutcome":false,"suggestions":["Examine","Open","Kick","Yell"]},"scn_hja":{"id":"scn_hja","name":"BEHIND THE BRICK","image":"assets/scene_image_scn_hja.jpeg","description":"You force the brick and discover an empty space behind it. \nSomething glints there. You find a rusty <key>!\nYou can <go back> to the <cell> at any time.","interactions":[{"id":"inter_svi","verbs":["get","grab","pick up","take","store"],"target":"obj_f2n","removesTargetFromScene":true,"addsToInventory":true,"soundEffect":"assets/sfx_scn_hja_0.mpeg","successMessage":"You picked up the key and added it to your inventory.","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_9r4","verbs":["go back","go","return","cell"],"target":"","goToScene":"scn_bh0","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":["obj_f2n","obj_abe"],"choices":[],"overlayEffect":"grain","isDefeatOutcome":false,"suggestions":["Take","Key","Return"]},"scn_3br":{"id":"scn_3br","name":"HURT BY THE DOOR!","image":"assets/scene_image_scn_3br.jpeg","description":"You hit the door with force.\nCLANK! \nIt creaks, but something snaps inside your foot. \nThe pain is unbearable.","interactions":[{"id":"inter_445","verbs":["go back","go","return","cell"],"target":"","goToScene":"scn_bh0","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":true,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"overlayEffect":"grain","isDefeatOutcome":false,"suggestions":["Return","Cell"]},"scn_1o5":{"id":"scn_1o5","name":"A RAT ATTACKS!","image":"assets/scene_image_scn_1o5.jpeg","description":"With disgust, you stir the bucket. \nSomething moves inside.\nSQUEAK! \nA rat attacks and sinks its teeth into your hand.","interactions":[{"id":"inter_b7l","verbs":["go back","go","return","cell"],"target":"","goToScene":"scn_bh0","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":true,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"overlayEffect":"grain","isDefeatOutcome":false,"suggestions":["Return","Cell"]},"VNT_OPENING":{"id":"VNT_OPENING","name":"Escape the Dungeon","image":"assets/splash_image.png","description":"You wake up in a dark cell.\nWrite to escape the dungeon!\n\n(type HELP to access the tutorial)","interactions":[],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"vignetteType":"opening","vignetteButtonText":"START","vignetteNextSceneId":"scn_bh0","overlayEffect":"rain","isDefeatOutcome":false,"suggestions":[]},"VNT_VICTORY":{"id":"VNT_VICTORY","name":"You escaped","image":"assets/splash_image.png","description":"The door creaks as you turn the key in the lock.\nYou step out of the cell and feel the fresh night wind.","backgroundMusic":"assets/scene_bgm_VNT_VICTORY.mpeg","interactions":[],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"vignetteType":"conclusion","vignetteButtonText":"RESTART","overlayEffect":"grain","isDefeatOutcome":false,"suggestions":[]},"VNT_DEFEAT":{"id":"VNT_DEFEAT","name":"You died in the dungeon","image":"assets/splash_image.png","description":"From hunger? Illness? No one will ever know...","backgroundMusic":"assets/scene_bgm_VNT_DEFEAT.mpeg","interactions":[],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"vignetteType":"conclusion","vignetteButtonText":"RESTART","overlayEffect":"rain","isDefeatOutcome":true,"suggestions":[]}},"globalObjects":{"obj_5fj":{"id":"obj_5fj","name":"bucket","examineDescription":"A rusty bucket lying on the floor. Could there be something inside?","isTakable":false},"obj_abe":{"id":"obj_abe","name":"door","examineDescription":"The large iron door of the cell. It is locked.","isTakable":false,"icon":"star"},"obj_seh":{"id":"obj_seh","name":"brick","examineDescription":"A brick seems loose in the wall. Can I move it?","isTakable":false,"icon":"star"},"obj_f2n":{"id":"obj_f2n","name":"key","examineDescription":"A rusty key! It looks like it fits the lock of the cell door.","isTakable":true,"image":"assets/obj_image_obj_f2n.jpeg","icon":"star"}},"mensagem_falha_padrao":"Isso não parece ter nenhum efeito.","nome_jogador_diario":"Jogador","gameSystemEnabled":"none","gameMaxChances":2,"gameChanceIcon":"heart","gameChanceIconColor":"#d4af37","gameChanceReturnButtonText":"Tentar Novamente","gameTextColor":"#a1a1aa","gameTitleColor":"#d4af37","gameFocusColor":"#fbbf24","gameTextReadingFlow":"continuous","positiveEndingImage":"assets/splash_image.png","positiveEndingContentAlignment":"right","positiveEndingDescription":"Você conseguiu fugir da masmorra!","positiveEndingMusic":"assets/positive_ending_bgm.mpeg","negativeEndingImage":"assets/splash_image.png","negativeEndingContentAlignment":"right","negativeEndingDescription":"Você morreu...","gameRestartButtonText":"RESTART","gameContinueButtonText":"CONTINUE","gameSystemButtonText":"Save / Load","gameSaveMenuTitle":"Save","gameLoadMenuTitle":"Load","gameMainMenuButtonText":"Menu Principal","gameViewEndingButtonText":"Ver Final","fixedVerbs":[{"id":"verb_help_1","verbs":["help"],"description":"How to Interact with the World:\nEverything is based on the text field, and most commands follow a simple format:\n\nDirect actions: To interact with something in the scene, use VERB + TARGET.\nFor example: get key or look door.\n\nUsing inventory items: To use an item you have collected on something in the scene, the format is VERB + ITEM + TARGET.\nFor example: use key on door.\nRemember: the item (like the key) must be in your inventory for the action to work.\nKeep an eye on highlighted words in the scene description, like <this>. They indicate important points of interest!\n\nSome verbs are universal and very useful:\n\nLOOK or EXAMINE: Use to discover more details about your surroundings. You can use it on a specific object (look brick) or the environment in general (look around).\n\nGET or TAKE: Some objects can be collected and kept in your inventory for later use. If something looks useful and loose, try to get it!\n\nINVENTORY: To see all the items you are carrying, click the Inventory button.\n\nGO BACK: If you want to return to the scene you just came from, this command may work.\n\nStuck? Now what?\nBe creative! Try different verbs for the same object. push, pull, kick, use... experimentation is key!\nSuggestions Button: If you are out of ideas, the Suggestions button is your best friend. It can shed light on the most obvious actions in the current scene.\nJournal: Forgot what happened or an important detail? The Journal keeps a record of all the scenes you’ve visited and your actions. Use it to recall clues."}],"consequenceTrackers":[{"id":"trk_9mt","name":"Hunger","initialValue":0,"maxValue":150,"consequenceSceneId":"VNT_DEFEAT","icon":"skull","barColor":"#dd5f5f","invertBar":false,"hideValue":true}],"gameShowTrackersUI":true,"gameShowSystemButton":false,"gameTextAnimationType":"typewriter","gameTextSpeed":4,"gameImageTransitionType":"fade","gameImageSpeed":5,"enableInventory":true,"enableSuggestions":true,"enableChances":true,"enableTrackers":true,"enableDiary":true,"enableFixedVerbs":true,"enableImages":true,"enableTextControl":true,"enableRetrospective":true,"gameInteractionType":"parser","gameSuggestionsEmptyFeedback":"não há sugestões","gameInventoryEmptyFeedback":"não há itens no inventário","gameTranslations":{"view_diary_btn":"Ver Diário","stats_visited":"Você visitou","stats_time":"Tempo decorrido","of_scenes":"cenas"}};
+window.embeddedGameData = {"startScene":"VNT_OPENING","scenes":{"scn_bh0":{"id":"scn_bh0","name":"DARK CELL","description":"You awake in a damp, cramped <cell>. \nA locked <door> blocks the exit. \nIn the corner, a rusty <bucket>.\nA <brick> catches your attention on the wall.","image":"assets/scene_image_scn_bh0.jpeg","objects":[{"id":"obj_nb5","name":"balde","examineDescription":"Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície. Parece que tem algo dentro dele","isTakable":false},{"id":"obj_nuh","name":"tijolo","examineDescription":"Um dos tijolos da parede parece mal encaixado.","isTakable":false},{"id":"obj_kwx","name":"porta","examineDescription":"Uma porta de ferro maciça e trancada.","isTakable":false}],"interactions":[{"id":"inter_hsq","verbs":["pull","push","move","remove","take out","fiddle","touch","press","slide","poke","grope"],"target":"obj_seh","successMessage":"","goToScene":"scn_hja","removesTargetFromScene":true,"transitionType":"zoom","transitionSpeed":4,"soundEffect":"assets/sfx_scn_bh0_0.mpeg","icon":"star","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_ggc","verbs":["kick","hit","break open","smash","punch"],"target":"obj_abe","successMessage":"","goToScene":"scn_3br","transitionType":"blur","transitionSpeed":4,"soundEffect":"assets/sfx_scn_bh0_1.mpeg","icon":"skull","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_yui","verbs":["fiddle","rummage","kick","pick up","lift","move","ransack","search","poke around","grab","drag","flip"],"target":"obj_5fj","successMessage":"","goToScene":"scn_1o5","transitionType":"zoom","transitionSpeed":4,"soundEffect":"assets/sfx_scn_bh0_2.mpeg","icon":"skull","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_x1p","verbs":["use","open","unlock","insert","shove in"],"target":"obj_abe","requiresInInventory":"obj_f2n","consumesItem":true,"goToScene":"VNT_VICTORY","soundEffect":"assets/sfx_scn_bh0_3.mpeg","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_ajm","verbs":["shout","yell","call out","speak","roar"],"target":"","successMessage":"Você grita por ajuda, mas o silêncio permanece absoluto. Ninguém te ouve do lado de fora da cela..","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_4i9","verbs":["open","push","unlock","force"],"target":"","successMessage":"A porta está trancada. Você precisa de uma <chave> para abri-la.","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":["obj_5fj","obj_abe","obj_seh"],"choices":[],"isDefeatOutcome":false,"overlayEffect":"grain","suggestions":["Examine","Open","Kick","Yell"],"backgroundMusic":"assets/scene_bgm_scn_bh0.mpeg","backgroundMusicName":"Corroded Heartbeat.mp3"},"scn_hja":{"id":"scn_hja","name":"BEHIND THE BRICK","description":"You force the brick and discover an empty space behind it. \nSomething glints there. You find a rusty <key>!\nYou can <go back> to the <cell> at any time.","image":"assets/scene_image_scn_hja.jpeg","objects":[{"id":"obj_r28","name":"chave","examineDescription":"Uma chave pesada, coberta de ferrugem.","isTakable":true},{"id":"obj_bhy","name":"cela","examineDescription":"É a cela de onde você acabou de vir.","isTakable":false},{"id":"obj_h0w","name":"porta","examineDescription":"Uma porta de ferro maciça e trancada.","isTakable":false}],"interactions":[{"id":"inter_svi","verbs":["get","grab","pick up","take","store"],"target":"obj_f2n","removesTargetFromScene":true,"addsToInventory":true,"soundEffect":"assets/sfx_scn_hja_0.mpeg","successMessage":"You picked up the key and added it to your inventory.","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]},{"id":"inter_9r4","verbs":["go back","go","return","cell"],"target":"","goToScene":"scn_bh0","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"objectIds":["obj_f2n","obj_abe"],"choices":[],"isDefeatOutcome":false,"overlayEffect":"grain","suggestions":["Take","Key","Return"]},"scn_3br":{"id":"scn_3br","name":"HURT BY THE DOOR!","description":"You hit the door with force.\nCLANK! \nIt creaks, but something snaps inside your foot. \nThe pain is unbearable.","image":"assets/scene_image_scn_3br.jpeg","objects":[],"interactions":[{"id":"inter_445","verbs":["go back","go","return","cell"],"target":"","goToScene":"scn_bh0","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":true,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"isDefeatOutcome":false,"overlayEffect":"grain","suggestions":["Return","Cell"]},"scn_1o5":{"id":"scn_1o5","name":"A RAT ATTACKS!","description":"With disgust, you stir the bucket. \nSomething moves inside.\nSQUEAK! \nA rat attacks and sinks its teeth into your hand.","image":"assets/scene_image_scn_1o5.jpeg","objects":[],"interactions":[{"id":"inter_b7l","verbs":["go back","go","return","cell"],"target":"","goToScene":"scn_bh0","trackerEffects":[{"trackerId":"trk_9mt","valueChange":25}]}],"removesChanceOnEntry":true,"restoresChanceOnEntry":false,"objectIds":[],"choices":[],"isDefeatOutcome":false,"overlayEffect":"grain","suggestions":["Return","Cell"]},"VNT_OPENING":{"id":"VNT_OPENING","name":"Escape the Dungeon","description":"You wake up in a dark cell.\nWrite to escape the dungeon!\n\n(type HELP to access the tutorial)","image":"assets/splash_image.png","vignetteType":"opening","vignetteButtonText":"START","interactions":[],"objectIds":[],"vignetteNextSceneId":"scn_bh0","removesChanceOnEntry":false,"restoresChanceOnEntry":false,"choices":[],"isDefeatOutcome":false,"overlayEffect":"rain"},"VNT_VICTORY":{"id":"VNT_VICTORY","name":"You escaped","description":"The door creaks as you turn the key in the lock.\nYou step out of the cell and feel the fresh night wind.","image":"assets/splash_image.png","backgroundMusic":"assets/scene_bgm_VNT_VICTORY.mpeg","vignetteType":"conclusion","interactions":[],"objectIds":[],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"choices":[],"isDefeatOutcome":false,"overlayEffect":"grain","vignetteButtonText":"RESTART"},"VNT_DEFEAT":{"id":"VNT_DEFEAT","name":"You died in the dungeon","description":"From hunger? Illness? No one will ever know...","image":"assets/splash_image.png","backgroundMusic":"assets/scene_bgm_VNT_DEFEAT.mpeg","vignetteType":"conclusion","interactions":[],"objectIds":[],"removesChanceOnEntry":false,"restoresChanceOnEntry":false,"choices":[],"isDefeatOutcome":true,"overlayEffect":"rain","vignetteButtonText":"RESTART"}},"globalObjects":{"obj_5fj":{"id":"obj_5fj","name":"bucket","examineDescription":"A rusty bucket lying on the floor. Could there be something inside?","isTakable":false},"obj_abe":{"id":"obj_abe","name":"door","examineDescription":"The large iron door of the cell. It is locked.","isTakable":false,"icon":"star"},"obj_seh":{"id":"obj_seh","name":"brick","examineDescription":"A brick seems loose in the wall. Can I move it?","isTakable":false,"icon":"star"},"obj_f2n":{"id":"obj_f2n","name":"key","examineDescription":"A rusty key! It looks like it fits the lock of the cell door.","isTakable":true,"image":"assets/obj_image_obj_f2n.jpeg","icon":"star"}},"sceneOrder":["VNT_OPENING","scn_bh0","scn_hja","scn_3br","scn_1o5","VNT_VICTORY","VNT_DEFEAT"],"defaultFailureMessage":"Isso não parece ter nenhum efeito.","gameHTML":"\n<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.11/purify.min.js\"></script>\n    <title>__GAME_TITLE__</title>\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    __FONT_STYLESHEET__\n    <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body class=\"__FRAME_CLASS__ __FONT_ADJUST_CLASS__ __MOBILE_BEHAVIOR_CLASS__ with-spacing\">\n    <audio id=\"scene-sound-effect\" preload=\"auto\"></audio>\n    <audio id=\"bgm-audio\" preload=\"auto\" loop></audio>\n    <div class=\"main-wrapper\" id=\"main-wrapper\">\n\n\n        <div id=\"positive-ending-screen\" class=\"splash-screen hidden __POSITIVE_ENDING_ALIGN_CLASS__\" __POSITIVE_ENDING_BG_STYLE__>\n            <div class=\"splash-content\">\n                <div class=\"splash-text\">\n                    <p>__POSITIVE_ENDING_DESCRIPTION__</p>\n                </div>\n                <button class=\"ending-restart-button\">__RESTART_BUTTON_TEXT__</button>\n            </div>\n        </div>\n        <div id=\"negative-ending-screen\" class=\"splash-screen hidden __NEGATIVE_ENDING_ALIGN_CLASS__\" __NEGATIVE_ENDING_BG_STYLE__>\n            <div class=\"splash-content\">\n                <div class=\"splash-text\">\n                    <p>__NEGATIVE_ENDING_DESCRIPTION__</p>\n                </div>\n                <button class=\"ending-restart-button\">__RESTART_BUTTON_TEXT__</button>\n            </div>\n        </div>\n\n        <div id=\"vignette-screen\" class=\"splash-screen hidden\">\n            <div id=\"vignette-overlay\" class=\"scene-overlay\" style=\"z-index: 1;\"></div>\n            <div class=\"splash-content\" style=\"z-index: 10;\">\n                <div class=\"splash-text\">\n                    <h1 id=\"vignette-title\"></h1>\n                    <p id=\"vignette-description\"></p>\n                </div>\n                <div class=\"splash-buttons\">\n                    <button id=\"vignette-continue-button\" class=\"ending-restart-button\">Continuar</button>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"game-container __LAYOUT_ORIENTATION_CLASS__ __LAYOUT_ORDER_CLASS__ hidden\" id=\"game-container\">\n            <div class=\"image-panel\">\n                <div id=\"image-container\" class=\"image-container\">\n                  <!-- Back image: The Next Scene (loads behind) -->\n                  <img id=\"scene-image-back\" src=\"\" alt=\"Cena seguinte\" class=\"scene-image hidden\">\n                  <!-- Front image: The Current Scene (animates out) -->\n                  <img id=\"scene-image\" src=\"\" alt=\"Cena atual\" class=\"scene-image\">\n                  <div id=\"scene-overlay\" class=\"scene-overlay\"></div>\n                  <div id=\"scene-name-overlay\" class=\"scene-name-overlay\"></div>\n                </div>\n            </div>\n            <div class=\"text-panel\">\n                <div id=\"scene-description\" class=\"scene-description\"></div>\n                __CHANCES_CONTAINER__\n                <div class=\"action-bar\" id=\"standard-action-bar\">\n                    <div id=\"action-popup\" class=\"action-popup hidden\"></div>\n                    <div class=\"action-buttons\">\n                        __SUGGESTIONS_BUTTON__\n                        __INVENTORY_BUTTON__\n                        __DIARY_BUTTON__\n                        __TRACKERS_BUTTON__\n                        __SYSTEM_BUTTON__\n                    </div>\n                    <div class=\"input-area\">\n                        <div id=\"verb-input\" contenteditable=\"true\" role=\"textbox\" aria-multiline=\"false\"></div>\n                        <button id=\"submit-verb\">__ACTION_BUTTON_TEXT__</button>\n                    </div>\n                </div>\n                <div class=\"action-bar hidden\" id=\"ending-action-bar\">\n                    <button id=\"view-ending-button\" class=\"view-ending-button\">__VIEW_ENDING_BUTTON_TEXT__</button>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <!-- Trackers Modal -->\n    <div id=\"trackers-modal\" class=\"modal-overlay hidden\">\n        <div class=\"modal-content trackers-modal-content\">\n            <button class=\"modal-close-button\">&times;</button>\n            <h2>__TRACKERS_BUTTON_TEXT__</h2>\n            <div id=\"trackers-content\"></div>\n        </div>\n    </div>\n\n    <!-- Diary Modal -->\n    <div id=\"diary-modal\" class=\"modal-overlay hidden\">\n        <div class=\"modal-content diary-modal-content\">\n            <button class=\"modal-close-button\">&times;</button>\n            <h2 id=\"diary-modal-title\">__DIARY_BUTTON_TEXT__</h2>\n            <div id=\"diary-log\" class=\"diary-log\"></div>\n        </div>\n    </div>\n    \n    <!-- System Modal -->\n    <div id=\"system-modal\" class=\"modal-overlay hidden\">\n        <div class=\"modal-content system-modal-content\">\n            <button class=\"modal-close-button\">&times;</button>\n            <h2 id=\"system-modal-title\">__SYSTEM_BUTTON_TEXT__</h2>\n            \n            <!-- Main System Menu -->\n            <div id=\"system-menu-main\" class=\"system-menu\">\n                <button id=\"btn-save-menu\">__SAVE_MENU_TITLE__</button>\n                <button id=\"btn-load-menu\">__LOAD_MENU_TITLE__</button>\n                <button id=\"btn-main-menu\" class=\"danger-button\">__MAIN_MENU_BUTTON_TEXT__</button>\n            </div>\n\n            <!-- Slots Container -->\n            <div id=\"system-slots-container\" class=\"system-slots hidden\">\n                <div id=\"slots-list\">\n                    <!-- Slots will be injected here -->\n                </div>\n                <button id=\"btn-back-system\" class=\"mt-4\">Voltar</button>\n            </div>\n        </div>\n    </div>\n    \n    <!-- Item Modal -->\n    <div id=\"item-modal\" class=\"modal-overlay hidden\">\n        <div class=\"modal-content item-modal-content\">\n            <button class=\"modal-close-button\">&times;</button>\n            <h2 id=\"item-modal-title\">__INVENTORY_BUTTON_TEXT__</h2>\n            <div class=\"item-modal-body\">\n                <div id=\"item-modal-image-container\" class=\"item-modal-image-container hidden\">\n                    <img id=\"item-modal-image\" src=\"\" alt=\"Item Image\">\n                </div>\n                <div id=\"item-modal-text-container\" class=\"item-modal-text-container\">\n                    <h3 id=\"item-modal-name\" class=\"item-modal-name\"></h3>\n                    <p id=\"item-modal-description\"></p>\n                </div>\n            </div>\n        </div>\n    </div>\n    \n    <!-- Acquisition Modal -->\n    <div id=\"acquisition-modal\" class=\"modal-overlay hidden\">\n        <div class=\"modal-content acquisition-modal-content\">\n            <button class=\"modal-close-button\">&times;</button>\n            <h2 id=\"acquisition-modal-title\"></h2>\n            <div class=\"acquisition-modal-body\">\n                <div id=\"acquisition-modal-image-container\" class=\"acquisition-modal-image-container hidden\">\n                    <img id=\"acquisition-modal-image\" src=\"\" alt=\"Item Image\">\n                </div>\n                <div id=\"acquisition-modal-text-container\" class=\"acquisition-modal-text-container text-center\">\n                    <p id=\"acquisition-modal-description\"></p>\n                </div>\n            </div>\n        </div>\n    </div>\n  <svg style=\"display: none;\">\n    <defs>\n      <filter id=\"tv-distortion-filter\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">\n        <!-- 1. Chromatic Aberration (RGB Shift) -->\n        <feOffset in=\"SourceGraphic\" dx=\"-4\" dy=\"0\" result=\"r_offset\">\n          <animate attributeName=\"dx\" values=\"-4;-3;-5;-4\" dur=\"0.2s\" repeatCount=\"indefinite\"/>\n        </feOffset>\n        <feOffset in=\"SourceGraphic\" dx=\"4\" dy=\"0\" result=\"b_offset\">\n          <animate attributeName=\"dx\" values=\"4;3;5;4\" dur=\"0.3s\" repeatCount=\"indefinite\"/>\n        </feOffset>\n        <feOffset in=\"SourceGraphic\" dx=\"0\" dy=\"0\" result=\"g_offset\" />\n        \n        <!-- Split channels & merge with Screen blend mode (Fixes Blue Tint) -->\n        <feColorMatrix in=\"r_offset\" type=\"matrix\" values=\"1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0\" result=\"red\"/>\n        <feColorMatrix in=\"g_offset\" type=\"matrix\" values=\"0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0\" result=\"green\"/>\n        <feColorMatrix in=\"b_offset\" type=\"matrix\" values=\"0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0\" result=\"blue\"/>\n        \n        <feBlend in=\"red\" in2=\"green\" mode=\"screen\" result=\"rg\"/>\n        <feBlend in=\"rg\" in2=\"blue\" mode=\"screen\" result=\"rgb\"/>\n        \n        <!-- 2. Horizontal Glitch/Jitter Distortion -->\n        <feTurbulence type=\"fractalNoise\" baseFrequency=\"0.001 0.75\" numOctaves=\"1\" result=\"noise\" seed=\"0\">\n          <animate attributeName=\"baseFrequency\" values=\"0.001 0.75; 0.001 0.76; 0.001 0.75\" dur=\"0.15s\" repeatCount=\"indefinite\" />\n        </feTurbulence>\n        <feDisplacementMap in=\"rgb\" in2=\"noise\" scale=\"0.3\" xChannelSelector=\"R\" yChannelSelector=\"R\" result=\"distorted\"/>\n      </filter>\n      \n      <filter id=\"tv-distortion-filter-lg\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">\n        <!-- 1. Chromatic Aberration (RGB Shift) -->\n        <feOffset in=\"SourceGraphic\" dx=\"-4\" dy=\"0\" result=\"r_offset\">\n          <animate attributeName=\"dx\" values=\"-4;-3;-5;-4\" dur=\"0.2s\" repeatCount=\"indefinite\"/>\n        </feOffset>\n        <feOffset in=\"SourceGraphic\" dx=\"4\" dy=\"0\" result=\"b_offset\">\n          <animate attributeName=\"dx\" values=\"4;3;5;4\" dur=\"0.3s\" repeatCount=\"indefinite\"/>\n        </feOffset>\n        <feOffset in=\"SourceGraphic\" dx=\"0\" dy=\"0\" result=\"g_offset\" />\n        \n        <!-- Split channels & merge with Screen blend mode (Fixes Blue Tint) -->\n        <feColorMatrix in=\"r_offset\" type=\"matrix\" values=\"1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0\" result=\"red\"/>\n        <feColorMatrix in=\"g_offset\" type=\"matrix\" values=\"0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0\" result=\"green\"/>\n        <feColorMatrix in=\"b_offset\" type=\"matrix\" values=\"0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0\" result=\"blue\"/>\n        \n        <feBlend in=\"red\" in2=\"green\" mode=\"screen\" result=\"rg\"/>\n        <feBlend in=\"rg\" in2=\"blue\" mode=\"screen\" result=\"rgb\"/>\n        \n        <!-- 2. Horizontal Glitch/Jitter Distortion (Stronger for Large Screens) -->\n        <feTurbulence type=\"fractalNoise\" baseFrequency=\"0.001 0.75\" numOctaves=\"1\" result=\"noise\" seed=\"0\">\n          <animate attributeName=\"baseFrequency\" values=\"0.001 0.75; 0.001 0.76; 0.001 0.75\" dur=\"0.15s\" repeatCount=\"indefinite\" />\n        </feTurbulence>\n        <feDisplacementMap in=\"rgb\" in2=\"noise\" scale=\"2\" xChannelSelector=\"R\" yChannelSelector=\"R\" result=\"distorted\"/>\n      </filter>\n      \n      <!-- Glitch Distortion Filter -->\n      <filter id=\"glitch-distortion-filter\" x=\"-10%\" y=\"-10%\" width=\"120%\" height=\"120%\">\n        <!-- Sporadic Chromatic Aberration (RGB Shift) - Normal when static -->\n        <feOffset in=\"SourceGraphic\" dx=\"0\" dy=\"0\" result=\"r_offset\">\n          <animate attributeName=\"dx\" values=\"0;0;0;0;-4;0;0;0;0;-3;0;0\" dur=\"3s\" repeatCount=\"indefinite\"/>\n        </feOffset>\n        <feOffset in=\"SourceGraphic\" dx=\"0\" dy=\"0\" result=\"b_offset\">\n          <animate attributeName=\"dx\" values=\"0;0;0;0;4;0;0;0;0;3;0;0\" dur=\"3s\" repeatCount=\"indefinite\"/>\n        </feOffset>\n        <feOffset in=\"SourceGraphic\" dx=\"0\" dy=\"0\" result=\"g_offset\" />\n        \n        <!-- Split channels & merge with Screen blend mode -->\n        <feColorMatrix in=\"r_offset\" type=\"matrix\" values=\"1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0\" result=\"red\"/>\n        <feColorMatrix in=\"g_offset\" type=\"matrix\" values=\"0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0\" result=\"green\"/>\n        <feColorMatrix in=\"b_offset\" type=\"matrix\" values=\"0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0\" result=\"blue\"/>\n        \n        <feBlend in=\"red\" in2=\"green\" mode=\"screen\" result=\"rg\"/>\n        <feBlend in=\"rg\" in2=\"blue\" mode=\"screen\" result=\"rgb\"/>\n        \n        <!-- Sporadic Horizontal Slice Displacement -->\n        <feTurbulence type=\"fractalNoise\" baseFrequency=\"0.001 0.5\" numOctaves=\"1\" result=\"noise\" seed=\"5\">\n          <animate attributeName=\"seed\" values=\"5;5;5;5;8;5;5;5;5;3;5;5\" dur=\"4s\" repeatCount=\"indefinite\"/>\n        </feTurbulence>\n        <feDisplacementMap in=\"rgb\" in2=\"noise\" scale=\"4\" xChannelSelector=\"R\" yChannelSelector=\"G\" result=\"distorted\"/>\n      </filter>\n\n      <!-- Wiggle (Squiggly) Filters for Squigglevision -->\n      <filter id=\"squiggly-0\">\n        <feTurbulence baseFrequency=\"0.02\" numOctaves=\"3\" result=\"noise\" seed=\"0\"/>\n        <feDisplacementMap in=\"SourceGraphic\" in2=\"noise\" scale=\"2\" />\n      </filter>\n      <filter id=\"squiggly-1\">\n        <feTurbulence baseFrequency=\"0.02\" numOctaves=\"3\" result=\"noise\" seed=\"1\"/>\n        <feDisplacementMap in=\"SourceGraphic\" in2=\"noise\" scale=\"2\" />\n      </filter>\n      <filter id=\"squiggly-2\">\n        <feTurbulence baseFrequency=\"0.02\" numOctaves=\"3\" result=\"noise\" seed=\"2\"/>\n        <feDisplacementMap in=\"SourceGraphic\" in2=\"noise\" scale=\"2\" />\n      </filter>\n      <filter id=\"squiggly-3\">\n        <feTurbulence baseFrequency=\"0.02\" numOctaves=\"3\" result=\"noise\" seed=\"3\"/>\n        <feDisplacementMap in=\"SourceGraphic\" in2=\"noise\" scale=\"2\" />\n      </filter>\n      <filter id=\"squiggly-4\">\n        <feTurbulence baseFrequency=\"0.02\" numOctaves=\"3\" result=\"noise\" seed=\"4\"/>\n        <feDisplacementMap in=\"SourceGraphic\" in2=\"noise\" scale=\"2\" />\n      </filter>\n    </defs>\n  </svg>\n</body>\n</html>\n","gameCSS":"\nbody { padding: 0; }\nbody.with-spacing { padding: 30px; }\n:root { --bg-color: __GAME_BACKGROUND_COLOR__; --text-color: __GAME_TEXT_COLOR__; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: __GAME_TITLE_COLOR__; --highlight-color: __GAME_FOCUS_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --action-button-hover-bg: __ACTION_BUTTON_HOVER_COLOR__; --system-button-bg: __SYSTEM_BUTTON_COLOR__; --system-button-text: __SYSTEM_BUTTON_TEXT_COLOR__; --system-button-border: __SYSTEM_BUTTON_BORDER_COLOR__; --system-button-hover-bg: __SYSTEM_BUTTON_HOVER_COLOR__; --system-button-hover-text: __SYSTEM_BUTTON_HOVER_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: var(--highlight-color); --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }\nbody.is-demo { --scale-factor: 0.7; }\nbody.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }\nbody.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }\nbody.is-demo #splash-start-button, body.is-demo .ending-restart-button, body.is-demo #continue-button, body.is-demo #vignette-continue-button { padding: calc(8px * var(--scale-factor)) calc(16px * var(--scale-factor)); max-width: calc(350px * var(--scale-factor)); }\nbody.is-demo .action-buttons button { padding: calc(6px * var(--scale-factor)) calc(10px * var(--scale-factor)); }\nbody.is-demo .text-panel { padding: calc(30px * var(--scale-factor)); }\nbody.is-demo .diary-entry { padding: calc(20px * var(--scale-factor)); gap: calc(20px * var(--scale-factor)); }\nbody.is-demo .diary-entry img { width: calc(200px * var(--scale-factor)); height: calc(200px * var(--scale-factor)); }\nbody.is-demo .item-modal-image-container { width: calc(300px * var(--scale-factor)); min-width: calc(300px * var(--scale-factor)); height: calc(300px * var(--scale-factor)); }\n* { box-sizing: border-box; }\nbody { font-family: var(--font-family); font-size: var(--font-size); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; }\nselect { background-color: var(--button-bg); color: var(--text-color); border: 1px solid var(--border-color); }\noption { background-color: var(--bg-color); color: var(--text-color); }\n.main-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; max-width: 1280px; margin: 0 auto; }\nbody.with-spacing .main-wrapper { height: 100%; }\n.splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }\n.splash-screen.fade-out { opacity: 0; pointer-events: none; }\n.splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }\n.splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vh max(40px, 6vw); position: relative; }\n.splash-logo { max-height: 150px; width: auto; margin-bottom: 20px; }\n.splash-text h1 { font-size: 2.2em; color: var(--accent-color); margin: 0; text-shadow: none; line-height: 1.1; }\n.splash-text p, .splash-text .description { font-size: 1em; margin-top: 10px; color: var(--text-color); max-width: 60ch; white-space: pre-wrap; line-height: 1.6; }\n\n/* Vignette Scaling Classes (Relative to Base Font Size) */\n.vignette-scale-sm h1 { font-size: 1.6em !important; }\n.vignette-scale-sm p, .vignette-scale-sm .description { font-size: 0.85em !important; }\n.vignette-scale-md h1 { font-size: 2.2em !important; }\n.vignette-scale-md p, .vignette-scale-md .description { font-size: 1em !important; }\n.vignette-scale-lg h1 { font-size: 3.2em !important; }\n.vignette-scale-lg p, .vignette-scale-lg .description { font-size: 1.25em !important; }\n.splash-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; align-items: var(--splash-content-align-items); }\n#splash-start-button, .ending-restart-button, #continue-button, #vignette-continue-button { font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; }\n#splash-start-button, .ending-restart-button, #vignette-continue-button { background-color: var(--splash-button-bg); }\n#continue-button { background-color: #1d4ed8; }\n#splash-start-button:hover, .ending-restart-button:hover, #continue-button:hover { transform: translateY(-3px); box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4); }\n#splash-start-button:hover, .ending-restart-button:hover { background-color: var(--splash-button-hover-bg); }\n#continue-button:hover { background-color: #2563eb; }\n/* Vignette Credits */\n.vignette-credits { position: absolute; top: 0; bottom: 0; width: 48%; padding: 5vh max(40px, 4vw); display: flex; align-items: flex-end; overflow: hidden; z-index: 50; pointer-events: none; }\n.vignette-credits.credits-left { left: 0; }\n.vignette-credits.credits-right { right: 0; }\n.vignette-credits-text { font-size: 1em; color: var(--text-color); opacity: 1; white-space: pre-wrap; line-height: 1.6; width: 100%; }\n.vignette-credits.credits-scroll { align-items: flex-end; }\n.vignette-credits.credits-scroll .vignette-credits-text { animation: creditsScroll 30s linear forwards; }\n@keyframes creditsScroll { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }\n@media (max-width: 768px) {\n  .splash-screen { flex-direction: column; justify-content: flex-start !important; align-items: flex-start !important; }\n  .vignette-credits { position: relative; width: 100%; max-width: none; padding: 20px 20px 0 20px; top: auto; bottom: auto; left: auto; right: auto; align-items: flex-start; overflow: visible; flex-shrink: 0; }\n  .vignette-credits.credits-left, .vignette-credits.credits-right { left: auto; right: auto; }\n  .vignette-credits.credits-scroll .vignette-credits-text { animation: none; }\n  .vignette-credits-text { font-size: 0.95em; max-height: 30vh; overflow-y: auto; text-align: left; }\n  .splash-content { height: auto !important; flex-grow: 1; justify-content: flex-end; }\n}\n.chances-container { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 15px; }\n.chance-icon { width: 24px; height: 24px; transition: all 0.3s ease; }\n.chance-icon.lost { opacity: 0.5; }\n.game-container { display: flex; flex-grow: 1; overflow: hidden; transition: opacity 1s ease-in-out; position: relative; z-index: 10; padding: 30px; }\n.game-container.fade-out { opacity: 0; }\n.image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; padding: 0; }\n.image-container { width: 100%; height: 100%; position: relative; overflow: hidden; background-size: cover; background-position: center; transition: border 0.3s ease-in-out, outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }\n.scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }\n#scene-image-back { z-index: 1; }\n#scene-image { z-index: 2; }\n.scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; }\n.text-panel { flex: 1; display: flex; flex-direction: column; padding: 0 0 0 30px; position: relative; }\n.game-container.layout-horizontal { flex-direction: column; }\n.game-container.layout-horizontal .image-panel { flex-basis: 45%; max-width: none; width: 100%; border-right: none; border-bottom: 2px solid var(--border-color); }\n.game-container.layout-horizontal .text-panel { padding: 30px 0 0 0; min-height: 0; }\n.game-container.layout-image-last { flex-direction: row-reverse; }\n.game-container.layout-image-last .image-panel { border-right: none; border-left: 2px solid var(--border-color); }\n.game-container.layout-image-last .text-panel { padding: 0 30px 0 0; }\n.game-container.layout-horizontal.layout-image-last { flex-direction: column-reverse; }\n.game-container.layout-horizontal.layout-image-last .image-panel { border-left: none; border-bottom: none; border-top: 2px solid var(--border-color); }\n.game-container.layout-horizontal.layout-image-last .text-panel { padding: 0 0 30px 0; }\n.scene-description { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; padding-bottom: 20px; }\n.scene-description.typewriting-active .highlight-word { cursor: default; }\n.scene-description.typewriting-active .highlight-word:hover { filter: none; text-decoration: none; }\n.verb-echo { color: var(--text-dim-color); font-style: italic; }\n.highlight-item { color: var(--highlight-color); }\n.highlight-word { color: var(--accent-color); cursor: pointer; transition: color 0.2s; }\n.highlight-word:hover { filter: brightness(1.2); text-decoration: underline; }\n\n/* Desktop Action Bar with Popup Inside - Removido fundo cinza do popup */\n.action-bar { border-top: 2px solid var(--border-color); padding-top: 15px; margin-top: auto; flex-shrink: 0; display: flex; flex-direction: column; }\n.action-popup { margin-bottom: 12px; background-color: transparent; border: none; padding: 0; }\n.action-popup.hidden { display: none !important; }\n.action-popup-container { display: flex; flex-direction: column; gap: 10px; }\n.action-popup-row { display: flex; flex-wrap: wrap; gap: 6px; }\n.action-popup-list button, .action-popup-row button, .action-popup-list p { display: inline-block; padding: 6px 10px; margin: 0; text-align: left; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--highlight-color); font-family: var(--font-family); font-size: 1em; font-weight: bold; }\n.action-popup-list button, .action-popup-row button { cursor: pointer; }\n.action-popup-list button:hover, .action-popup-row button:hover { background-color: var(--border-color); }\n.action-popup-list p { cursor: default; color: var(--text-dim-color); }\n\n.action-buttons { display: flex; gap: 8px; margin-bottom: 12px; }\n.action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--system-button-border); background-color: var(--system-button-bg); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-size: 1em; }\n.action-buttons button:hover { background-color: var(--system-button-hover-bg); color: var(--system-button-hover-text, var(--system-button-text)); transform: translateY(-2px); }\n.input-area { display: flex; gap: 8px; }\n#verb-input { flex-grow: 1; padding: 12px 10px; border: 2px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-family: var(--font-family); font-size: 1em; }\n#verb-input:focus { outline: none; border-color: var(--action-button-bg); }\n#verb-input:disabled { background-color: var(--button-bg); cursor: not-allowed; }\n#submit-verb { padding: 8px 16px; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; font-weight: bold; transition: background-color 0.2s; font-size: 1em; }\n#submit-verb:hover { background-color: var(--action-button-hover-bg); filter: none; }\n#submit-verb:disabled { background-color: var(--button-hover-bg); color: var(--text-dim-color); cursor: not-allowed; }\n#submit-verb:disabled:hover { background-color: var(--button-hover-bg); }\n.view-ending-button { width: 100%; padding: 12px; font-size: 1.1em; font-weight: bold; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; transition: all 0.2s; }\n.view-ending-button:hover { filter: brightness(0.9); transform: translateY(-2px); }\n.hidden { display: none !important; }\n\n.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 3000; }\n.modal-content { background-color: var(--panel-bg); padding: 25px; border: 2px solid var(--border-color); position: relative; max-width: 600px; width: 90%; }\n.modal-content h2 { margin-top: 0; font-size: 1.3em; color: var(--accent-color); font-family: var(--font-family); }\n.modal-close-button { position: absolute; top: 10px; right: 15px; background: none; border: none; color: var(--text-dim-color); font-size: 2em; cursor: pointer; line-height: 1; }\n\n.trackers-modal-content { max-height: 80vh; display: flex; flex-direction: column; }\n#trackers-content { flex-grow: 1; overflow-y: auto; padding-right: 15px; margin-right: -15px; }\n.diary-modal-content { max-width: 80vw; height: 80vh; display: flex; flex-direction: column; }\n.diary-log { flex-grow: 1; overflow-y: auto; text-align: left; }\n.diary-entry { display: flex; gap: 40px; align-items: flex-start; padding: 40px; border-bottom: 2px solid var(--border-color); }\n.diary-entry:last-child { border-bottom: none; }\n.diary-entry img { width: 300px; height: 300px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color); box-shadow: none; }\n.diary-entry .text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; }\n.diary-entry .scene-name { font-weight: bold; color: var(--accent-color); margin-bottom: 8px; display: block; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }\n.diary-entry p { margin: 0; white-space: pre-wrap; }\n.diary-interactions-container { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; }\n.diary-input { color: var(--text-dim-color); font-style: italic; font-size: 0.9em; margin: 0; padding: 0 0 0 30px; border: none; }\n.diary-output { color: var(--text-color); margin: 0; padding: 0; border: none; line-height: 1.6; font-size: 0.95em; }\n\n/* Diary Stats Header */\n.diary-stats-container { display: flex; gap: 40px; padding: 20px 40px; border-bottom: none; justify-content: center; }\n.diary-stat-box { flex: 1; padding: 0; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.diary-stat-label { font-size: 1em; color: var(--text-color); }\n.diary-stat-value { font-size: 1.4em; font-weight: bold; color: var(--accent-color); }\n@media (max-width: 768px) { .diary-stats-container { padding: 15px; gap: 15px; flex-direction: column; } .diary-stat-value { font-size: 1.25em; } }\n\n.item-modal-content { max-width: 80vw; width: 90%; }\n.item-modal-body { display: flex; flex-direction: row; gap: 30px; align-items: flex-start; }\n@media (max-width: 768px) { .item-modal-body { flex-direction: column; align-items: center; } }\n.item-modal-image-container { width: 300px; min-width: 300px; height: 300px; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); }\n@media (max-width: 768px) { .item-modal-image-container { width: 100%; min-width: 0; max-width: 300px; height: auto; aspect-ratio: 1; } }\n.item-modal-image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.item-modal-text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; text-align: left; }\n.item-modal-name { margin: 0; font-size: 1.3em; color: var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }\n#item-modal-description { color: var(--text-color); line-height: 1.6; font-size: 1em; }\n.acquisition-modal-content { max-width: 600px; text-align: center; }\n.acquisition-modal-body { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }\n.acquisition-modal-image-container { width: 500px; height: 500px; overflow: hidden; border: 2px solid var(--border-color); background-color: var(--input-bg); flex-shrink: 0; }\n.acquisition-modal-image-container img { width: 100%; height: 100%; object-fit: cover; }\n.acquisition-modal-text-container { width: 100%; padding-bottom: 10px; }\n#acquisition-modal-description { color: var(--text-color); line-height: 1.6; font-size: 1em; margin: 0; }\n.text-center { text-align: center; }\n\n.system-modal-content { max-width: 400px; text-align: center; }\n.system-menu { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }\n.system-menu button { width: 100%; padding: 15px; font-size: 1.1em; background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-family: var(--font-family); }\n.system-menu button:hover { background-color: var(--system-button-hover-bg); border-color: var(--accent-color); transform: translateY(-2px); }\n.system-menu button.danger-button { color: var(--danger-color); border-color: var(--danger-color); background-color: transparent; }\n.system-menu button.danger-button:hover { background-color: var(--danger-hover-bg); color: #fff; border-color: var(--danger-hover-bg); }\n.system-slots { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; text-align: left; }\n.slot-item { background-color: var(--input-bg); border: 2px solid var(--border-color); padding: 15px; cursor: pointer; transition: border-color 0.2s; display: flex; justify-content: space-between; align-items: center; }\n.slot-item:hover { border-color: var(--accent-color); }\n.slot-info { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }\n.slot-title { font-weight: bold; color: var(--accent-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.slot-meta { font-size: 0.8em; color: var(--text-dim-color); }\n.slot-empty { font-style: italic; color: var(--text-dim-color); }\n.slot-actions { display: flex; gap: 10px; align-items: center; }\n.slot-delete-btn { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 10px; line-height: 1; }\n.slot-delete-btn:hover { color: #fff; background-color: var(--danger-color); border-radius: 4px; }\n#btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; transition: all 0.2s; }\n#btn-back-system:hover { background-color: var(--system-button-hover-bg); transform: translateY(-2px); }\n\n/* Mobile Immersive Layout Definitivo - CORREÇÃO DE FUNDOS E TRANSPARÊNCIAS */\n@media (max-width: 768px) {\n    body.behavior-immersive {\n        padding: 0 !important;\n        margin: 0 !important;\n        overflow-x: hidden !important;\n    }\n    body.behavior-immersive .main-wrapper { \n        height: 100vh;\n        overflow: hidden;\n        display: block;\n        padding: 0 !important;\n        margin: 0 !important;\n        max-width: none !important;\n    }\n    body.behavior-immersive .splash-content {\n        padding: 40px 15px !important; \n        height: 100%;\n        justify-content: flex-end;\n    }\n    body.behavior-immersive .game-container {\n        display: block;\n        height: 100vh;\n        padding: 0 !important;\n        margin: 0 !important;\n        width: 100vw !important;\n        left: 0 !important;\n    }\n    body.behavior-immersive .image-panel {\n        position: fixed;\n        top: 0; left: 0;\n        width: 100vw; height: 100vh;\n        z-index: 1;\n        max-width: none;\n        border: none !important;\n        padding: 0 !important;\n        background: black;\n    }\n    body.behavior-immersive .image-container, \n    body.behavior-immersive .scene-image {\n        border: none !important;\n        border-radius: 0 !important;\n        box-shadow: none !important;\n        padding: 0 !important;\n        width: 100vw !important;\n        height: 100vh !important;\n    }\n    body.behavior-immersive .text-panel {\n        position: absolute;\n        bottom: 0; left: 0;\n        width: 100vw !important;\n        z-index: 2;\n        background: none;\n        padding: 0 !important;\n        margin: 0 !important;\n        flex: none;\n        display: flex;\n        flex-direction: column;\n        justify-content: flex-end;\n        height: 100vh;\n        pointer-events: none;\n    }\n    body.behavior-immersive .scene-description {\n        background: linear-gradient(to top, rgba(0,0,0,0.98) 75%, transparent 100%) !important;\n        display: flex !important;\n        flex-direction: column !important;\n        justify-content: flex-end !important;\n        padding: 100px 15px 10px 15px !important; \n        max-height: 60vh !important; \n        min-height: 35vh !important; \n        width: 100vw !important;\n        flex-grow: 0;\n        border-radius: 0;\n        pointer-events: auto;\n        box-sizing: border-box !important;\n        left: 0 !important;\n        margin: 0 !important;\n        font-size: 0.85em !important;\n    }\n    body.behavior-immersive .action-bar {\n        background: rgba(0,0,0,0.98) !important; \n        border-top: none !important;\n        padding: 2px 15px 15px 15px !important; \n        margin-top: 0 !important;\n        pointer-events: auto;\n        width: 100vw !important;\n        box-sizing: border-box !important;\n        left: 0 !important;\n        margin: 0 !important;\n    }\n    \n    body.behavior-immersive .action-popup:not(.hidden) {\n        background: rgba(0,0,0,0.98) !important; \n        border: none !important;\n        margin: 0 !important; \n        padding: 10px 15px !important; \n        width: 100vw !important; \n        box-sizing: border-box !important;\n        pointer-events: auto !important;\n        display: flex !important;\n        flex-direction: row !important;\n        flex-wrap: wrap !important;\n        gap: 6px !important; \n        justify-content: flex-start !important;\n    }\n    \n    body.behavior-immersive .action-buttons {\n        display: flex;\n        flex-wrap: wrap;\n        gap: 6px;\n        margin-bottom: 8px;\n        width: 100%;\n    }\n    body.behavior-immersive .action-buttons button {\n        flex: 1 1 calc(33.33% - 6px);\n        min-width: 0;\n        padding: 10px 4px;\n        background: rgba(0,0,0,0.98) !important; \n        border: 1px solid rgba(255,255,255,0.25);\n        backdrop-filter: none !important;\n    }\n    \n    body.behavior-immersive .action-popup-container,\n    body.behavior-immersive .action-popup-list,\n    body.behavior-immersive .action-popup-row {\n        display: flex !important;\n        flex-direction: row !important;\n        flex-wrap: wrap !important;\n        gap: 6px !important;\n        width: 100% !important;\n        background: none !important;\n        border: none !important;\n        padding: 0 !important;\n    }\n    body.behavior-immersive .action-popup button {\n        background: rgba(0,0,0,0.98) !important; \n        border: 1px solid rgba(255,255,255,0.3) !important;\n        backdrop-filter: none !important;\n        width: auto !important;\n        flex: 0 1 auto !important;\n        display: inline-block !important;\n        padding: 6px 12px !important; \n        border-radius: 6px;\n        pointer-events: auto !important;\n        font-size: 0.85em !important;\n        margin-bottom: 2px !important;\n        line-height: 1.2 !important;\n        color: var(--highlight-color) !important;\n    }\n    body.behavior-immersive .action-popup-list p {\n        background: rgba(0,0,0,0.98) !important; \n        color: var(--text-dim-color) !important;\n        padding: 12px !important;\n        border-radius: 6px;\n        font-size: 0.85em !important;\n        width: 100% !important;\n    }\n    body.behavior-immersive .input-area {\n        gap: 6px;\n        width: 100%;\n    }\n    body.behavior-immersive #verb-input {\n        padding: 12px;\n        background: rgba(0,0,0,0.98) !important; \n        border: 1px solid rgba(255,255,255,0.35);\n        box-sizing: border-box !important;\n        backdrop-filter: none !important;\n    }\n    body.behavior-immersive #submit-verb {\n        padding: 8px 12px !important;\n        background-color: var(--action-button-bg) !important;\n        color: var(--action-button-text-color) !important;\n        border: 1px solid rgba(255,255,255,0.2) !important;\n        white-space: nowrap !important;\n    }\n    body.behavior-immersive .chances-container {\n        position: fixed;\n        top: 15px;\n        right: 15px;\n        z-index: 100;\n        margin: 0;\n        pointer-events: none;\n    }\n    body.behavior-immersive .scene-name-overlay {\n        top: 15px;\n        bottom: auto;\n        left: 15px;\n        transform: none;\n        margin: 0;\n        background-color: var(--scene-name-overlay-bg) !important;\n        color: var(--scene-name-overlay-text-color) !important;\n        border: 1px solid rgba(255,255,255,0.4) !important;\n        padding: 5px 12px;\n        opacity: 1 !important;\n        display: block !important;\n        pointer-events: none;\n        z-index: 100;\n    }\n\n    /* ADAPTAÇÃO DIÁRIO E INVENTÁRIO MOBILE */\n    body.behavior-immersive .modal-content {\n        padding: 12px !important; \n    }\n    body.behavior-immersive .diary-entry {\n        flex-direction: column;\n        padding: 10px 0 !important; \n        gap: 12px !important;\n    }\n    body.behavior-immersive .diary-entry img {\n        width: 100% !important;\n        height: auto !important;\n        max-height: 220px;\n        aspect-ratio: 16/9;\n        margin: 0 !important;\n    }\n    body.behavior-immersive .diary-entry .text-container {\n        width: 100% !important;\n        gap: 6px !important;\n    }\n    body.behavior-immersive .diary-entry .scene-name {\n        margin-bottom: 4px !important;\n        padding-bottom: 4px !important;\n    }\n    body.behavior-immersive .item-modal-body {\n        flex-direction: column !important;\n        align-items: center !important;\n        gap: 15px !important;\n    }\n    body.behavior-immersive .item-modal-image-container {\n        width: 100% !important;\n        min-width: 0 !important;\n        max-width: 250px !important;\n        height: auto !important;\n        aspect-ratio: 1 !important;\n    }\n\n    /* UNIFICAÇÃO DE FONTES EM 0.85em */\n    body.behavior-immersive .action-bar button,\n    body.behavior-immersive .action-bar input,\n    body.behavior-immersive .action-popup button,\n    body.behavior-immersive .action-popup p,\n    body.behavior-immersive .scene-name-overlay,\n    body.behavior-immersive .diary-entry p,\n    body.behavior-immersive .diary-entry .scene-name,\n    body.behavior-immersive .item-modal-name,\n    body.behavior-immersive #item-modal-description,\n    body.behavior-immersive .slot-title,\n    body.behavior-immersive .slot-meta {\n        font-size: 0.85em !important;\n    }\n}\n\n/* Animações de Imagem */\n.trans-fade-out { animation: fadeOut var(--image-anim-speed) forwards; }\n.trans-slide-left-out { animation: slideLeftOut var(--image-anim-speed) forwards; }\n.trans-slide-right-out { animation: slideRightOut var(--image-anim-speed) forwards; }\n.trans-slide-up-out { animation: slideUpOut var(--image-anim-speed) forwards; }\n.trans-slide-down-out { animation: slideDownOut var(--image-anim-speed) forwards; }\n.trans-zoom-out { animation: zoomOut var(--image-anim-speed) ease-in forwards; }\n.trans-blur-out { animation: blurOut var(--image-anim-speed) ease-in forwards; }\n\n@keyframes fadeOut { to { opacity: 0; } }\n@keyframes slideLeftOut { to { transform: translateX(-100%); } }\n@keyframes slideRightOut { to { transform: translateX(100%); } }\n@keyframes slideUpOut { to { transform: translateY(-100%); } }\n@keyframes slideDownOut { to { transform: translateY(100%); } }\n@keyframes zoomOut { from { transform: scale(1); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }\n@keyframes blurOut { from { filter: blur(0); opacity: 1; } to { filter: blur(20px); opacity: 0; } }\n\nbody.frame-none .image-panel { border: none; }\n\nbody.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }\nbody.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }\nbody.frame-book-cover .game-container .image-panel { padding: 5px; background: __FRAME_BOOK_COLOR__; border: none; }\nbody.frame-book-cover .game-container .image-container { box-shadow: none; border-radius: 0 !important; }\nbody.frame-book-cover #scene-image, body.frame-book-cover #scene-image-back { border-radius: 0 !important; }\nbody.frame-trading-card .image-panel { padding: 4px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 12px; }\nbody.frame-trading-card .game-container:not(.layout-image-last) .image-panel { border-right-color: transparent; }\nbody.frame-trading-card .game-container.layout-image-last .image-panel { border-left-color: transparent; }\nbody.frame-trading-card .image-container { border: none; border-radius: 8px; }\n#scene-image { border-radius: 0px; }\n#scene-image-back { border-radius: 0px; }\nbody.font-adjust-gothic { font-size: 1.1em; }\n.scene-description::-webkit-scrollbar, .diary-log::-webkit-scrollbar, #trackers-content::-webkit-scrollbar { width: 10px; }\n.scene-description::-webkit-scrollbar-track, .diary-log::-webkit-scrollbar-track, #trackers-content::-webkit-scrollbar-track { background: var(--panel-bg); }\n.scene-description::-webkit-scrollbar-thumb, .diary-log::-webkit-scrollbar-thumb, #trackers-content::-webkit-scrollbar-thumb { background-color: var(--text-dim-color); border-radius: 6px; border: 3px solid var(--panel-bg); }\n.scene-description::-webkit-scrollbar-thumb:hover, .diary-log::-webkit-scrollbar-thumb:hover, #trackers-content::-webkit-scrollbar-thumb:hover { background-color: var(--text-color); }\n.tracker-item { margin-bottom: 15px; }\n.tracker-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }\n.tracker-item-name { font-size: 1em; color: var(--text-dim-color); }\n.tracker-item-values { font-size: 1em; font-family: monospace; color: var(--text-color); }\n.tracker-bar-container { width: 100%; height: 20px; background-color: var(--tracker-bar-bg-color); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; }\n.tracker-bar { height: 100%; background-color: var(--tracker-bar-fill-color); transition: width 0.3s ease-in-out; }\n.empty-inventory-msg { font-size: 0.85em; color: var(--text-dim-color); font-style: italic; }\n.continue-indicator { text-align: left; cursor: pointer; padding: 0; color: var(--continue-indicator-color); animation: bounce 1s infinite; font-size: 1.3em; user-select: none; width: 100%; margin-top: -10px; }\n@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }\n.scene-paragraph { margin: 0 0 10px 0; opacity: 0; animation: fadeIn var(--text-anim-speed) forwards; }\n.typewriter-cursor::after { content: '|'; animation: blink 1s step-end infinite; }\n@keyframes blink { 50% { opacity: 0; } }\n@keyframes fadeIn { to { opacity: 1; } }\n\n/* Implementação de Layout Full-Bleed (Sem Borda) Desktop */\n@media (min-width: 769px) {\n    body.frame-none.with-spacing {\n        padding: 0 !important;\n    }\n    body.frame-none .main-wrapper {\n        max-width: none !important;\n        margin: 0 !important;\n        height: 100vh !important;\n    }\n    body.frame-none .game-container {\n        height: 100vh !important;\n        padding: 0 !important;\n    }\n    body.frame-none .image-panel {\n        height: 100vh !important;\n        border-right: none !important;\n        padding: 0 !important;\n    }\n    /* Manteve borda apenas se layout for Horizontal */\n    body.frame-none .game-container.layout-horizontal .image-panel {\n        width: 100% !important;\n        flex-basis: auto !important;\n        height: 45vh !important; /* Ajuste para horizontal */\n    }\n    /* Ajuste para Image-Last (Imagem na direita) */\n    body.frame-none .game-container.layout-image-last .image-panel {\n        border-left: none !important;\n    }\n    /* No padding horizontal separator for full-bleed */\n    body.frame-none .text-panel {\n        padding: 30px !important;\n    }\n}\n\n/* LIFE SYSTEM POSITIONING */\n/* Desktop: Flow-based (Between Description and Action Bar) */\n@media (min-width: 769px) {\n    .chances-container {\n        display: flex;\n        justify-content: flex-end;\n        align-items: center;\n        width: 100%;\n        gap: 8px;\n        padding-bottom: 10px; /* Space above separator */\n        position: relative;\n        z-index: 5;\n    }\n}\n\n/* Mobile: Fixed Top Right */\n@media (max-width: 768px) {\n    .chances-container {\n        position: fixed;\n        top: 15px;\n        right: 15px;\n        margin: 0;\n        padding: 0;\n        z-index: 2000;\n        display: flex;\n        gap: 6px;\n    }\n}\n\n/* Common Icon Style */\n.chance-icon svg { width: 24px; height: 24px; display: block; }\n.chance-icon.lost svg { opacity: 0.3; }\n","gameTitle":"Fuja da Masmorra","gameSystemEnabled":"none","enableTrackers":true,"enableInventory":true,"enableSuggestions":true,"enableDiary":true,"enableFixedVerbs":true,"enableChances":true,"gameTextReadingFlow":"continuous","gameInteractionType":"parser","gameBackgroundColor":"#0d1117","gameTextColor":"#a1a1aa","gameTitleColor":"#d4af37","gameFocusColor":"#fbbf24","gameFrameColor":"#ffffff","inventoryCapacity":10,"inventoryMaxWeight":0,"diaryAutoScroll":true,"diaryAllowExport":false,"diaryMaxMessages":100,"gameMaxChances":2,"gameChanceIcon":"heart","gameChanceIconColor":"#d4af37","frameBookColor":"#FFFFFF","frameTradingCardColor":"#FFFFFF","frameRoundedTopColor":"#948989","gameSceneNameOverlayBg":"#000000","gameSceneNameOverlayTextColor":"#FFFFFF","gameContinueIndicatorColor":"#fbbf24","gameTextAnimationType":"typewriter","gameTextSpeed":4,"gameImageTransitionType":"fade","gameImageSpeed":3,"gameFontSize":"12","gameShowTrackersUI":true,"gameShowSystemButton":false,"fixedVerbs":[{"id":"verb_help_1","verbs":["help"],"description":"How to Interact with the World:\nEverything is based on the text field, and most commands follow a simple format:\n\nDirect actions: To interact with something in the scene, use VERB + TARGET.\nFor example: get key or look door.\n\nUsing inventory items: To use an item you have collected on something in the scene, the format is VERB + ITEM + TARGET.\nFor example: use key on door.\nRemember: the item (like the key) must be in your inventory for the action to work.\nKeep an eye on highlighted words in the scene description, like <this>. They indicate important points of interest!\n\nSome verbs are universal and very useful:\n\nLOOK or EXAMINE: Use to discover more details about your surroundings. You can use it on a specific object (look brick) or the environment in general (look around).\n\nGET or TAKE: Some objects can be collected and kept in your inventory for later use. If something looks useful and loose, try to get it!\n\nINVENTORY: To see all the items you are carrying, click the Inventory button.\n\nGO BACK: If you want to return to the scene you just came from, this command may work.\n\nStuck? Now what?\nBe creative! Try different verbs for the same object. push, pull, kick, use... experimentation is key!\nSuggestions Button: If you are out of ideas, the Suggestions button is your best friend. It can shed light on the most obvious actions in the current scene.\nJournal: Forgot what happened or an important detail? The Journal keeps a record of all the scenes you’ve visited and your actions. Use it to recall clues."}],"consequenceTrackers":[{"id":"trk_9mt","name":"Hunger","initialValue":0,"maxValue":150,"consequenceSceneId":"VNT_DEFEAT","icon":"skull","barColor":"#dd5f5f","invertBar":false,"hideValue":true}],"positiveEndingMusic":"assets/positive_ending_bgm.mpeg","vignettes":[],"gameSuggestionsEmptyFeedback":"","gameInventoryEmptyFeedback":"","gameActionButtonText":"ACTION","gameSplashButtonText":"COMEÇAR","gameContinueButtonText":"CONTINUE","gameRestartButtonText":"RESTART","gameVerbInputPlaceholder":"","gameDiaryPlayerName":"","gameSuggestionsButtonText":"","gameInventoryButtonText":"","gameDiaryButtonText":"","gameTrackersButtonText":"Status","gameSystemButtonText":"Save / Load","gameSaveMenuTitle":"Save","gameLoadMenuTitle":"Load","gameMainMenuButtonText":"","gameChanceReturnButtonText":"Tentar Novamente","gameViewEndingButtonText":"","gameTheme":"dark","gameImageFrame":"trading-card","gameLayoutOrientation":"vertical","gameLayoutOrder":"image-first","textColorLight":"#18181b","titleColorLight":"#92400e","focusColorLight":"#b45309","gameSplashButtonColor":"#d4af37","gameSplashButtonHoverColor":"#a16207","gameSplashButtonTextColor":"#000000","gameActionButtonColor":"#fbbf24","gameActionButtonTextColor":"#18181b","gameFontFamily":"'Silkscreen', sans-serif","gameSplashImage":"assets/splash_image.png","gameSplashContentAlignment":"right","gameSplashDescription":"Você acorda em uma cela escura.\nEscreva para fugir da cela!\n\n(digite AJUDA para acessar o tutorial)","gameOmitSplashTitle":false,"gameEnableChances":true,"gameTextColorLight":"#24292f","gameTitleColorLight":"#0969da","gameFocusColorLight":"#0969da","positiveEndingImage":"assets/splash_image.png","positiveEndingContentAlignment":"right","positiveEndingDescription":"Você conseguiu fugir da masmorra!","negativeEndingImage":"assets/splash_image.png","negativeEndingContentAlignment":"right","negativeEndingDescription":"Você morreu...","frameChamferedColor":"#FFFFFF","gameMobileLayoutBehavior":"immersive","gameChanceLossMessage":"","gameChanceRestoreMessage":"","gameSplashContentVerticalAlignment":"bottom","metadata":{"exportedBy":"IF Builder User","exportDate":"2026-05-04T22:00:53.723Z","platform":"IF Builder","version":"1.0"},"gameSystemButtonColor":"transparent","gameSystemButtonTextColor":"#a1a1aa","gameSystemButtonBorderColor":"#a1a1aa40","gameSystemButtonHoverColor":"#fbbf24","gameSystemButtonHoverTextColor":"#000000"};
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,6 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
         diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
 
+    window.safeHTML = function(content, config) {
+        if (typeof DOMPurify !== 'undefined') {
+            const finalConfig = config || {};
+            finalConfig.ADD_ATTR = [...(finalConfig.ADD_ATTR || []), 'class', 'style', 'data-word', 'data-slot', 'title', 'viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd', 'x1', 'y1', 'x2', 'y2'];
+            finalConfig.ADD_TAGS = [...(finalConfig.ADD_TAGS || []), 'span', 'svg', 'path', 'line'];
+            return DOMPurify.sanitize(content, finalConfig);
+        }
+        // Fail Secure: If DOMPurify is missing, return raw text without HTML execution
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        // Basic escaping just in case it's used in innerHTML somewhere
+        return tempDiv.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    };
+
     const gameData = window.embeddedGameData;
     let currentSceneId = gameData.cena_inicial;
     let inventory = [];
@@ -35,12 +49,78 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPrinting = false;
     let activePopupType = null;
     let renderSessionId = 0; // Prevent race conditions in rendering
+    let isGameSessionActive = false;
 
-    const textSpeedVal = gameData.gameTextSpeed || 3; 
-    const imgSpeedVal = gameData.gameImageSpeed || 3;
-    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
-    const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
-    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
+    const previewSaves = {};
+
+    const getGameSave = (key) => {
+        if (window.isPreview) {
+            return previewSaves[key] || null;
+        }
+        return localStorage.getItem(key);
+    };
+
+    const setGameSave = (key, value) => {
+        if (window.isPreview) {
+            previewSaves[key] = value;
+            return;
+        }
+        localStorage.setItem(key, value);
+    };
+
+    const removeGameSave = (key) => {
+        if (window.isPreview) {
+            delete previewSaves[key];
+            return;
+        }
+        localStorage.removeItem(key);
+    };
+
+    const savedTextSpeed = window.isPreview ? null : localStorage.getItem('if_builder_settings_text_speed');
+    let textSpeedVal = savedTextSpeed ? parseInt(savedTextSpeed) : (gameData.gameTextSpeed || 3); 
+    if (textSpeedVal === 5) textSpeedVal = 3; // Fallback for legacy text speed 5
+    
+    const savedImgSpeed = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
+    let imgSpeedVal = 0.5;
+    if (savedImgSpeed) {
+        const speedVal = parseInt(savedImgSpeed);
+        if (speedVal === 1) imgSpeedVal = 2.0;
+        else if (speedVal === 2) imgSpeedVal = 1.0;
+        else if (speedVal === 3) imgSpeedVal = 0.5;
+        else if (speedVal === 4) imgSpeedVal = 0.2;
+        else {
+            const parsed = parseFloat(savedImgSpeed);
+            imgSpeedVal = isNaN(parsed) ? 0.5 : parsed;
+        }
+    } else {
+        const speedVal = gameData.gameImageSpeed || 0.5;
+        if (speedVal === 1) imgSpeedVal = 2.0;
+        else if (speedVal === 2) imgSpeedVal = 1.0;
+        else if (speedVal === 3 || speedVal === 5) imgSpeedVal = 0.5;
+        else if (speedVal === 4) imgSpeedVal = 0.2;
+        else imgSpeedVal = speedVal;
+    }
+    
+    if (isNaN(imgSpeedVal) || imgSpeedVal < 0.1 || imgSpeedVal > 3.0) {
+        imgSpeedVal = 0.5;
+    }
+    
+    let typeSpeedBase = 40;
+    let textAnimDuration = '0.5s';
+    if (textSpeedVal === 1) {
+        typeSpeedBase = 150;
+        textAnimDuration = '2.0s';
+    } else if (textSpeedVal === 2) {
+        typeSpeedBase = 80;
+        textAnimDuration = '1.0s';
+    } else if (textSpeedVal === 3) {
+        typeSpeedBase = 40;
+        textAnimDuration = '0.5s';
+    } else {
+        typeSpeedBase = 15;
+        textAnimDuration = '0.2s';
+    }
+    const imageAnimDuration = imgSpeedVal + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
@@ -85,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button:not(#vignette-continue-button)');
+    const endingRestartButtons = document.querySelectorAll('#positive-ending-screen .ending-restart-button, #negative-ending-screen .ending-restart-button');
     
     const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
@@ -100,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diaryButton = document.getElementById('diary-button');
     const trackersButton = document.getElementById('trackers-button');
     const systemButton = document.getElementById('system-button');
+    const exportPdfButton = document.getElementById('export-pdf-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
     // Overlay Injection if not present
     let sceneOverlay = document.getElementById('scene-overlay');
@@ -134,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const acquisitionModalDescription = document.getElementById('acquisition-modal-description');
     
     const systemModal = document.getElementById('system-modal');
+    const settingsModal = document.getElementById('settings-modal');
     const systemModalTitle = document.getElementById('system-modal-title');
     const systemMenuMain = document.getElementById('system-menu-main');
     const systemSlotsContainer = document.getElementById('system-slots-container');
@@ -753,8 +835,343 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        // Auto-start game, bypassing splash screen
-        startGame();
+        // Menu Principal & System Button Hooks
+        const gearSystemButton = document.getElementById('gear-system-button');
+        if (gearSystemButton) {
+            gearSystemButton.classList.add('hidden');
+        }
+
+        const resumeBtn = document.getElementById('start-resume-game-btn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', () => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        const newGameBtn = document.getElementById('start-new-game-btn');
+        if (newGameBtn) {
+            newGameBtn.addEventListener('click', () => {
+                if (isGameSessionActive && !window.isPreview) {
+                    if (!confirm('Começar de novo apagará seu progresso atual e o caminho salvo automaticamente. Deseja continuar?')) {
+                        return;
+                    }
+                }
+                
+                // Novo jogo apaga o autosave imediatamente!
+                removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                
+                // Start game first so the first scene is rendered behind the menu
+                startGame();
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        const continueBtn = document.getElementById('start-continue-btn');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                if (isGameSessionActive) {
+                    hideStartScreen();
+                } else {
+                    const latestSave = getLatestSave();
+                    if (latestSave) {
+                        // Load save first so it is rendered behind the menu
+                        loadGameFromData(latestSave);
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                hideStartScreen(() => {
+                                    if (gearSystemButton) {
+                                        gearSystemButton.classList.add('hidden');
+                                    }
+                                });
+                            });
+                        });
+                    }
+                }
+            });
+        }
+
+        const startSavesBtn = document.getElementById('start-saves-btn');
+        const startScreenButtons = document.querySelector('.start-screen-buttons');
+        const startScreenSavesContainer = document.getElementById('start-screen-saves-container');
+        
+        if (startSavesBtn) {
+            startSavesBtn.addEventListener('click', () => {
+                if (startScreenButtons) startScreenButtons.classList.add('hidden');
+                if (startScreenSavesContainer) startScreenSavesContainer.classList.remove('hidden');
+                renderStartScreenSlots();
+            });
+        }
+
+        const startScreenSavesBackBtn = document.getElementById('start-screen-saves-back-btn');
+        if (startScreenSavesBackBtn) {
+            startScreenSavesBackBtn.addEventListener('click', () => {
+                if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
+                if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+                showStartScreen(true);
+            });
+        }
+
+        const startOptionsBtn = document.getElementById('start-options-btn');
+        const startScreenOptionsContainer = document.getElementById('start-screen-options-container');
+        if (startOptionsBtn) {
+            startOptionsBtn.addEventListener('click', () => {
+                if (startScreenButtons) startScreenButtons.classList.add('hidden');
+                if (startScreenOptionsContainer) startScreenOptionsContainer.classList.remove('hidden');
+                syncSquareSliders();
+            });
+        }
+
+        const startScreenOptionsBackBtn = document.getElementById('start-screen-options-back-btn');
+        if (startScreenOptionsBackBtn) {
+            startScreenOptionsBackBtn.addEventListener('click', () => {
+                if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
+                if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+                showStartScreen(true);
+            });
+        }
+
+        const getSpeedLabel = (level) => {
+            const l = parseInt(level);
+            if (l === 1) return "Muito Lento";
+            if (l === 2) return "Lento";
+            if (l === 3) return "Normal";
+            if (l === 4) return "Rápido";
+            return "Normal";
+        };
+
+        const syncSquareSliders = () => {
+            const sqVolume = document.getElementById('start-square-volume');
+            const sqVolumeVal = document.getElementById('start-square-volume-val');
+            const sqTextSpeed = document.getElementById('start-square-text-speed');
+            const sqTextSpeedVal = document.getElementById('start-square-text-speed-val');
+            const sqImageSpeed = document.getElementById('start-square-image-speed');
+            const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
+
+            const savedVol = (window.isPreview ? null : localStorage.getItem('if_builder_settings_volume')) || '100';
+            if (sqVolume) {
+                sqVolume['value'] = savedVol;
+                if (sqVolumeVal) sqVolumeVal.textContent = savedVol + '%';
+            }
+
+            const savedTextSpeed = (window.isPreview ? null : localStorage.getItem('if_builder_settings_text_speed')) || '3';
+            if (sqTextSpeed) {
+                sqTextSpeed['value'] = savedTextSpeed;
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(savedTextSpeed);
+            }
+
+            const savedImageSpeed = (window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed')) || '3';
+            if (sqImageSpeed) {
+                sqImageSpeed['value'] = savedImageSpeed;
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(savedImageSpeed);
+            }
+        };
+
+        const bgm = bgmAudio;
+        const sfx = soundEffectAudio;
+
+        const sqVolume = document.getElementById('start-square-volume');
+        const sqVolumeVal = document.getElementById('start-square-volume-val');
+        if (sqVolume) {
+            sqVolume.addEventListener('input', (e) => {
+                const target = e.target;
+                const volVal = parseFloat(target['value']);
+                if (sqVolumeVal) sqVolumeVal.textContent = volVal + '%';
+                if (bgm) bgm.volume = volVal / 100;
+                if (sfx) sfx.volume = volVal / 100;
+                localStorage.setItem('if_builder_settings_volume', volVal.toString());
+            });
+        }
+
+        const sqTextSpeed = document.getElementById('start-square-text-speed');
+        const sqTextSpeedVal = document.getElementById('start-square-text-speed-val');
+        if (sqTextSpeed) {
+            sqTextSpeed.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target['value']);
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(speed);
+                textSpeedVal = speed;
+                
+                // Map qualitative text speed: 1 = Muito Lento (150ms), 2 = Lento (80ms), 3 = Normal (40ms), 4 = Rápido (15ms)
+                if (speed === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (speed === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (speed === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+                if (!window.isPreview) localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+            });
+        }
+
+        const sqImageSpeed = document.getElementById('start-square-image-speed');
+        const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
+        if (sqImageSpeed) {
+            sqImageSpeed.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target['value']);
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(speed);
+                if (!window.isPreview) localStorage.setItem('if_builder_settings_image_speed', speed.toString());
+                
+                // Map qualitative image transition speed: 1 = Muito Lento (2.0s), 2 = Lento (1.0s), 3 = Normal (0.5s), 4 = Rápido (0.2s)
+                let imageDuration = '0.5s';
+                if (speed === 1) imageDuration = '2.0s';
+                else if (speed === 2) imageDuration = '1.0s';
+                else if (speed === 3) imageDuration = '0.5s';
+                else if (speed === 4) imageDuration = '0.2s';
+                
+                document.documentElement.style.setProperty('--image-anim-speed', imageDuration);
+            });
+        }
+
+
+
+        const volumeSlider = document.getElementById('settings-volume-slider');
+        if (volumeSlider) {
+            const savedVol = window.isPreview ? null : localStorage.getItem('if_builder_settings_volume');
+            if (savedVol !== null) {
+                volumeSlider.value = savedVol;
+                if (bgm) bgm.volume = parseFloat(savedVol) / 100;
+                if (sfx) sfx.volume = parseFloat(savedVol) / 100;
+            } else {
+                if (bgm) volumeSlider.value = (bgm.volume * 100).toString();
+            }
+
+            volumeSlider.addEventListener('input', (e) => {
+                const target = e.target;
+                const volVal = parseFloat(target.value);
+                if (bgm) bgm.volume = volVal / 100;
+                if (sfx) sfx.volume = volVal / 100;
+                localStorage.setItem('if_builder_settings_volume', volVal.toString());
+            });
+        }
+
+        const speedSlider = document.getElementById('settings-speed-slider');
+        if (speedSlider) {
+            speedSlider.setAttribute('min', '1');
+            speedSlider.setAttribute('max', '4');
+            speedSlider.setAttribute('step', '1');
+
+            const savedSpeed = window.isPreview ? null : localStorage.getItem('if_builder_settings_text_speed');
+            if (savedSpeed !== null) {
+                speedSlider.value = savedSpeed;
+                textSpeedVal = parseInt(savedSpeed);
+                if (textSpeedVal === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (textSpeedVal === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (textSpeedVal === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+            } else {
+                speedSlider.value = textSpeedVal.toString();
+            }
+
+            speedSlider.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target.value);
+                textSpeedVal = speed;
+                if (speed === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (speed === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (speed === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+                if (!window.isPreview) localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+            });
+        }
+
+        // ESC Key listener
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const startScreen = document.getElementById('start-screen');
+                const isTransitioning = startScreen && (
+                    startScreen.classList.contains('menu-trans-fade-in') ||
+                    startScreen.classList.contains('menu-trans-fade-out') ||
+                    startScreen.classList.contains('menu-trans-slide-in') ||
+                    startScreen.classList.contains('menu-trans-slide-out')
+                );
+                if (isTransitioning) return;
+                // If any modal is visible, close it instead of showing start screen
+                let modalClosed = false;
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        modal.classList.add('hidden');
+                        modalClosed = true;
+                    }
+                });
+                if (modalClosed) return;
+
+                if (gameData.enableSystemMenu && !window.isSceneTest) {
+                    const startScreen = document.getElementById('start-screen');
+                    if (startScreen.classList.contains('hidden')) {
+                        if (isGameSessionActive) {
+                            showStartScreen();
+                        }
+                    } else {
+                        if (isGameSessionActive) {
+                            hideStartScreen(() => {
+                                gameContainer.classList.remove('hidden');
+                                if (gearSystemButton) gearSystemButton.classList.add('hidden');
+                            });
+                        }
+                    }
+                } else {
+                    toggleSystemMenu();
+                }
+            }
+        });
+
+        // Hide main menu button inside modal if Menu Principal is enabled
+        if (gameData.enableSystemMenu && btnMainMenu) {
+            btnMainMenu.classList.add('hidden');
+        }
+
+        // Auto-start game or show Start Screen
+        if (gameData.enableSystemMenu && !window.isSceneTest) {
+            showStartScreen(true);
+        } else {
+            startGame();
+        }
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
              // Prepare the game behind the ending screen
              startGame();
@@ -777,7 +1194,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
+        if (exportPdfButton) {
+            if (gameData.diaryAllowExport === false) {
+                exportPdfButton.classList.add('hidden');
+            } else {
+                exportPdfButton.classList.remove('hidden');
+            }
+            console.log('Botão de exportação encontrado, anexando listener...');
+            exportPdfButton.addEventListener('click', exportDiaryToPDF);
+        } else {
+            console.error('ERRO: Botão de exportação (#export-pdf-button) NÃO encontrado no DOM durante init.');
+        }
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.add('hidden'); });
+        });
         btnSaveMenu.addEventListener('click', () => renderSlots('save'));
         btnLoadMenu.addEventListener('click', () => renderSlots('load'));
         btnBackSystem.addEventListener('click', () => { systemSlotsContainer.classList.add('hidden'); systemMenuMain.classList.remove('hidden'); systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
@@ -816,8 +1247,123 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.isSceneTest) startGame();
     };
 
+    const exportDiaryToPDF = () => {
+        console.log('Iniciando exportação de PDF...');
+        
+        const runExport = () => {
+            if (typeof html2pdf === 'undefined') {
+                console.error('Biblioteca html2pdf não encontrada.');
+                alert("Erro: Biblioteca de PDF não carregada.");
+                return;
+            }
+
+            const originalText = exportPdfButton.textContent;
+            exportPdfButton.textContent = 'Gerando...';
+            exportPdfButton.disabled = true;
+
+            const opt = {
+                margin:       [0, 0],
+                filename:     (gameData.gameTitle || 'Diario') + '_Log.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    allowTaint: true,
+                    letterRendering: true
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Criar um container temporário no DOM para garantir que o html2canvas funcione
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.left = '-10000px';
+            container.style.top = '0';
+            container.style.width = '1800px'; 
+            container.style.backgroundColor = '#ffffff';
+            document.body.appendChild(container);
+
+            const element = diaryLog.cloneNode(true);
+            element.style.height = 'auto';
+            element.style.maxHeight = 'none';
+            element.style.overflow = 'visible';
+            element.style.maskImage = 'none';
+            element.style.webkitMaskImage = 'none';
+            element.style.padding = '20px'; 
+            element.style.backgroundColor = '#ffffff';
+            element.style.color = '#333333';
+            element.style.display = 'block';
+            element.style.width = '100%';
+            
+            const allElements = element.querySelectorAll('*');
+            allElements.forEach(el => {
+                if (el instanceof HTMLElement) {
+                    el.style.backgroundImage = 'none';
+                    el.style.backgroundColor = 'transparent';
+                    el.style.color = '#333333';
+                    el.style.borderColor = '#eeeeee';
+                    el.style.boxShadow = 'none';
+                    el.style.textShadow = 'none';
+                    el.style.fontSize = '8pt';
+                    el.style.lineHeight = '1.4';
+                    el.style.margin = '0';
+                }
+            });
+
+            element.querySelectorAll('.diary-entry').forEach(entry => {
+                entry.style.display = 'flex';
+                entry.style.gap = '20px';
+                entry.style.marginBottom = '20px';
+                entry.style.paddingBottom = '15px';
+                entry.style.borderBottom = '1px solid #eeeeee';
+                entry.style.alignItems = 'flex-start';
+                entry.style.width = '100%';
+                entry.style.boxSizing = 'border-box';
+            });
+
+            element.querySelectorAll('img').forEach(img => {
+                img.style.width = '30%';
+                img.style.height = 'auto';
+                img.style.borderRadius = '2px';
+                img.style.display = 'block';
+                img.style.flexShrink = '0';
+            });
+
+            element.querySelectorAll('.text-container').forEach(text => {
+                text.style.flex = '1';
+                text.style.width = '65%';
+            });
+
+            element.querySelectorAll('.scene-name').forEach(name => {
+                name.style.fontSize = '10pt';
+                name.style.fontWeight = 'bold';
+                name.style.color = '#000000';
+                name.style.display = 'block';
+                name.style.marginBottom = '12px';
+            });
+
+            container.appendChild(element);
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                console.log('PDF gerado com sucesso.');
+                document.body.removeChild(container);
+                exportPdfButton.textContent = originalText;
+                exportPdfButton.disabled = false;
+            }).catch(err => {
+                console.error('Erro crítico na geração do PDF:', err);
+                document.body.removeChild(container);
+                alert("Erro ao gerar PDF: " + (err.message || "Verifique o console para detalhes técnicos."));
+                exportPdfButton.textContent = originalText;
+                exportPdfButton.disabled = false;
+            });
+        };
+
+        runExport();
+    };
+
     const startGame = () => {
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+        removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
         inventory = []; 
         visitedScenes = []; 
@@ -826,6 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trackers = {}; 
         removedObjectsFromScenes = {};
         isGameEnded = false;
+        isGameSessionActive = true;
         gameStartTime = Date.now();
         gameEndTime = null;
 
@@ -901,6 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
                 isGameEnded = false;
+                isGameSessionActive = true;
                 standardActionBar.classList.remove('hidden');
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
@@ -911,11 +1459,191 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) { startGame(); }
     };
 
+    const getLatestSave = () => {
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const manual1Key = 'if_builder_manual_1_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const manual2Key = 'if_builder_manual_2_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        
+        const autoSave = getGameSave(autoKey);
+        const m1Save = getGameSave(manual1Key);
+        const m2Save = getGameSave(manual2Key);
+        
+        let latestSave = null;
+        let latestTime = 0;
+        
+        [autoSave, m1Save, m2Save].forEach(saveStr => {
+            if (saveStr) {
+                try {
+                    const data = JSON.parse(saveStr);
+                    const time = Date.parse(data.timestamp) || 0;
+                    if (time > latestTime) {
+                        latestTime = time;
+                        latestSave = saveStr;
+                    }
+                } catch (e) {}
+            }
+        });
+        return latestSave;
+    };
+
+    const showStartScreen = (skipTransition = false) => {
+        const startScreen = document.getElementById('start-screen');
+        const startTitle = document.getElementById('start-screen-title');
+        const newGameBtn = document.getElementById('start-new-game-btn');
+        const continueBtn = document.getElementById('start-continue-btn');
+        const savesBtn = document.getElementById('start-saves-btn');
+        const gearBtn = document.getElementById('gear-system-button');
+
+        if (!startScreen) return;
+
+        if (!skipTransition) {
+            const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
+                                    startScreen.classList.contains('menu-trans-fade-out') ||
+                                    startScreen.classList.contains('menu-trans-slide-in') ||
+                                    startScreen.classList.contains('menu-trans-slide-out');
+            if (isTransitioning) return;
+        }
+
+        // Reset containers back to root start screen
+        const startScreenButtons = startScreen.querySelector('.start-screen-buttons');
+        const startScreenSavesContainer = document.getElementById('start-screen-saves-container');
+        const startScreenOptionsContainer = document.getElementById('start-screen-options-container');
+
+        if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+        if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
+        if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
+
+        // Main Menu transitions speed - Unified
+        const menuTransition = gameData.gameMenuTransitionType || 'fade';
+        let speed = gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500;
+        if (speed > 10) {
+            speed = speed / 1000;
+        }
+        if (speed > 5.0) speed = 0.5;
+        document.documentElement.style.setProperty('--menu-anim-speed', speed + 's');
+
+        startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+
+        // Show start screen
+        startScreen.classList.remove('hidden');
+
+        if (skipTransition) {
+            // No transitions on first load or instant resets
+        } else {
+            // Force reflow to ensure CSS animations play correctly
+            void startScreen.offsetWidth;
+            
+            if (menuTransition === 'none') {
+                // No anim
+            } else if (menuTransition === 'fade') {
+                startScreen.classList.add('menu-trans-fade-in');
+                setTimeout(() => {
+                    startScreen.classList.remove('menu-trans-fade-in');
+                }, speed * 1000 + 100);
+            } else if (menuTransition === 'slide') {
+                startScreen.classList.add('menu-trans-slide-in');
+                setTimeout(() => {
+                    startScreen.classList.remove('menu-trans-slide-in');
+                }, speed * 1000 + 100);
+            }
+            if (gameData.gameMenuTransitionSound) {
+                playSound(gameData.gameMenuTransitionSound);
+            }
+        }
+
+        // Render custom title if configured
+        if (startTitle) {
+            if (gameData.showStartScreenTitle !== false) {
+                startTitle.textContent = gameData.startScreenTitle || gameData.gameTitle || 'Minha Aventura de Texto';
+                startTitle.classList.remove('hidden');
+            } else {
+                startTitle.classList.add('hidden');
+            }
+        }
+
+        // Handle buttons visibility and texts
+        if (isGameSessionActive) {
+            if (newGameBtn) newGameBtn.textContent = gameData.gameRestartButtonText || 'Começar de novo';
+        } else {
+            if (newGameBtn) newGameBtn.textContent = 'Começar';
+        }
+
+        // Check if there are any saves OR active session to show the "Continuar" button
+        const latestSave = getLatestSave();
+        if ((latestSave || isGameSessionActive) && continueBtn) {
+            continueBtn.classList.remove('hidden');
+        } else if (continueBtn) {
+            continueBtn.classList.add('hidden');
+        }
+
+        // Check autosave presence to show/hide "Caminhos salvos" button
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const autoData = getGameSave(autoKey);
+        if (savesBtn) {
+            if (autoData) {
+                savesBtn.classList.remove('hidden');
+            } else {
+                savesBtn.classList.add('hidden');
+            }
+        }
+
+        // Hide gear button when we are on the Menu Principal itself
+        if (gearBtn) gearBtn.classList.add('hidden');
+    };
+
+    const hideStartScreen = (callback) => {
+        const startScreen = document.getElementById('start-screen');
+        if (!startScreen) {
+            if (callback) callback();
+            return;
+        }
+
+        const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
+                                startScreen.classList.contains('menu-trans-fade-out') ||
+                                startScreen.classList.contains('menu-trans-slide-in') ||
+                                startScreen.classList.contains('menu-trans-slide-out');
+        if (isTransitioning) return;
+
+        if (gameData.gameMenuTransitionSound) {
+            playSound(gameData.gameMenuTransitionSound);
+        }
+
+        const transition = gameData.gameMenuTransitionType || 'fade';
+        let speed = gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500;
+        if (speed > 10) {
+            speed = speed / 1000;
+        }
+        if (speed > 5.0) speed = 0.5;
+        document.documentElement.style.setProperty('--menu-anim-speed', speed + 's');
+
+        if (transition === 'none') {
+            startScreen.classList.add('hidden');
+            startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            if (callback) callback();
+        } else {
+            startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            
+            // Force reflow
+            void startScreen.offsetWidth;
+            
+            if (transition === 'fade') {
+                startScreen.classList.add('menu-trans-fade-out');
+            } else if (transition === 'slide') {
+                startScreen.classList.add('menu-trans-slide-out');
+            }
+
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+                if (callback) callback();
+            }, speed * 1000 + 100);
+        }
+    };
+
     const autoSaveGame = () => {
-        if (window.isPreview) return; 
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
+        setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
@@ -927,31 +1655,241 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderSlots = (mode) => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
-        systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
-        for (let i = 1; i <= 3; i++) {
-            const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-            const savedData = localStorage.getItem(slotKey);
-            const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
-            let contentHtml = '';
-            if (savedData) {
-                const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
-                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
-                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
-                else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
+        systemModalTitle.textContent = gameData.enableSystemMenu ? 'Caminhos salvos' : (mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo'));
+
+        if (gameData.enableSystemMenu) {
+            // Render 1 Autosave + 2 Manual Saves
+            // --- 1. AUTOSAVE SLOT ---
+            const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+            const autoData = getGameSave(autoKey);
+            const autoDiv = document.createElement('div'); autoDiv.className = 'slot-item';
+            let autoHtml = '';
+            if (autoData) {
+                try {
+                    const data = JSON.parse(autoData);
+                    const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                } catch (e) {
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                }
             } else {
-                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
-                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
+                autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Sem dados</span></div>';
             }
-            slotDiv.innerHTML = contentHtml;
-            slotDiv.addEventListener('click', (e) => { if (e.target.classList.contains('slot-delete-btn')) return; if (mode === 'save') performSave(i); else if (mode === 'load' && savedData) loadGameFromData(savedData); });
-            slotsList.appendChild(slotDiv);
+            autoDiv.innerHTML = window.safeHTML(autoHtml);
+            if (autoData) {
+                autoDiv.addEventListener('click', () => {
+                    loadGameFromData(autoData);
+                });
+            }
+            slotsList.appendChild(autoDiv);
+
+            // --- 2. MANUAL SAVES (Slots 1 & 2) ---
+            for (let i = 1; i <= 2; i++) {
+                const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+                const savedData = getGameSave(slotKey);
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
+                let contentHtml = '';
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                        contentHtml += '<button class="slot-delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+                    } catch (e) {
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                    }
+                } else {
+                    if (mode === 'save') {
+                        contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.75); cursor: pointer;">Clique para salvar</span></div>';
+                    } else {
+                        contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.3);">Slot vazio</span></div>';
+                    }
+                }
+                slotDiv.innerHTML = window.safeHTML(contentHtml);
+                
+                // Add button listeners
+                const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+                
+                slotDiv.addEventListener('click', (e) => {
+                    const deleteBtnClicked = e.target.closest('.slot-delete-btn');
+                    if (deleteBtnClicked) {
+                        return;
+                    }
+                    if (mode === 'save') {
+                        if (!savedData) {
+                            performSave(i);
+                        }
+                    } else if (savedData) {
+                        loadGameFromData(savedData);
+                    }
+                });
+
+                if (deleteBtn && savedData) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeGameSave(slotKey);
+                        renderSlots(mode);
+                    });
+                }
+                slotsList.appendChild(slotDiv);
+            }
+        } else {
+            // Legacy / Standard behavior
+            for (let i = 1; i <= 3; i++) {
+                const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+                const savedData = getGameSave(slotKey);
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
+                let contentHtml = '';
+                if (savedData) {
+                    const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                    contentHtml += '<button class="slot-delete-btn" data-slot="' + i + '" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+                } else {
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
+                }
+                slotDiv.innerHTML = window.safeHTML(contentHtml);
+                slotDiv.addEventListener('click', (e) => { 
+                    const deleteBtn = e.target.closest('.slot-delete-btn');
+                    if (deleteBtn) {
+                        e.stopPropagation();
+                        const slot = deleteBtn.getAttribute('data-slot');
+                        removeGameSave('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                        renderSlots(mode);
+                        return;
+                    } 
+                    if (mode === 'save') {
+                        if (!savedData) {
+                            performSave(i);
+                        }
+                    } 
+                    else if (mode === 'load' && savedData) loadGameFromData(savedData); 
+                });
+                slotsList.appendChild(slotDiv);
+            }
         }
     };
 
     const performSave = (slotIndex) => {
-        const slotKey = 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const slotKey = gameData.enableSystemMenu
+            ? 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas')
+            : 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
+        setGameSave(slotKey, JSON.stringify(save)); renderSlots('save');
+    };
+
+    const renderStartScreenSlots = () => {
+        const slotsList = document.getElementById('start-screen-slots-list');
+        if (!slotsList) return;
+        slotsList.innerHTML = '';
+
+        const alignment = gameData.startScreenButtonAlignment || 'center';
+
+        // Render 1 Autosave + 2 Manual Saves
+        // --- 1. AUTOSAVE SLOT ---
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const autoData = getGameSave(autoKey);
+        const autoDiv = document.createElement('div');
+        autoDiv.className = 'slot-item';
+        
+        let autoHtml = '';
+        if (autoData) {
+            try {
+                const data = JSON.parse(autoData);
+                const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                const textAlignment = alignment === 'right' ? 'right' : (alignment === 'center' ? 'center' : 'left');
+                autoHtml = '<div class="slot-info" style="text-align: ' + textAlignment + '; width: 100%;"><span class="slot-title">Progresso automático - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+            } catch (e) {
+                autoHtml = '<div class="slot-info"><span class="slot-title">Progresso automático</span><span class="slot-empty">Erro ao ler dados</span></div>';
+            }
+        } else {
+            autoHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title">Progresso automático</span><span class="slot-empty">Nenhum progresso automático disponível</span></div>';
+        }
+        
+        autoDiv.innerHTML = window.safeHTML(autoHtml);
+        if (autoData) {
+            autoDiv.addEventListener('click', () => {
+                loadGameFromData(autoData);
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            });
+        }
+        slotsList.appendChild(autoDiv);
+
+        // --- 2. MANUAL SAVES (Slots 1 & 2) ---
+        for (let i = 1; i <= 2; i++) {
+            const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+            const savedData = getGameSave(slotKey);
+            const slotDiv = document.createElement('div');
+            
+            const deleteBtnHtml = '<button class="slot-delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+            let contentHtml = '';
+            
+            if (savedData) {
+                slotDiv.className = 'slot-item';
+                try {
+                    const data = JSON.parse(savedData);
+                    const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    const textAlignment = alignment === 'right' ? 'right' : (alignment === 'center' ? 'center' : 'left');
+                    contentHtml = deleteBtnHtml + '<div class="slot-info" style="text-align: ' + textAlignment + '; padding-left: 58px; padding-right: 24px; width: 100%;"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                } catch (e) {
+                    contentHtml = '<div class="slot-info" style="padding-left: 58px; padding-right: 24px;"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                }
+            } else {
+                const disabledClass = isGameSessionActive ? '' : ' disabled';
+                slotDiv.className = 'slot-item dashed-slot' + disabledClass;
+                
+                if (isGameSessionActive) {
+                    contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.75);">Clique para salvar</span></div>';
+                } else {
+                    contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.3);">Slot vazio</span></div>';
+                }
+            }
+            
+            slotDiv.innerHTML = window.safeHTML(contentHtml);
+            
+            const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+
+            if (deleteBtn && savedData) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeGameSave(slotKey);
+                    renderStartScreenSlots();
+                });
+            }
+            
+            slotDiv.addEventListener('click', () => {
+                if (!savedData && isGameSessionActive) {
+                    performStartScreenSave(i);
+                } else if (savedData) {
+                    loadGameFromData(savedData);
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            hideStartScreen(() => {
+                                if (gearSystemButton) {
+                                    gearSystemButton.classList.add('hidden');
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+
+            slotsList.appendChild(slotDiv);
+        }
+    };
+
+    const performStartScreenSave = (slotIndex) => {
+        const slotKey = 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        setGameSave(slotKey, JSON.stringify(save));
+        renderStartScreenSlots();
     };
 
     const getObjectsForScene = (sceneId) => {
@@ -996,6 +1934,14 @@ document.addEventListener('DOMContentLoaded', () => {
              if (vignetteDiaryButton && gameData.enableRetrospective !== false) {
                  vignetteDiaryButton.classList.remove('hidden');
              }
+        }
+        
+        // Vertical Alignment
+        vignetteScreen.classList.remove('align-v-center', 'align-v-bottom');
+        if (gameData.gameSplashContentVerticalAlignment === 'center') {
+            vignetteScreen.classList.add('align-v-center');
+        } else {
+            vignetteScreen.classList.add('align-v-bottom');
         }
         
         // Set vignette content
@@ -1350,13 +2296,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
-        if (transitionSpeed !== null) {
-            const dynamicDuration = Math.max(0.3, 5.0 - (transitionSpeed * 0.9)) + 's';
-            document.documentElement.style.setProperty('--image-anim-speed', dynamicDuration);
+        let speed = 0.5;
+        const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
+        if (savedImageSpeedStr) {
+            const speedVal = parseInt(savedImageSpeedStr);
+            if (speedVal === 1) speed = 2.0;
+            else if (speedVal === 2) speed = 1.0;
+            else if (speedVal === 3) speed = 0.5;
+            else if (speedVal === 4) speed = 0.2;
+        } else if (transitionSpeed !== null && transitionSpeed !== undefined && transitionSpeed !== '') {
+            speed = typeof transitionSpeed === 'string' ? parseFloat(transitionSpeed) : transitionSpeed;
+            if (speed === 1) speed = 2.0;
+            else if (speed === 2) speed = 1.0;
+            else if (speed === 3) speed = 0.5;
+            else if (speed === 4) speed = 0.2;
+            else if (speed > 2.0) speed = 0.5;
         } else {
-            const defaultDuration = Math.max(0.3, 5.0 - ((gameData.gameImageSpeed || 3) * 0.9)) + 's';
-            document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
+            speed = gameData.gameImageSpeed || 0.5;
+            if (speed === 1) speed = 2.0;
+            else if (speed === 2) speed = 1.0;
+            else if (speed === 3 || speed === 5) speed = 0.5; // Fixed legacy value 5
+            else if (speed === 4) speed = 0.2;
+            else if (speed > 2.0) speed = 0.5;
         }
+        if (typeof speed !== 'number' || isNaN(speed)) {
+            speed = 0.5;
+        }
+        const defaultDuration = speed + 's';
+        document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
@@ -1393,8 +2360,133 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const adjustLayoutForImagesAndChances = (scene) => {
+        const imagePanel = imageContainer ? imageContainer.parentElement : null;
+        const textPanel = document.querySelector('.text-panel');
+        const chancesContainer = document.getElementById('chances-container');
+        
+        const isImagesEnabled = gameData.enableImages !== false;
+        
+        if (sceneNameOverlay) {
+            sceneNameOverlay.style.whiteSpace = 'nowrap';
+        }
+        
+        if (!isImagesEnabled) {
+            // Completely hide image panel and container
+            if (imagePanel) imagePanel.style.display = 'none';
+            if (imageContainer) imageContainer.style.display = 'none';
+            if (textPanel) textPanel.style.padding = '0';
+            
+            // Create text-scene-header if not present
+            let textSceneHeader = document.getElementById('text-scene-header');
+            if (!textSceneHeader && textPanel) {
+                textSceneHeader = document.createElement('div');
+                textSceneHeader.id = 'text-scene-header';
+                textSceneHeader.className = 'text-scene-header';
+                
+                // Style the header container using standard CSS tokens
+                textSceneHeader.style.display = 'flex';
+                textSceneHeader.style.justifyContent = 'space-between';
+                textSceneHeader.style.alignItems = 'center';
+                textSceneHeader.style.marginBottom = '20px';
+                textSceneHeader.style.paddingBottom = '10px';
+                textSceneHeader.style.borderBottom = '2px solid var(--border-color)';
+                
+                // Insert before scene-description
+                if (sceneDescription) {
+                    textPanel.insertBefore(textSceneHeader, sceneDescription);
+                } else {
+                    textPanel.appendChild(textSceneHeader);
+                }
+            }
+            
+            if (textSceneHeader) {
+                // Move scene-name-overlay and chances-container to the text-scene-header
+                if (sceneNameOverlay) {
+                    textSceneHeader.appendChild(sceneNameOverlay);
+                    
+                    // Reset styling for inline text display
+                    sceneNameOverlay.style.position = 'relative';
+                    sceneNameOverlay.style.top = '0';
+                    sceneNameOverlay.style.left = '0';
+                    sceneNameOverlay.style.border = '2px solid var(--border-color)';
+                    sceneNameOverlay.style.backgroundColor = 'var(--scene-name-overlay-bg)';
+                    sceneNameOverlay.style.color = 'var(--scene-name-overlay-text-color)';
+                    sceneNameOverlay.style.pointerEvents = 'none';
+                    sceneNameOverlay.style.padding = '6px 12px';
+                    sceneNameOverlay.style.margin = '0';
+                    sceneNameOverlay.style.boxSizing = 'border-box';
+                }
+                
+                if (chancesContainer) {
+                    textSceneHeader.appendChild(chancesContainer);
+                    
+                    // Reset chances styling for inline display
+                    chancesContainer.style.position = 'relative';
+                    chancesContainer.style.top = '0';
+                    chancesContainer.style.right = '0';
+                    chancesContainer.style.margin = '0';
+                    chancesContainer.style.padding = '0';
+                    chancesContainer.style.backgroundColor = 'transparent';
+                    chancesContainer.style.border = 'none';
+                    chancesContainer.style.backdropFilter = 'none';
+                }
+            }
+        } else {
+            // Restore default panels visibility
+            if (imagePanel) imagePanel.style.display = '';
+            if (imageContainer) imageContainer.style.display = '';
+            if (textPanel) textPanel.style.padding = '';
+            
+            // Remove text-scene-header if present
+            const textSceneHeader = document.getElementById('text-scene-header');
+            if (textSceneHeader) {
+                textSceneHeader.remove();
+            }
+            
+            // Move scene-name-overlay back inside imageContainer
+            if (sceneNameOverlay && imageContainer) {
+                imageContainer.appendChild(sceneNameOverlay);
+                
+                // Style scene-name-overlay for absolute overlay mode
+                sceneNameOverlay.style.position = 'absolute';
+                sceneNameOverlay.style.top = '20px';
+                sceneNameOverlay.style.left = '20px';
+                sceneNameOverlay.style.border = '2px solid var(--border-color)';
+                sceneNameOverlay.style.backgroundColor = 'var(--scene-name-overlay-bg)';
+                sceneNameOverlay.style.color = 'var(--scene-name-overlay-text-color)';
+                sceneNameOverlay.style.padding = '6px 12px';
+                sceneNameOverlay.style.margin = '0';
+                sceneNameOverlay.style.boxSizing = 'border-box';
+            }
+            
+            // Move chances-container inside imageContainer in the top-right corner
+            if (chancesContainer && imageContainer) {
+                imageContainer.appendChild(chancesContainer);
+                
+                // Absolute overlay positioning (floating directly over image)
+                chancesContainer.style.position = 'absolute';
+                chancesContainer.style.top = '20px'; // Matching top padding of sceneNameOverlay
+                chancesContainer.style.right = '20px';
+                chancesContainer.style.margin = '0';
+                chancesContainer.style.zIndex = '30';
+                chancesContainer.style.display = 'flex';
+                chancesContainer.style.alignItems = 'center';
+                chancesContainer.style.gap = '8px';
+                chancesContainer.style.justifyContent = 'flex-end';
+                chancesContainer.style.backgroundColor = 'transparent';
+                chancesContainer.style.padding = '0';
+                chancesContainer.style.border = 'none';
+                chancesContainer.style.borderRadius = '0';
+                chancesContainer.style.backdropFilter = 'none';
+                chancesContainer.style.boxSizing = 'border-box';
+            }
+        }
+    };
+
     const renderScene = (scene, successPrefix = null) => {
-        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        const isImagesEnabled = gameData.enableImages !== false;
+        if (scene.image && isImagesEnabled) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         
@@ -1569,7 +2661,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; 
-                p.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }) : formattedHTML;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
                 let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
@@ -1596,7 +2688,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 type();
             } else { 
-                p.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }) : formattedHTML;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); 
             }
         };
@@ -1662,6 +2754,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             lastChanceChange = null;
         }
+        
+        adjustLayoutForImagesAndChances(scene);
         
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
@@ -1753,7 +2847,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
         }
 
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+        removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
     const gameOver = () => { 
@@ -1860,7 +2954,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneDescription.classList.add('typewriting-active');
             p.className = 'scene-paragraph typewriter-cursor'; 
             p.style.opacity = '1'; 
-            p.innerHTML = formattedHTML; 
+            p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); 
             sceneDescription.appendChild(p);
             const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
             let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
@@ -1884,7 +2978,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textAnimType === 'typewriter') {
                  // Already handled by if block above
             } else {
-                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             }
         }
     };
@@ -1912,12 +3007,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div'); container.className = 'action-popup-container';
         
         if (sceneSuggestions.length === 0) {
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
             row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
             container.appendChild(row1);
         } else {
 
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-center';
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
             sceneSuggestions.forEach(v => { 
                 const btn = document.createElement('button'); btn.textContent = v; 
                 btn.addEventListener('click', () => { 
@@ -1944,7 +3039,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div'); container.className = 'action-popup-container';
         if (inventory.length === 0) { 
             const msg = document.createElement('div'); 
-            msg.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
             msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
             container.appendChild(msg); 
         }
@@ -1984,14 +3079,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = document.createElement('div');
                 item.className = 'tracker-item';
                 
-                item.innerHTML = 
+                item.innerHTML = window.safeHTML(
                     '<div class="tracker-item-header">' +
                         '<span class="tracker-item-name">' + def.name + '</span>' +
                         (!def.hideValue ? '<span class="tracker-item-values">' + currentVal + ' / ' + def.maxValue + '</span>' : '') +
                     '</div>' +
                     '<div class="tracker-bar-container">' +
                         '<div class="tracker-bar" style="width: ' + percentage + '%; background-color: ' + barColor + '; margin-left: ' + (def.invertBar ? 'auto' : '0') + '"></div>' +
-                    '</div>';
+                    '</div>'
+                , { ADD_ATTR: ['style'] });
                 trackersContent.appendChild(item);
             });
         }
@@ -1999,7 +3095,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
+        itemModalName.textContent = item.name; itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(itemModalDescription);
         if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
         else itemModalImageContainer.classList.add('hidden');
@@ -2008,7 +3104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const openAcquisitionModal = (item, customDescription) => {
         if (!acquisitionModal) return;
         acquisitionModalTitle.textContent = item.name;
-        acquisitionModalDescription.innerHTML = formatText(customDescription || item.examineDescription);
+        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(acquisitionModalDescription);
         if (item.image) { acquisitionModalImage.src = item.image; acquisitionModalImageContainer.classList.remove('hidden'); }
         else acquisitionModalImageContainer.classList.add('hidden');
@@ -2051,7 +3147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            statsContainer.innerHTML = 
+            statsContainer.innerHTML = window.safeHTML(
                 '<div class="diary-stat-box">' +
                     '<span class="diary-stat-label">' + gameData.gameTranslations.stats_visited + '</span>' +
                     '<span class="diary-stat-value">' + visitedCount + ' / ' + totalScenesCount + ' ' + gameData.gameTranslations.of_scenes + '</span>' +
@@ -2063,7 +3159,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<div class="diary-stat-box">' +
                     '<span class="diary-stat-label">' + gameData.gameTranslations.total_words_read + '</span>' +
                     '<span class="diary-stat-value">' + totalWords + '</span>' +
-                '</div>';
+                '</div>'
+            );
             diaryLog.appendChild(statsContainer);
         }
 
@@ -2072,14 +3169,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div'); div.className = 'diary-entry';
                 if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
                 const txt = document.createElement('div'); txt.className = 'text-container'; 
-                txt.innerHTML = '<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>';
+                txt.innerHTML = window.safeHTML('<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>', { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 div.appendChild(txt); diaryLog.appendChild(div);
                 setupHighlights(txt);
                 currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
                     const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
-                    if (entry.type === 'output') { p.innerHTML = formatText(entry.text); setupHighlights(p); } else p.textContent = entry.text;
+                    if (entry.type === 'output') { p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); setupHighlights(p); } else p.textContent = entry.text;
                     currentInterContainer.appendChild(p);
                 }
             }

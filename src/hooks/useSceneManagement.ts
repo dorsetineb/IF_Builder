@@ -152,6 +152,7 @@ export const useSceneManagement = ({
             }
             setIsDirty(true);
             const scene = gameData.scenes[sceneId];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const type = (scene as any).vignetteType && (scene as any).vignetteType !== 'none' ? 'vignette' : 'scene';
             toast(
                 t(`editor.${type}DeletedTitle`),

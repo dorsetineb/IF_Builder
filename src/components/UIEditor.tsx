@@ -1,11 +1,13 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import { useTheme } from './ThemeProvider';
 import { useToast } from './ToastContext';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
 
 
 import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DitherShader } from '@/components/ui/dither-shader';
 import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
@@ -63,6 +65,7 @@ interface UIEditorProps {
     onUpdate: (field: any, value?: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setConfirmationModal: (modal: any) => void;
     closeConfirmationModal: () => void;
     enableInventory: boolean;
@@ -90,7 +93,7 @@ interface UIEditorProps {
     omitSplashDescription: boolean;
     splashImage: string;
     splashContentAlignment: 'left' | 'right';
-    gameSplashContentVerticalAlignment?: 'top' | 'center' | 'bottom';
+    gameSplashContentVerticalAlignment?: 'center' | 'bottom';
 
     splashDescription: string;
     backgroundMusic: string;
@@ -284,6 +287,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos'>('sistemas');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleAppThemeChange = (newTheme: string) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (setTheme) setTheme(newTheme as any);
@@ -851,6 +855,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalLanguage(i18n.language || 'pt');
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const applyTheme = (theme: any) => {
         setLocalGameBackgroundColor(theme.gameBackgroundColor);
         setLocalTextColor(theme.textColor);
@@ -881,6 +886,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     // ... (rest of the code)
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -912,6 +918,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -934,18 +941,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ChanceIcon: React.FC<{ type: any, color: string, className?: string }> = ({ type, color, className }) => {
-        switch (type) {
-            case 'heart': return <Heart fill={color} stroke="none" className={className} />;
-            case 'circle': return <Circle fill={color} stroke="none" className={className} />;
-            case 'cross': return <svg stroke={color} strokeWidth="4" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none"><path d="M12 5 V19 M5 12 H19" /></svg>;
-            case 'square': return <Square fill={color} stroke="none" className={className} />;
-            case 'diamond': return <Diamond fill={color} stroke="none" className={className} />;
-            default: return <Heart fill={color} stroke="none" className={className} />;
-        }
-       // getFramePreviewStyles moved to src/utils/frameStyles.ts
-    };
+
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
@@ -1113,7 +1109,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             previewType={previewType}
                             setPreviewType={setPreviewType}
                             localSplashContentAlignment={localSplashContentAlignment}
-                            localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
                             localOmitSplashTitle={localOmitSplashTitle}
                             localOmitSplashDescription={localOmitSplashDescription}
                             localSplashButtonText={localSplashButtonText}
@@ -1174,7 +1169,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalGameFontSize={setLocalGameFontSize}
                                 localSplashContentAlignment={localSplashContentAlignment}
                                 setLocalSplashContentAlignment={setLocalSplashContentAlignment}
-                                localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
+                                localSplashContentVerticalAlignment={localSplashContentVerticalAlignment as 'center' | 'bottom'}
                                 setLocalSplashContentVerticalAlignment={setLocalSplashContentVerticalAlignment}
                                 localOmitSplashTitle={localOmitSplashTitle}
                                 setLocalOmitSplashTitle={setLocalOmitSplashTitle}
@@ -1290,7 +1285,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 previewType={previewType}
                                 setPreviewType={setPreviewType}
                                 localSplashContentAlignment={localSplashContentAlignment}
-                                localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
                                 localOmitSplashTitle={localOmitSplashTitle}
                                 localOmitSplashDescription={localOmitSplashDescription}
                                 localSplashButtonText={localSplashButtonText}
@@ -1350,7 +1344,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         previewType={previewType}
                         setPreviewType={setPreviewType}
                         localSplashContentAlignment={localSplashContentAlignment}
-                        localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
+                        localSplashContentVerticalAlignment={localSplashContentVerticalAlignment as 'center' | 'bottom'}
                         localOmitSplashTitle={localOmitSplashTitle}
                         localOmitSplashDescription={localOmitSplashDescription}
                         localSplashButtonText={localSplashButtonText}

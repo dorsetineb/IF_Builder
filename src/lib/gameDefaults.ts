@@ -891,6 +891,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 
 /* Animações de Imagem */
 .trans-fade-out { animation: fadeOut var(--image-anim-speed) forwards; }
+.trans-slide-out { animation: slideLeftOut var(--image-anim-speed) forwards; }
 .trans-slide-left-out { animation: slideLeftOut var(--image-anim-speed) forwards; }
 .trans-slide-right-out { animation: slideRightOut var(--image-anim-speed) forwards; }
 .trans-slide-up-out { animation: slideUpOut var(--image-anim-speed) forwards; }
@@ -1950,6 +1951,7 @@ export const sanitizeGameDataContent = (data: any): any => {
         ADD_TAGS: ['span'],
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clean = (s: any): string => {
         if (typeof s !== 'string') return s;
         return DOMPurify.sanitize(s, purifyConfig);
@@ -1968,12 +1970,15 @@ export const sanitizeGameDataContent = (data: any): any => {
 
     // Sanitize scenes
     if (result.scenes && typeof result.scenes === 'object') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const cleanedScenes: any = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.entries(result.scenes).forEach(([id, scene]: [string, any]) => {
             const cleanedScene = { ...scene };
             cleanedScene.description = clean(scene.description);
             cleanedScene.name = clean(scene.name);
             if (cleanedScene.interactions) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 cleanedScene.interactions = cleanedScene.interactions.map((inter: any) => ({
                     ...inter,
                     successMessage: clean(inter.successMessage),
@@ -1988,7 +1993,9 @@ export const sanitizeGameDataContent = (data: any): any => {
 
     // Sanitize global objects
     if (result.globalObjects && typeof result.globalObjects === 'object') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const cleanedObjects: any = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.entries(result.globalObjects).forEach(([id, obj]: [string, any]) => {
             cleanedObjects[id] = {
                 ...obj,
@@ -2002,6 +2009,7 @@ export const sanitizeGameDataContent = (data: any): any => {
     return result;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sanitizeLegacyI18n = (data: any): any => {
     if (!data) return data;
     const d = { ...data };

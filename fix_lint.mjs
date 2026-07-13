@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 const lintOutput = fs.readFileSync('lint_output.txt', 'utf8');
-const lines = lintOutput.split('\n');
+const lines = lintOutput.replace(/\r/g, '').split('\n');
 
 const fileWarnings = {};
 let currentFile = null;

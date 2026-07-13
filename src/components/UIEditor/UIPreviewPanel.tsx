@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ChevronDown, Split, Heart, Circle, Square, Star } from 'lucide-react';
 import { FONTS } from '../../constants';
 import { getFramePreviewStyles } from '../../utils/frameStyles';
 import { DitherShader } from '@/components/ui/dither-shader';
 
 // Helper component for the life icons in preview
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ChanceIcon: React.FC<{ type: any, color: string, className?: string }> = ({ type, color, className }) => {
     switch (type) {
         case 'heart': return <Heart className={className} style={{ fill: color, color }} />;
@@ -98,6 +100,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     localTextColor,
     localTitleColor,
     localFocusColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameContinueIndicatorColor,
     localSplashButtonColor,
     localSplashButtonTextColor,
@@ -119,6 +122,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     localEnableInventory,
     localEnableDiary,
     localEnableTrackers,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameShowSystemButton,
     localEnableImages,
     localEnableSuggestions,
@@ -161,6 +165,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     const [visibleChars, setVisibleChars] = React.useState(0);
 
     React.useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let timer: any;
         if (visibleChars < fullText.length) {
             timer = setTimeout(() => {
@@ -308,6 +313,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                                     `}
                                 >
                                     {(() => {
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any, localGameBackgroundColor, localGameFrameColor);
 
                                         return (

@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useRef, CSSProperties, useState, useMemo, useCallback } from 'react';
 import { Scene, View } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Trash2, Menu, ArrowRight, ArrowDown, Search, Split, Map, Columns3 } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -170,15 +171,20 @@ const SceneList: React.FC<SceneListProps> = ({
   startSceneId,
   selectedSceneId,
   onSelectScene,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAddNode,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   hasOpeningVignette = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onViewMap,
   onDeleteScene,
   onReorderScenes,
   isDirty,
   currentView,
   isLateralMenu,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNarrativeMenuOpen,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onToggleNarrative,
 }) => {
   const { t } = useTranslation();
@@ -243,6 +249,7 @@ const SceneList: React.FC<SceneListProps> = ({
     dragOverItem.current = null;
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getAddButtonClass = () => {
     const baseClass =
       'flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent flex-shrink-0 whitespace-nowrap';

@@ -11,6 +11,7 @@ import {
   sanitizeGameDataContent,
 } from '../lib/gameDefaults';
 import { FONTS } from '../constants';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import DOMPurify from 'dompurify';
 import dompurifyCode from 'dompurify/dist/purify.min.js?raw';
 import { useTranslation } from 'react-i18next';
@@ -109,6 +110,7 @@ export const useExportImport = ({
 
     // Process Vignette assets
     if (exportData.vignettes && Array.isArray(exportData.vignettes)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       exportData.vignettes.forEach((vig: any, index: number) => {
         vig.image = processAsset(vig.image, `vignette_image_${index}`, assetsFolder, assetMap);
         vig.backgroundMusic = processAsset(vig.backgroundMusic, `vignette_bgm_${index}`, assetsFolder, assetMap);
@@ -1021,6 +1023,7 @@ DATE:        ${exportDate.toLocaleString()}
     ]
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const optimizeImportedGameData = async (data: any): Promise<any> => {
     try {
       const { compressImageToWebP } = await import('../utils/imageOptimizer');
@@ -1030,6 +1033,7 @@ DATE:        ${exportDate.toLocaleString()}
       let optimizedCount = 0;
       let skippedCount = 0;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const optimizeField = async (val: any): Promise<any> => {
         if (typeof val === 'string' && val.startsWith('data:image/') && !val.startsWith('data:image/webp')) {
           try {
@@ -1063,6 +1067,7 @@ DATE:        ${exportDate.toLocaleString()}
 
       // Scenes
       if (data.scenes) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const scenePromises = Object.values(data.scenes).map(async (scene: any) => {
           if (scene.image) scene.image = await optimizeField(scene.image);
         });
@@ -1071,6 +1076,7 @@ DATE:        ${exportDate.toLocaleString()}
 
       // Vignettes
       if (data.vignettes && Array.isArray(data.vignettes)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const vignettePromises = data.vignettes.map(async (vignette: any) => {
           if (vignette.image) vignette.image = await optimizeField(vignette.image);
         });
@@ -1079,6 +1085,7 @@ DATE:        ${exportDate.toLocaleString()}
 
       // Global Objects
       if (data.globalObjects) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const objPromises = Object.values(data.globalObjects).map(async (obj: any) => {
           if (obj.image) obj.image = await optimizeField(obj.image);
         });

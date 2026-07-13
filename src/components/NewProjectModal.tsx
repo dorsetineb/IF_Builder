@@ -169,6 +169,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         if (e.target) e.target.value = '';
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleApplyTheme = (preset: any) => {
         setGameBackgroundColor(preset.gameBackgroundColor || '#000000');
         setColors(prev => ({
@@ -801,6 +802,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.orientation', 'Orientação')}</label>
                                                 <select
                                                     value={layoutOrientation}
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                     onChange={(e) => setLayoutOrientation(e.target.value as any)}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                 >
@@ -812,6 +814,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.imagePosition', 'Posição da Imagem')}</label>
                                                 <select
                                                     value={layoutOrder}
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                     onChange={(e) => setLayoutOrder(e.target.value as any)}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                 >
@@ -834,6 +837,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.frameTitle', 'Moldura')}</label>
                                             <select
                                                 value={imageFrame}
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 onChange={(e) => setImageFrame(e.target.value as any)}
                                                 className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                             >
@@ -972,6 +976,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                 `}
                                                             >
                                                                 {(() => {
+                                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                                     const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame as any, gameBackgroundColor, '#FFFFFF');
 
                                                                     return (

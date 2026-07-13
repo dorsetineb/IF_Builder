@@ -198,10 +198,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem(key);
     };
 
-    const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed');
+    const savedTextSpeed = window.isPreview ? null : localStorage.getItem('if_builder_settings_text_speed');
     let textSpeedVal = savedTextSpeed ? parseInt(savedTextSpeed) : (gameData.gameTextSpeed || 3); 
+    if (textSpeedVal === 5) textSpeedVal = 3; // Fallback for legacy text speed 5
     
-    const savedImgSpeed = localStorage.getItem('if_builder_settings_image_speed');
+    const savedImgSpeed = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
     let imgSpeedVal = 0.5;
     if (savedImgSpeed) {
         const speedVal = parseInt(savedImgSpeed);
@@ -217,17 +218,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const speedVal = gameData.gameImageSpeed || 0.5;
         if (speedVal === 1) imgSpeedVal = 2.0;
         else if (speedVal === 2) imgSpeedVal = 1.0;
-        else if (speedVal === 3) imgSpeedVal = 0.5;
+        else if (speedVal === 3 || speedVal === 5) imgSpeedVal = 0.5;
         else if (speedVal === 4) imgSpeedVal = 0.2;
         else imgSpeedVal = speedVal;
     }
     
-    if (isNaN(imgSpeedVal) || imgSpeedVal < 0.1 || imgSpeedVal > 5.0) {
+    if (isNaN(imgSpeedVal) || imgSpeedVal < 0.1 || imgSpeedVal > 3.0) {
         imgSpeedVal = 0.5;
     }
     
-    let typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
-    let textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+    let typeSpeedBase = 40;
+    let textAnimDuration = '0.5s';
+    if (textSpeedVal === 1) {
+        typeSpeedBase = 150;
+        textAnimDuration = '2.0s';
+    } else if (textSpeedVal === 2) {
+        typeSpeedBase = 80;
+        textAnimDuration = '1.0s';
+    } else if (textSpeedVal === 3) {
+        typeSpeedBase = 40;
+        textAnimDuration = '0.5s';
+    } else {
+        typeSpeedBase = 15;
+        textAnimDuration = '0.2s';
+    }
     const imageAnimDuration = imgSpeedVal + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
@@ -1072,19 +1086,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const sqImageSpeed = document.getElementById('start-square-image-speed');
             const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
 
-            const savedVol = localStorage.getItem('if_builder_settings_volume') || '100';
+            const savedVol = (window.isPreview ? null : localStorage.getItem('if_builder_settings_volume')) || '100';
             if (sqVolume) {
                 sqVolume['value'] = savedVol;
                 if (sqVolumeVal) sqVolumeVal.textContent = savedVol + '%';
             }
 
-            const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed') || '3';
+            const savedTextSpeed = (window.isPreview ? null : localStorage.getItem('if_builder_settings_text_speed')) || '3';
             if (sqTextSpeed) {
                 sqTextSpeed['value'] = savedTextSpeed;
                 if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(savedTextSpeed);
             }
 
-            const savedImageSpeed = localStorage.getItem('if_builder_settings_image_speed') || '3';
+            const savedImageSpeed = (window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed')) || '3';
             if (sqImageSpeed) {
                 sqImageSpeed['value'] = savedImageSpeed;
                 if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(savedImageSpeed);
@@ -1132,7 +1146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
-                localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+                if (!window.isPreview) localStorage.setItem('if_builder_settings_text_speed', speed.toString());
             });
         }
 
@@ -1143,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const target = e.target;
                 const speed = parseInt(target['value']);
                 if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(speed);
-                localStorage.setItem('if_builder_settings_image_speed', speed.toString());
+                if (!window.isPreview) localStorage.setItem('if_builder_settings_image_speed', speed.toString());
                 
                 // Map qualitative image transition speed: 1 = Muito Lento (2.0s), 2 = Lento (1.0s), 3 = Normal (0.5s), 4 = Rápido (0.2s)
                 let imageDuration = '0.5s';
@@ -1160,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const volumeSlider = document.getElementById('settings-volume-slider');
         if (volumeSlider) {
-            const savedVol = localStorage.getItem('if_builder_settings_volume');
+            const savedVol = window.isPreview ? null : localStorage.getItem('if_builder_settings_volume');
             if (savedVol !== null) {
                 volumeSlider.value = savedVol;
                 if (bgm) bgm.volume = parseFloat(savedVol) / 100;
@@ -1184,7 +1198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             speedSlider.setAttribute('max', '4');
             speedSlider.setAttribute('step', '1');
 
-            const savedSpeed = localStorage.getItem('if_builder_settings_text_speed');
+            const savedSpeed = window.isPreview ? null : localStorage.getItem('if_builder_settings_text_speed');
             if (savedSpeed !== null) {
                 speedSlider.value = savedSpeed;
                 textSpeedVal = parseInt(savedSpeed);
@@ -1224,7 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     textAnimDuration = '0.2s';
                 }
                 document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
-                localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+                if (!window.isPreview) localStorage.setItem('if_builder_settings_text_speed', speed.toString());
             });
         }
 
@@ -2405,15 +2419,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
         let speed = 0.5;
-        const savedImageSpeedStr = localStorage.getItem('if_builder_settings_image_speed');
+        const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
         if (savedImageSpeedStr) {
             const speedVal = parseInt(savedImageSpeedStr);
             if (speedVal === 1) speed = 2.0;
             else if (speedVal === 2) speed = 1.0;
             else if (speedVal === 3) speed = 0.5;
             else if (speedVal === 4) speed = 0.2;
-        } else if (transitionSpeed !== null) {
-            speed = transitionSpeed;
+        } else if (transitionSpeed !== null && transitionSpeed !== undefined && transitionSpeed !== '') {
+            speed = typeof transitionSpeed === 'string' ? parseFloat(transitionSpeed) : transitionSpeed;
             if (speed === 1) speed = 2.0;
             else if (speed === 2) speed = 1.0;
             else if (speed === 3) speed = 0.5;
@@ -2421,11 +2435,12 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (speed > 2.0) speed = 0.5;
         } else {
             speed = gameData.gameImageSpeed || 0.5;
-            if (speed === 1) speed = 2.0;
-            else if (speed === 2) speed = 1.0;
-            else if (speed === 3) speed = 0.5;
+            if (speed === 3 || speed === 5) speed = 0.5; // Fixed legacy value 5
             else if (speed === 4) speed = 0.2;
             else if (speed > 2.0) speed = 0.5;
+        }
+        if (typeof speed !== 'number' || isNaN(speed)) {
+            speed = 0.5;
         }
         const defaultDuration = speed + 's';
         document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
@@ -2433,7 +2448,7 @@ document.addEventListener('DOMContentLoaded', () => {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
-                 const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
+                 const durationMs = speed * 1000;
                  setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
              } else renderScene(scene, successPrefix);
         } else { renderScene(scene, successPrefix); }

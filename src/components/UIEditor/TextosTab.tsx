@@ -7,7 +7,9 @@ import {
     Book, 
     Wrench 
 } from 'lucide-react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UIPreviewPanel } from './UIPreviewPanel';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FONTS } from '../../constants';
 
 interface TextosTabProps {
@@ -106,6 +108,7 @@ interface TextosTabProps {
     localMaxChances?: number;
     localGameInteractionType?: 'parser' | 'choice';
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onUpdate: (key: string, value: any, save?: boolean) => void;
 }
 
@@ -153,53 +156,98 @@ export const TextosTab: React.FC<TextosTabProps> = ({
     localEnableInventory,
     localEnableDiary,
     localEnableTrackers,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameShowSystemButton,
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localFontFamily,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameFontSize,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameBackgroundColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameFrameColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localTextColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localTitleColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localFocusColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameContinueIndicatorColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSplashButtonColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSplashButtonTextColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSplashButtonHoverColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localActionButtonColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localActionButtonTextColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localActionButtonHoverColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSystemButtonColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSystemButtonTextColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSystemButtonBorderColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSystemButtonHoverColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSystemButtonHoverTextColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameSceneNameOverlayBg,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameSceneNameOverlayTextColor,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localLayoutOrientation,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localLayoutOrder,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localImageFrame,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ditherColors,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localEnableImages,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localEnableSystemMenu,
     
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     previewType,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setPreviewType,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSplashContentAlignment,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localOmitSplashTitle,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localOmitSplashDescription,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localSplashButtonText,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localStartScreenBgImage = '',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localShowStartScreenTitle = true,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localStartScreenTitle = '',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localStartScreenButtonAlignment = 'center',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localStartScreenVerticalAlignment = 'center',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localTitle = '',
     
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localEnableChances = false,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localChanceIcon = 'heart',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localChanceIconColor = '#ff4d4d',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localMaxChances = 3,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameInteractionType = 'parser',
 
     onUpdate

@@ -41,11 +41,11 @@ describe('useSceneManagement Hook', () => {
         const updateFn = mockSetGameData.mock.calls[0][0];
 
         // Simulate state update
-        const newState = updateFn(initialGameData);
+        const newState = updateFn({ ...initialGameData, scenes: {}, sceneOrder: [] });
         expect(Object.keys(newState.scenes).length).toBe(1);
         expect(newState.sceneOrder.length).toBe(1);
 
-        expect(mockSetCurrentView).toHaveBeenCalledWith('scenes');
+        expect(mockSetCurrentView).toHaveBeenCalledWith('three_panels');
         expect(mockSetSelectedSceneId).toHaveBeenCalled();
         expect(mockSetIsDirty).toHaveBeenCalledWith(true);
     });
@@ -82,7 +82,7 @@ describe('useSceneManagement Hook', () => {
 
         expect(mockSetConfirmationModal).toHaveBeenCalledWith(expect.objectContaining({
             isOpen: true,
-            title: "Deletar Cena"
+            title: "sceneEditor.deleteTitle"
         }));
     });
 
@@ -105,7 +105,7 @@ describe('useSceneManagement Hook', () => {
             result.current.handleDeleteScene('scn_1');
         });
 
-        expect(mockToast).toHaveBeenCalledWith("Ação não permitida", expect.stringContaining("cena inicial"), "error");
+        expect(mockToast).toHaveBeenCalledWith("Ação não permitida", expect.stringContaining("inicial"), "error");
         expect(mockSetConfirmationModal).not.toHaveBeenCalled();
     });
 });

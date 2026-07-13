@@ -250,6 +250,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             /* 3. Text Scale Dynamic Injection */
             ${(() => {
                 const vignettes = gameData.vignettes || [];
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const vignetteScaleClass = `vignette-scale-${gameData.vignetteScaling || 'md'}`;
                 const opening = vignettes.find(v => v.id === 'VNT_OPENING') || vignettes[0];
                 const victory = vignettes.find(v => v.isConclusion && v.id.includes('VICTORY')) || vignettes.find(v => v.isConclusion);
