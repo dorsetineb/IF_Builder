@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useMemo, useRef } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, Activity, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split } from 'lucide-react';
+import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, Activity, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split, History as HistoryIcon, List, Lightbulb, Shuffle } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
@@ -11,6 +11,7 @@ import { getFramePreviewStyles } from '../utils/frameStyles';
 import { useTheme } from './ThemeProvider';
 import { DitherShader } from './ui/dither-shader';
 import { getDitherColors } from '../utils/themeStyles';
+import { ChanceIcon } from './UIEditor/SystemsTab';
 
 interface NewProjectModalProps {
     isOpen: boolean;
@@ -83,18 +84,47 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [enableDiary, setEnableDiary] = useState(true);
     const [enableChances, setEnableChances] = useState(false);
     const [enableTrackers, setEnableTrackers] = useState(true);
+
+    const [enableTextControl, setEnableTextControl] = useState(true);
+    const [textReadingFlow, setTextReadingFlow] = useState<'continuous' | 'paused'>('paused');
+    const [textAnimationType, setTextAnimationType] = useState<'fade' | 'typewriter'>('typewriter');
+    const [textSpeed, setTextSpeed] = useState<number>(3);
+
+    const [enableImages, setEnableImages] = useState(true);
+    const [imageTransitionType, setImageTransitionType] = useState<'fade' | 'slide' | 'none'>('fade');
+    const [imageSpeed, setImageSpeed] = useState<number>(3);
+
+    const [enableSystemMenu, setEnableSystemMenu] = useState(true);
+    const [startScreenTitle, setStartScreenTitle] = useState('');
+    const [showStartScreenTitle, setShowStartScreenTitle] = useState(true);
+    const [startScreenBgImage, setStartScreenBgImage] = useState('');
+    const [menuTransitionType, setMenuTransitionType] = useState<'fade' | 'slide' | 'none'>('fade');
+    const [menuTransitionSpeed, setMenuTransitionSpeed] = useState<number>(500);
+    const [menuTransitionSound, setMenuTransitionSound] = useState<string | undefined>(undefined);
+
+    const [maxChances, setMaxChances] = useState<number>(3);
+    const [chanceIcon, setChanceIcon] = useState<'circle' | 'cross' | 'heart' | 'square' | 'diamond'>('heart');
+    const [chanceIconColor, setChanceIconColor] = useState<string>('#ff4d4d');
+
+    const [diaryShowPlayerAction, setDiaryShowPlayerAction] = useState(true);
+    const [diaryAllowExport, setDiaryAllowExport] = useState(false);
+
+    const [enableRetrospective, setEnableRetrospective] = useState(true);
+    const [enableSuggestions, setEnableSuggestions] = useState(true);
     
     // Vignette Layout State
     const [splashContentAlignment, setSplashContentAlignment] = useState<'left' | 'right'>('right');
     const [omitSplashTitle, setOmitSplashTitle] = useState(false);
     const [omitSplashDescription, setOmitSplashDescription] = useState(false);
 
-    // Effect to disable inventory if Interaction Type is Choice (IF)
+    // Effect to disable inventory and suggestions if Interaction Type is Choice (IF)
     React.useEffect(() => {
         if (interactionType === 'choice') {
             setEnableInventory(false);
+            setEnableSuggestions(false);
         } else {
             setEnableInventory(true); // Build default expectation, parser usually has inventory
+            setEnableSuggestions(true);
         }
     }, [interactionType]);
     
@@ -246,11 +276,28 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         enableDiary,
         enableChances,
         enableTrackers,
-        enableSystemMenu: false,
-        startScreenBgImage: '',
-        showStartScreenTitle: true,
-        startScreenTitle: '',
+        enableSystemMenu: false, // Always false for previewing actual scenes
+        startScreenBgImage,
+        showStartScreenTitle,
+        startScreenTitle,
         startScreenButtonAlignment: 'center',
+        gameMenuTransitionType: menuTransitionType,
+        gameMenuTransitionSpeed: menuTransitionSpeed,
+        gameMenuTransitionSound: menuTransitionSound,
+        gameMaxChances: maxChances,
+        gameChanceIcon: chanceIcon,
+        gameChanceIconColor: chanceIconColor,
+        diaryShowPlayerAction,
+        diaryAllowExport,
+        enableRetrospective,
+        enableSuggestions,
+        enableTextControl,
+        gameTextReadingFlow: textReadingFlow,
+        gameTextAnimationType: textAnimationType,
+        gameTextSpeed: textSpeed,
+        enableImages,
+        gameImageTransitionType: imageTransitionType as any,
+        gameImageSpeed: imageSpeed,
         // Since we are toggling them, we also need to make sure the UI reflect it
         gameShowSystemButton: false, // User requested REMOVAL of system button
         gameShowTrackersUI: true, // Always show trackers UI if enabled
@@ -264,7 +311,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         gameFontSize: fontSize,
         gameActionButtonText: actionButtonText,
         gameVerbInputPlaceholder: verbInputPlaceholder,
-        gameTextSpeed: 3,
 
         // Vignette Layout
         gameSplashContentAlignment: splashContentAlignment,
@@ -280,7 +326,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         gameSplashButtonTextColor: colors.splashButtonTextColor,
         gameActionButtonColor: colors.actionButtonColor,
         gameActionButtonTextColor: colors.actionButtonTextColor,
-        gameChanceIconColor: colors.chanceIconColor,
         frameBookColor: colors.frameBookColor,
         frameTradingCardColor: colors.frameTradingCardColor,
         frameRoundedTopColor: colors.frameRoundedTopColor,
@@ -309,7 +354,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             textAnimationType: 'fade',
             textSpeed: 3
         }]
-    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers, splashContentAlignment, omitSplashTitle, omitSplashDescription]);
+    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers, splashContentAlignment, omitSplashTitle, omitSplashDescription, startScreenBgImage, showStartScreenTitle, startScreenTitle, menuTransitionType, menuTransitionSpeed, menuTransitionSound, maxChances, chanceIcon, chanceIconColor, diaryShowPlayerAction, diaryAllowExport, enableRetrospective, enableSuggestions, enableTextControl, textReadingFlow, textAnimationType, textSpeed, enableImages, imageTransitionType, imageSpeed]);
 
     const handleCreate = () => {
         const startSceneId = 'SCN_OPENING';
@@ -408,115 +453,537 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                 {/* Main Content */}
                 <div className="flex-1 overflow-hidden grid grid-cols-12">
                     <div className="col-span-12 lg:col-span-5 xl:col-span-5 flex flex-col border-r border-muted-foreground/50 bg-zinc-900/30 overflow-hidden">
-                        {/* Tab Content */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar pb-12">
-
                             {tab === 'system' && (
                                 <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <button
-                                            onClick={() => setInteractionType('parser')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
-                                        >
-                                            <div className={`p-4 rounded-xl transition-colors ${interactionType === 'parser' ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
-                                                <Terminal className="w-8 h-8" />
-                                            </div>
-                                            <div>
-                                                <h3 className={`text-xs font-bold uppercase tracking-widest mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.parserTitle', 'Parser (Descreva comandos)')}</h3>
-                                                <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    {t('newProject.system.parserDesc', 'O jogador digita ações como "pegar chave" ou "olhar mesa".')}
-                                                </p>
-                                            </div>
-                                        </button>
+                                    {/* SECTION: ESTILO DE DECISÃO */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <Shuffle className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.sistemas.gameStyle', 'Estilo de Decisão')}</h3>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setInteractionType('parser')}
+                                                className={`flex items-start gap-4 p-4 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
+                                            >
+                                                <div className={`p-3 rounded-lg transition-colors ${interactionType === 'parser' ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
+                                                    <Terminal className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h3 className={`text-xs font-bold uppercase tracking-widest mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.parserTitle', 'Parser (Descreva comandos)')}</h3>
+                                                    <p className="text-[11px] text-zinc-400 leading-normal">
+                                                        {t('newProject.system.parserDesc', 'O jogador digita ações como "pegar chave" ou "olhar mesa".')}
+                                                    </p>
+                                                </div>
+                                            </button>
 
-                                        <button
-                                            onClick={() => setInteractionType('choice')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
-                                        >
-                                            <div className={`p-4 rounded-xl transition-colors ${interactionType === 'choice' ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
-                                                <MousePointerClick className="w-8 h-8" />
-                                            </div>
-                                            <div>
-                                                <h3 className={`text-xs font-bold uppercase tracking-widest mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>
-                                                    {t('newProject.system.choiceTitle', 'IF (Escolha uma opção)')}
-                                                </h3>
-                                                <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    {t('newProject.system.choiceDesc', 'O jogador escolhe entre opções pré-definidas para avançar na história.')}
-                                                </p>
-                                            </div>
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setInteractionType('choice')}
+                                                className={`flex items-start gap-4 p-4 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
+                                            >
+                                                <div className={`p-3 rounded-lg transition-colors ${interactionType === 'choice' ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
+                                                    <MousePointerClick className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h3 className={`text-xs font-bold uppercase tracking-widest mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>
+                                                        {t('newProject.system.choiceTitle', 'IF (Escolha uma opção)')}
+                                                    </h3>
+                                                    <p className="text-[11px] text-zinc-400 leading-normal">
+                                                        {t('newProject.system.choiceDesc', 'O jogador escolhe entre opções pré-definidas para avançar na história.')}
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableInventory ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
+                                    {/* SECTION: CONTROLE DE TEXTO */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableTextControl ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
                                             <button
+                                                type="button"
+                                                onClick={() => setEnableTextControl(!enableTextControl)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableTextControl ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableTextControl ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableTextControl ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <Type className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableTextControl ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.textControl', 'Controle de Texto')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.textControlDesc', 'Animação e fluxo da descrição de ramificação')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {enableTextControl && (
+                                            <div className="mt-4 pt-4 border-t border-muted-foreground/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="modalTextReadingFlow" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.readingFlow', 'Fluxo de Leitura')}</label>
+                                                        <select
+                                                            id="modalTextReadingFlow"
+                                                            value={textReadingFlow}
+                                                            onChange={(e) => setTextReadingFlow(e.target.value as 'continuous' | 'paused')}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        >
+                                                            <option value="paused">{t('UIEditor.sistemas.flowPaused', 'Pausado (Por Parágrafo)')}</option>
+                                                            <option value="continuous">{t('UIEditor.sistemas.flowContinuous', 'Contínuo (Texto Completo)')}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="modalTextAnimationType" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.animationStyle', 'Estilo de Animação')}</label>
+                                                        <select
+                                                            id="modalTextAnimationType"
+                                                            value={textAnimationType}
+                                                            onChange={(e) => setTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        >
+                                                            <option value="fade">{t('UIEditor.sistemas.animFade', 'Esmaecer')}</option>
+                                                            <option value="typewriter">{t('UIEditor.sistemas.animTypewriter', 'Máquina de Escrever')}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.speed', 'Velocidade')}</label>
+                                                    <div className="flex items-center gap-4">
+                                                        <input
+                                                            type="range"
+                                                            min="1"
+                                                            max="4"
+                                                            step="1"
+                                                            value={textSpeed}
+                                                            onChange={(e) => setTextSpeed(parseInt(e.target.value))}
+                                                            style={{
+                                                                background: `linear-gradient(to right, ${currentSliderColor} ${((textSpeed - 1) / 3) * 100}%, ${currentSliderColor}33 ${((textSpeed - 1) / 3) * 100}%)`
+                                                            }}
+                                                            className="flex-1 h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
+                                                        />
+                                                        <span className="text-xs font-bold text-zinc-400 w-24 shrink-0">
+                                                            {textSpeed === 1 ? "Muito Lento" : (textSpeed === 2 ? "Lento" : (textSpeed === 3 ? "Normal" : "Rápido"))}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: IMAGENS NAS RAMIFICAÇÕES */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableImages ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
+                                                onClick={() => setEnableImages(!enableImages)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableImages ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableImages ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableImages ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <ImageIcon className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableImages ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.imagesInScenes', 'Imagens nas Ramificações')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.imagesInScenesDesc', 'Ramificações ilustradas por imagens')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {enableImages && (
+                                            <div className="mt-4 pt-4 border-t border-muted-foreground/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="modalImageTransitionType" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.imageTransition', 'Transição de Imagem')}</label>
+                                                        <select
+                                                            id="modalImageTransitionType"
+                                                            value={imageTransitionType}
+                                                            onChange={(e) => setImageTransitionType(e.target.value as any)}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        >
+                                                            <option value="fade">{t('UIEditor.sistemas.transFade', 'Esmaecer (Fade)')}</option>
+                                                            <option value="slide">{t('UIEditor.sistemas.transSlide', 'Deslizar (Slide)')}</option>
+                                                            <option value="none">{t('UIEditor.sistemas.transNone', 'Nenhuma')}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.speed', 'Velocidade')}</label>
+                                                        <div className="flex items-center gap-4 h-[34px] pt-1">
+                                                            <input
+                                                                type="range"
+                                                                min="1"
+                                                                max="4"
+                                                                step="1"
+                                                                value={imageSpeed}
+                                                                onChange={(e) => setImageSpeed(parseInt(e.target.value))}
+                                                                style={{
+                                                                    background: `linear-gradient(to right, ${currentSliderColor} ${((imageSpeed - 1) / 3) * 100}%, ${currentSliderColor}33 ${((imageSpeed - 1) / 3) * 100}%)`
+                                                                }}
+                                                                className="flex-1 h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
+                                                            />
+                                                            <span className="text-xs font-bold text-zinc-400 w-24 shrink-0">
+                                                                {imageSpeed === 1 ? "Muito Lento" : (imageSpeed === 2 ? "Lento" : (imageSpeed === 3 ? "Normal" : "Rápido"))}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: MENU PRINCIPAL E SAVES */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableSystemMenu ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
+                                                onClick={() => setEnableSystemMenu(!enableSystemMenu)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableSystemMenu ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableSystemMenu ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableSystemMenu ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <List className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableSystemMenu ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.startMenuTitle', 'Menu Principal')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.systemMenuDesc', 'Habilita o Menu Principal, salvamento manual e o botão/tecla ESC de sistema.')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {enableSystemMenu && (
+                                            <div className="mt-4 pt-4 border-t border-muted-foreground/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="modalStartScreenTitle" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.startScreen.titleText', 'Título da Ficção')}</label>
+                                                        <input
+                                                            type="text"
+                                                            id="modalStartScreenTitle"
+                                                            value={startScreenTitle}
+                                                            onChange={(e) => setStartScreenTitle(e.target.value)}
+                                                            disabled={!showStartScreenTitle}
+                                                            className={`w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all ${!showStartScreenTitle ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                                            placeholder={title || 'Digite o título...'}
+                                                        />
+                                                    </div>
+                                                    <label className="flex items-center gap-2 cursor-pointer pb-2 group select-none">
+                                                        <div className="relative w-4 h-4 border border-muted-foreground/50 rounded flex items-center justify-center bg-black/50 group-hover:border-primary/50 transition-colors">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                                checked={showStartScreenTitle}
+                                                                onChange={(e) => setShowStartScreenTitle(e.target.checked)}
+                                                            />
+                                                            {showStartScreenTitle && <div className="w-2 h-2 bg-primary rounded-sm" />}
+                                                        </div>
+                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('UIEditor.startScreen.showTitle', 'Exibir Título')}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                                    <div className="space-y-2">
+                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.startScreen.bgImage', 'Imagem de Fundo')}</label>
+                                                        <div className="flex gap-4 items-start">
+                                                            <div className="relative w-20 h-20 bg-zinc-950 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-primary/50 transition-colors">
+                                                                {startScreenBgImage ? (
+                                                                    <>
+                                                                        <img src={startScreenBgImage} alt="" className="w-full h-full object-cover" />
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setStartScreenBgImage('')}
+                                                                            className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center">
+                                                                        <ImageIcon className="w-6 h-6 text-zinc-700" />
+                                                                    </div>
+                                                                )}
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={(e) => {
+                                                                        if (e.target.files && e.target.files[0]) {
+                                                                            const file = e.target.files[0];
+                                                                            import('../utils/imageOptimizer').then(({ compressImageToWebP }) => {
+                                                                                compressImageToWebP(file).then(setStartScreenBgImage);
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                />
+                                                            </div>
+                                                            <span className="text-[9px] text-zinc-500 leading-normal">{t('UIEditor.startScreen.suggestedRes', '1920x1080 sugerido')}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        <div className="space-y-1">
+                                                            <label htmlFor="modalMenuTransitionType" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.startScreen.transition', 'Transição')}</label>
+                                                            <select
+                                                                id="modalMenuTransitionType"
+                                                                value={menuTransitionType}
+                                                                onChange={(e) => setMenuTransitionType(e.target.value as any)}
+                                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                            >
+                                                                <option value="fade">{t('UIEditor.sistemas.transFade', 'Esmaecer')}</option>
+                                                                <option value="slide">{t('UIEditor.sistemas.transSlide', 'Deslizar')}</option>
+                                                                <option value="none">{t('UIEditor.sistemas.transNone', 'Nenhuma')}</option>
+                                                            </select>
+                                                        </div>
+
+                                                        {menuTransitionType !== 'none' && (
+                                                            <div className="space-y-1 animate-in fade-in slide-in-from-top-1">
+                                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.speed', 'Velocidade')}</label>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input
+                                                                        type="range"
+                                                                        min="1"
+                                                                        max="4"
+                                                                        step="1"
+                                                                        value={menuTransitionSpeed === 200 ? 4 : (menuTransitionSpeed === 500 ? 3 : (menuTransitionSpeed === 1000 ? 2 : (menuTransitionSpeed === 2000 ? 1 : 3)))}
+                                                                        onChange={(e) => {
+                                                                            const step = parseInt(e.target.value);
+                                                                            let speed = 500;
+                                                                            if (step === 4) speed = 200;
+                                                                            else if (step === 3) speed = 500;
+                                                                            else if (step === 2) speed = 1000;
+                                                                            else if (step === 1) speed = 2000;
+                                                                            setMenuTransitionSpeed(speed);
+                                                                        }}
+                                                                        style={{
+                                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((menuTransitionSpeed === 200 ? 4 : (menuTransitionSpeed === 500 ? 3 : (menuTransitionSpeed === 1000 ? 2 : 1))) - 1) / 3 * 100}%, ${currentSliderColor}33 ${((menuTransitionSpeed === 200 ? 4 : (menuTransitionSpeed === 500 ? 3 : (menuTransitionSpeed === 1000 ? 2 : 1))) - 1) / 3 * 100}%)`
+                                                                        }}
+                                                                        className="flex-1 h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
+                                                                    />
+                                                                    <span className="text-xs font-bold text-zinc-400 w-24 shrink-0">
+                                                                        {menuTransitionSpeed === 200 ? "Rápido" : (menuTransitionSpeed === 500 ? "Normal" : (menuTransitionSpeed === 1000 ? "Lento" : "Muito Lento"))}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: SISTEMA DE VIDAS */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableChances ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
+                                                onClick={() => setEnableChances(!enableChances)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableChances ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableChances ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <Heart className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableChances ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.lifeSystem', 'Sistema de Vidas')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.lifeSystemDesc', 'Limitar tentativas e chances')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {enableChances && (
+                                            <div className="mt-4 pt-4 border-t border-muted-foreground/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <div className="flex items-end gap-4 w-full">
+                                                    <div className="space-y-1 w-20 shrink-0">
+                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.lives', 'Vidas')}</label>
+                                                        <input
+                                                            type="number"
+                                                            value={maxChances}
+                                                            onChange={(e) => setMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                            min="1"
+                                                            max="10"
+                                                            className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-xs font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-1 flex-1 min-w-0">
+                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.icon', 'Ícone')}</label>
+                                                        <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
+                                                            {['heart', 'circle', 'square', 'star', 'cross'].map((icon) => (
+                                                                <button
+                                                                    key={icon}
+                                                                    type="button"
+                                                                    onClick={() => setChanceIcon(icon as any)}
+                                                                    className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${chanceIcon === icon ? 'bg-primary/10 shadow-sm opacity-100 ring-1 ring-primary/20' : 'opacity-30 grayscale-[50%] hover:opacity-100 hover:grayscale-0 hover:bg-zinc-900/50'}`}
+                                                                    title={icon}
+                                                                >
+                                                                    <ChanceIcon type={icon} color={chanceIconColor} className="w-4 h-4" />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-1 w-32 shrink-0">
+                                                        <label htmlFor="modalChanceColor" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.sistemas.color', 'Cor')}</label>
+                                                        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
+                                                            <input
+                                                                type="color"
+                                                                id="modalChanceColor-picker"
+                                                                value={chanceIconColor}
+                                                                onChange={(e) => setChanceIconColor(e.target.value)}
+                                                                className="w-8 h-full p-0 border-none rounded cursor-pointer bg-transparent shrink-0"
+                                                                aria-label="Seletor de cor"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                id="modalChanceColor"
+                                                                value={chanceIconColor}
+                                                                onChange={(e) => setChanceIconColor(e.target.value)}
+                                                                className="w-full bg-transparent font-mono text-[10px] text-zinc-300 focus:outline-none focus:ring-0 uppercase truncate"
+                                                                placeholder="#FF0000"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: DIÁRIO DE BORDO */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableDiary ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
+                                                onClick={() => setEnableDiary(!enableDiary)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableDiary ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableDiary ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <BookOpen className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableDiary ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.diary', 'Diário de Bordo')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.diaryDesc', 'Registro automático de eventos')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {enableDiary && (
+                                            <div className="mt-4 pt-4 border-t border-muted-foreground/20 flex flex-col sm:flex-row gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <label className="flex items-center gap-2 cursor-pointer group select-none">
+                                                    <div className="relative w-4 h-4 border border-muted-foreground/50 rounded flex items-center justify-center bg-black/50 group-hover:border-primary/50 transition-colors">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                            checked={diaryShowPlayerAction}
+                                                            onChange={(e) => setDiaryShowPlayerAction(e.target.checked)}
+                                                        />
+                                                        {diaryShowPlayerAction && <div className="w-2 h-2 bg-primary rounded-sm" />}
+                                                    </div>
+                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('UIEditor.sistemas.showPlayerAction', 'Mostrar Ação do Jogador')}</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 cursor-pointer group select-none">
+                                                    <div className="relative w-4 h-4 border border-muted-foreground/50 rounded flex items-center justify-center bg-black/50 group-hover:border-primary/50 transition-colors">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                            checked={diaryAllowExport}
+                                                            onChange={(e) => setDiaryAllowExport(e.target.checked)}
+                                                        />
+                                                        {diaryAllowExport && <div className="w-2 h-2 bg-primary rounded-sm" />}
+                                                    </div>
+                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('UIEditor.sistemas.allowExport', 'Permitir Exportação')}</span>
+                                                </label>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: RASTREADORES */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableTrackers ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
+                                                onClick={() => setEnableTrackers(!enableTrackers)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableTrackers ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableTrackers ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <Activity className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableTrackers ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.trackers', 'Rastreadores')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.trackersDesc', 'Variáveis numéricas (saúde, dinheiro, sanidade)')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* SECTION: INVENTÁRIO */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableInventory ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
                                                 onClick={() => interactionType !== 'choice' && setEnableInventory(!enableInventory)}
                                                 disabled={interactionType === 'choice'}
                                                 className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableInventory ? 'bg-primary' : 'bg-zinc-700'} ${interactionType === 'choice' ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableInventory ? 'translateX(24px)' : 'translateX(0)' }} />
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableInventory ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableInventory ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
-                                                    <Package className="w-6 h-6" />
+                                                    <Package className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableInventory ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.inventory', 'Inventário')}</h4>
-                                                    <p className="text-xs text-zinc-500">{t('newProject.features.inventoryDesc', 'Gestão de itens pegos pelo jogador')}</p>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableInventory ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.inventory', 'Inventário')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.inventoryDesc', 'Gestão de itens pegos pelo jogador')}</p>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableDiary ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
+                                    {/* SECTION: SUGESTÕES */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableSuggestions ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
                                             <button
-                                                onClick={() => setEnableDiary(!enableDiary)}
-                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
+                                                type="button"
+                                                onClick={() => interactionType !== 'choice' && setEnableSuggestions(!enableSuggestions)}
+                                                disabled={interactionType === 'choice'}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableSuggestions ? 'bg-primary' : 'bg-zinc-700'} ${interactionType === 'choice' ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableDiary ? 'translateX(24px)' : 'translateX(0)' }} />
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableSuggestions ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                             <div className="flex items-center gap-4">
-                                                <div className={`p-3 rounded-lg ${enableDiary ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
-                                                    <BookText className="w-6 h-6" />
+                                                <div className={`p-3 rounded-lg ${enableSuggestions ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <Lightbulb className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableDiary ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.diary', 'Diário de Bordo')}</h4>
-                                                    <p className="text-xs text-zinc-500">{t('newProject.features.diaryDesc', 'Registro automático de eventos')}</p>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableSuggestions ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableChances ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
+                                    {/* SECTION: RETROSPECTIVA */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableRetrospective ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
                                             <button
-                                                onClick={() => setEnableChances(!enableChances)}
-                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
+                                                type="button"
+                                                onClick={() => setEnableRetrospective(!enableRetrospective)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableRetrospective ? 'bg-primary' : 'bg-zinc-700'}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableChances ? 'translateX(24px)' : 'translateX(0)' }} />
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableRetrospective ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                             <div className="flex items-center gap-4">
-                                                <div className={`p-3 rounded-lg ${enableChances ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
-                                                    <Heart className="w-6 h-6" />
+                                                <div className={`p-3 rounded-lg ${enableRetrospective ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <HistoryIcon className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableChances ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.chances', 'Sistema de Vidas')}</h4>
-                                                    <p className="text-xs text-zinc-500">{t('newProject.features.chancesDesc', 'Limitar tentativas e chances')}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableTrackers ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
-                                            <button
-                                                onClick={() => setEnableTrackers(!enableTrackers)}
-                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
-                                            >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableTrackers ? 'translateX(24px)' : 'translateX(0)' }} />
-                                            </button>
-                                            <div className="flex items-center gap-4">
-                                                <div className={`p-3 rounded-lg ${enableTrackers ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
-                                                    <Activity className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableTrackers ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.trackers', 'Rastreadores')}</h4>
-                                                    <p className="text-xs text-zinc-500">{t('newProject.features.trackersDesc', 'Variáveis numéricas (saúde, dinheiro, sanidade)')}</p>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableRetrospective ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.retrospective', 'Retrospectiva')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.retrospectiveDesc', 'Permite ao jogador ver as cenas passadas')}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1011,7 +1478,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                                         />
                                                                                     </div>
                                                                                 )}
-                                                                                <div className="absolute top-4 left-4 z-20">
+                                                                                <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-center">
                                                                                     <div
                                                                                         className="px-2 py-0.5 border uppercase leading-none"
                                                                                         style={{ 
@@ -1024,6 +1491,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                                     >
                                                                                         {t('UIEditor.aparencia.sceneName', 'Nome da Ramificação')}
                                                                                     </div>
+                                                                                    {enableChances && (
+                                                                                        <div className="flex gap-1">
+                                                                                            {[1, 2].map(i => (
+                                                                                                <ChanceIcon key={i} type={chanceIcon} color={chanceIconColor} className="w-4 h-4 shadow-none drop-shadow-none" />
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -1106,14 +1580,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        {enableChances && (
-                                                            <div className="absolute top-6 right-6 flex gap-1 z-20">
-                                                                {[1, 2, 3].map(i => (
-                                                                    <Heart key={i} className="w-4 h-4 fill-current shadow-none drop-shadow-none" style={{ color: colors.chanceIconColor }} />
-                                                                ))}
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 );
                                             }
