@@ -916,7 +916,12 @@ DATE:        ${exportDate.toLocaleString()}
         cleanedScenes[id] = {
           ...cleanedScenes[id],
           objectIds: cleanedScenes[id].objectIds || [],
-          interactions: cleanedScenes[id].interactions || [],
+          interactions: (cleanedScenes[id].interactions || []).map((inter: any) => {
+            // Delete legacy custom transitions from interactions to ensure global settings are respected
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { transitionType, transitionSpeed, ...rest } = inter;
+            return rest;
+          }),
           mapX: undefined,
           mapY: undefined,
           isEndingScene: undefined,
@@ -992,7 +997,21 @@ DATE:        ${exportDate.toLocaleString()}
         gameTextAnimationType: sanitizedData.gameTextAnimationType || 'fade',
         gameTextSpeed: sanitizedData.gameTextSpeed || 5,
         gameImageTransitionType: sanitizedData.gameImageTransitionType || 'fade',
-        gameImageSpeed: sanitizedData.gameImageSpeed || 5,
+        // Migrate legacy float-seconds (0.2/0.5/1.0/2.0) to step integer (1-4).
+        // JS issue: 1.0===1 and 2.0===2, so we use range-based matching for non-integers.
+        // Step mapping: 4=Rápido(0.2s), 3=Normal(0.5s), 2=Lento(1.0s), 1=Muito Lento(2.0s)
+        gameImageSpeed: ((): number => {
+          const raw = sanitizedData.gameImageSpeed;
+          if (raw === undefined || raw === null) return 3;
+          const n = Number(raw);
+          if (isNaN(n)) return 3;
+          if (Number.isInteger(n) && n >= 1 && n <= 4) return n; // Already step
+          if (n <= 0.25) return 4;  // 0.2s → Rápido
+          if (n <= 0.75) return 3;  // 0.5s → Normal
+          if (n <= 1.5)  return 2;  // 1.0s → Lento
+          if (n <= 3.0)  return 1;  // 2.0s → Muito Lento
+          return 3;
+        })(),
         enableSuggestions: sanitizedData.enableSuggestions ?? true,
         gameShowTrackersUI: sanitizedData.gameShowTrackersUI ?? true,
         gameShowSystemButton: sanitizedData.gameShowSystemButton ?? true,

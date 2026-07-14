@@ -1912,7 +1912,7 @@ export const initialGameData: GameData = {
     gameTextAnimationType: 'fade',
     gameTextSpeed: 5,
     gameImageTransitionType: 'fade',
-    gameImageSpeed: 0.5,
+    gameImageSpeed: 3,
     gameFontSize: '12',
     gameShowTrackersUI: true,
     gameShowSystemButton: true,

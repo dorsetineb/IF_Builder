@@ -468,26 +468,18 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                          min="1"
                                                          max="4"
                                                          step="1"
-                                                         value={localImageSpeed === 0.2 ? 4 : (localImageSpeed === 0.5 ? 3 : (localImageSpeed === 1.0 ? 2 : (localImageSpeed === 2.0 ? 1 : 3)))}
+                                                         value={localImageSpeed}
                                                          onChange={(e) => {
                                                              const step = parseInt(e.target.value);
-                                                             let speed = 0.5;
-                                                             if (step === 4) speed = 0.2;
-                                                             else if (step === 3) speed = 0.5;
-                                                             else if (step === 2) speed = 1.0;
-                                                             else if (step === 1) speed = 2.0;
-                                                             setLocalImageSpeed(speed);
+                                                             setLocalImageSpeed(step);
                                                          }}
                                                          style={{
-                                                             background: (() => {
-                                                                 const step = localImageSpeed === 0.2 ? 4 : (localImageSpeed === 0.5 ? 3 : (localImageSpeed === 1.0 ? 2 : (localImageSpeed === 2.0 ? 1 : 3)));
-                                                                 return `linear-gradient(to right, ${currentSliderColor} ${((step - 1) / 3) * 100}%, ${currentSliderColor}33 ${((step - 1) / 3) * 100}%)`;
-                                                             })()
+                                                             background: `linear-gradient(to right, ${currentSliderColor} ${((localImageSpeed - 1) / 3) * 100}%, ${currentSliderColor}33 ${((localImageSpeed - 1) / 3) * 100}%)`
                                                          }}
                                                          className="w-full h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                      />
                                                      <span className="text-xs font-bold w-20 text-left whitespace-nowrap">
-                                                         {localImageSpeed === 0.2 ? "Rápido" : (localImageSpeed === 0.5 ? "Normal" : (localImageSpeed === 1.0 ? "Lento" : (localImageSpeed === 2.0 ? "Muito Lento" : "Normal")))}
+                                                         {localImageSpeed === 4 ? "Rápido" : (localImageSpeed === 3 ? "Normal" : (localImageSpeed === 2 ? "Lento" : (localImageSpeed === 1 ? "Muito Lento" : "Normal")))}
                                                      </span>
                                                  </div>
                                              </div>

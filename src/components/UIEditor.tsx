@@ -353,7 +353,26 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localTextSpeed, setLocalTextSpeed] = useState<number>(props.textSpeed || 3);
     const [localTextReadingFlow, setLocalTextReadingFlow] = useState<'continuous' | 'paused'>(textReadingFlow || 'paused');
     const [localImageTransitionType, setLocalImageTransitionType] = useState<GameData['gameImageTransitionType']>(props.imageTransitionType || 'fade');
-    const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed || 0.5);
+    /**
+     * Converts any legacy or current speed value to a valid step integer (1-4).
+     * CRITICAL: Check exact step integers FIRST before any float comparisons.
+     * In JavaScript, 1.0 === 1 and 2.0 === 2, so order matters.
+     * Steps: 1=Muito Lento(2.0s), 2=Lento(1.0s), 3=Normal(0.5s), 4=Rápido(0.2s)
+     */
+    const getImageSpeedStep = (val: any): number => {
+        const n = Number(val);
+        if (isNaN(n)) return 3;
+        // Valid step integers 1-4 are returned as-is (new format)
+        if (n === 1) return 1; // Muito Lento
+        if (n === 2) return 2; // Lento
+        if (n === 3) return 3; // Normal
+        if (n === 4) return 4; // Rápido
+        // Legacy float-seconds (only 0.2 and 0.5 are unambiguous here)
+        if (n <= 0.25) return 4;  // ~0.2s = Rápido
+        if (n <= 0.75) return 3;  // ~0.5s = Normal
+        return 3;                 // Fallback to Normal
+    };
+    const [localImageSpeed, setLocalImageSpeed] = useState(() => getImageSpeedStep(imageSpeed));
 
     const [localEnableSystemMenu, setLocalEnableSystemMenu] = useState(enableSystemMenu || false);
     const [localStartScreenBgImage, setLocalStartScreenBgImage] = useState(startScreenBgImage || '');
@@ -506,7 +525,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalTextReadingFlow(textReadingFlow || 'paused'); }, [textReadingFlow]);
     useEffect(() => { setLocalGameInteractionType(gameInteractionType || 'parser'); }, [gameInteractionType]);
     useEffect(() => { setLocalImageTransitionType(imageTransitionType); }, [imageTransitionType]);
-    useEffect(() => { setLocalImageSpeed(imageSpeed || 0.5); }, [imageSpeed]);
+    useEffect(() => { setLocalImageSpeed(getImageSpeedStep(imageSpeed)); }, [imageSpeed]);
 
     // 7. Feature Flags (Enablers)
     useEffect(() => { setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers')); }, [enableTrackers, gameSystemEnabled]);
@@ -818,7 +837,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalTextSpeed(textSpeed);
         setLocalTextReadingFlow(textReadingFlow || 'paused');
         setLocalImageTransitionType(imageTransitionType);
-        setLocalImageSpeed(imageSpeed || 0.5);
+        setLocalImageSpeed(getImageSpeedStep(imageSpeed));
 
         // Reset New Systems
         setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers'));

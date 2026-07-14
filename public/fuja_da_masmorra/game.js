@@ -93,12 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
             imgSpeedVal = isNaN(parsed) ? 0.5 : parsed;
         }
     } else {
-        const speedVal = gameData.gameImageSpeed || 0.5;
+        const rawSpeed = gameData.gameImageSpeed;
+        const speedVal = rawSpeed !== undefined && rawSpeed !== null ? Number(rawSpeed) : 3;
         if (speedVal === 1) imgSpeedVal = 2.0;
         else if (speedVal === 2) imgSpeedVal = 1.0;
         else if (speedVal === 3 || speedVal === 5) imgSpeedVal = 0.5;
         else if (speedVal === 4) imgSpeedVal = 0.2;
-        else imgSpeedVal = speedVal;
+        else imgSpeedVal = 0.5;
     }
     
     if (isNaN(imgSpeedVal) || imgSpeedVal < 0.1 || imgSpeedVal > 3.0) {
@@ -2294,7 +2295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
+        let effectiveTransition = gameData.gameImageTransitionType || 'fade';
         if (effectiveTransition === 'none') transition = false;
         let speed = 0.5;
         const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
@@ -2304,20 +2305,14 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (speedVal === 2) speed = 1.0;
             else if (speedVal === 3) speed = 0.5;
             else if (speedVal === 4) speed = 0.2;
-        } else if (transitionSpeed !== null && transitionSpeed !== undefined && transitionSpeed !== '') {
-            speed = typeof transitionSpeed === 'string' ? parseFloat(transitionSpeed) : transitionSpeed;
-            if (speed === 1) speed = 2.0;
-            else if (speed === 2) speed = 1.0;
-            else if (speed === 3) speed = 0.5;
-            else if (speed === 4) speed = 0.2;
-            else if (speed > 2.0) speed = 0.5;
         } else {
-            speed = gameData.gameImageSpeed || 0.5;
-            if (speed === 1) speed = 2.0;
-            else if (speed === 2) speed = 1.0;
-            else if (speed === 3 || speed === 5) speed = 0.5; // Fixed legacy value 5
-            else if (speed === 4) speed = 0.2;
-            else if (speed > 2.0) speed = 0.5;
+            const rawSpeed = gameData.gameImageSpeed;
+            const speedVal = rawSpeed !== undefined && rawSpeed !== null ? Number(rawSpeed) : 3;
+            if (speedVal === 1) speed = 2.0;
+            else if (speedVal === 2) speed = 1.0;
+            else if (speedVal === 3 || speedVal === 5) speed = 0.5;
+            else if (speedVal === 4) speed = 0.2;
+            else speed = 0.5;
         }
         if (typeof speed !== 'number' || isNaN(speed)) {
             speed = 0.5;
@@ -2328,7 +2323,7 @@ document.addEventListener('DOMContentLoaded', () => {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
-                 const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
+                 const durationMs = speed * 1000;
                  setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
              } else renderScene(scene, successPrefix);
         } else { renderScene(scene, successPrefix); }

@@ -111,6 +111,15 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
         const cssOverrides = `
             :root {
                 --menu-anim-speed: ${(gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500) / 1000}s;
+                --image-anim-speed: ${(() => {
+                    const val = gameData.gameImageSpeed;
+                    const speedVal = val !== undefined && val !== null ? Number(val) : 3;
+                    if (speedVal === 1) return 2.0;
+                    if (speedVal === 2) return 1.0;
+                    if (speedVal === 3 || speedVal === 5) return 0.5;
+                    if (speedVal === 4) return 0.2;
+                    return 0.5;
+                })()}s;
             }
             body.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
             body.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }

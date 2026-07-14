@@ -1512,7 +1512,7 @@ const Editor: React.FC = () => {
                     textSpeed={gameData.gameTextSpeed || 5}
                     textReadingFlow={gameData.gameTextReadingFlow || 'paused'}
                     imageTransitionType={gameData.gameImageTransitionType || 'fade'}
-                    imageSpeed={gameData.gameImageSpeed || 0.5}
+                    imageSpeed={gameData.gameImageSpeed !== undefined ? gameData.gameImageSpeed : 3}
                     gameMenuTransitionType={gameData.gameMenuTransitionType || 'fade'}
                     gameMenuTransitionSpeed={gameData.gameMenuTransitionSpeed || 0.5}
                     gameMenuTransitionSound={gameData.gameMenuTransitionSound || ''}
