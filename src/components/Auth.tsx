@@ -107,9 +107,9 @@ export function Auth() {
         <div className={`${isMobile ? 'w-full pointer-events-none' : 'w-96'} flex flex-col h-full relative z-20 transition-all duration-300`}>
             <div className={`flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12 ${isMobile ? '' : ''}`}>
                 {/* Tagline */}
-                <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-[15px] text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>
+                <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-[16px] text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>
                     {isMobile ? (
-                        <div className="text-[15px] text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
+                        <div className="text-[16px] text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                             <p>{t('auth.sidebar.mobile.line1', 'Por uma fresta, você enxerga uma caverna escura.')}</p>
                             <p className="text-primary font-bold mt-2">
                                 &gt; {t('auth.sidebar.mobile.line2', 'ACESSO NEGADO DEVIDO A SMARTPHONE.')}
@@ -137,7 +137,7 @@ export function Auth() {
                                 e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                             }}
                             onClick={() => navigate('/editor')}
-                            className={`w-fit flex items-center justify-start gap-3 px-5 py-3 rounded-xl font-bold text-[15px] transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}
+                            className={`w-fit flex items-center justify-start gap-3 px-5 py-3 rounded-xl font-bold text-[16px] transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}
                         >
                             <div
                                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -150,7 +150,7 @@ export function Auth() {
                         </button>
 
                         {/* Secret Hint Text */}
-                        <div className="text-[15px] text-white/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
+                        <div className="text-[16px] text-white/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
                             <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                             <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                         </div>
@@ -178,7 +178,7 @@ export function Auth() {
                     </div>
                 </div>
 
-                <div className="space-y-4 text-muted-foreground leading-relaxed text-[15px]">
+                <div className="space-y-4 text-muted-foreground leading-relaxed text-[16px]">
                     <p>
                         {t('auth.about.p1', 'Crie ramificações, objetos e defina as interações que avançam a sua ficção interativa.')}
                     </p>

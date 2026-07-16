@@ -17,9 +17,9 @@
   --font-body: "Pixelon", monospace;
 
   /* Adjust font sizes for Pixelon consistency */
-  --text-xs: 11px;
-  --text-sm: 11px;
-  --text-base: 11px;
+  --text-xs: 12px;
+  --text-sm: 12px;
+  --text-base: 12px;
 
   --color-brand-bg: #1a202c;
   --color-brand-sidebar: #232a38;
@@ -109,6 +109,8 @@
 
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: none;
+    font-smooth: never;
   }
 }
 
@@ -585,6 +587,8 @@ textarea:not(:disabled) {
 
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: none;
+    font-smooth: never;
   }
 
   button,
