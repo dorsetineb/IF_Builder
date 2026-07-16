@@ -68,5 +68,7 @@ jobs:
       - name: Generate Release Notes
         if: matrix.platform == 'ubuntu-latest' # Roda apenas em um dos SOs para não duplicar
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "v${{ env.VERSION }}" --generate-notes
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NOTES=$(gh api POST /repos/${{ github.repository }}/releases/generate-notes -f tag_name="v${{ env.VERSION }}" -q .body)
+          gh release edit "v${{ env.VERSION }}" --notes "$NOTES"
