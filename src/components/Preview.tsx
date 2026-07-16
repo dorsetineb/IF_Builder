@@ -60,6 +60,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Logbook')}</button>`
             : '';
 
+        const notesButtonHTML = gameData.enableNotes
+            ? `<button id="notes-button">${gameData.gameNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações')}</button>`
+            : '';
+
         const rawHtml = gameHTML;
         // Force migration of legacy input to contenteditable div for all projects
         const migratedHtml = rawHtml.replace(/<input type="text" id="verb-input"[^>]*>/, '<div id="verb-input" contenteditable="true" role="textbox" aria-multiline="false"></div>');
@@ -77,11 +81,14 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace('__SUGGESTIONS_BUTTON__', suggestionsButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
+            .replace('__NOTES_BUTTON__', notesButtonHTML)
             .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder'))
             .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder'))
             .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || t('UIEditor.textos.trackersPlaceholder'))
             .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder'))
             .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder'))
+            .replace(/__NOTES_BUTTON_TEXT__/g, gameData.gameNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações'))
+            .replace(/__NOTES_TEXTAREA_PLACEHOLDER__/g, gameData.gameNotesPlaceholderText || t('UIEditor.textos.notesTextAreaPlaceholderDefault', 'Escreva suas anotações aqui...'))
             .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || t('UIEditor.textos.saveMenuPlaceholder', 'Save Game'))
             .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || t('UIEditor.textos.loadMenuPlaceholder', 'Load Game'))
             .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder'))

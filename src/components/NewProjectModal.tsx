@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useMemo, useRef } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, Activity, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split, History as HistoryIcon, List, Lightbulb, Shuffle } from 'lucide-react';
+import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, Activity, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split, History as HistoryIcon, List, Lightbulb, Shuffle, FileText } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
@@ -82,6 +82,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [interactionType, setInteractionType] = useState<'parser' | 'choice'>('parser');
     const [enableInventory, setEnableInventory] = useState(true);
     const [enableDiary, setEnableDiary] = useState(true);
+    const [enableNotes, setEnableNotes] = useState(false);
     const [enableChances, setEnableChances] = useState(false);
     const [enableTrackers, setEnableTrackers] = useState(true);
 
@@ -274,6 +275,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         // System Settings
         enableInventory,
         enableDiary,
+        enableNotes,
+        gameNotesButtonText: '',
+        gameNotesPlaceholderText: '',
         enableChances,
         enableTrackers,
         enableSystemMenu: false, // Always false for previewing actual scenes
@@ -354,7 +358,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             textAnimationType: 'fade',
             textSpeed: 3
         }]
-    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers, splashContentAlignment, omitSplashTitle, omitSplashDescription, startScreenBgImage, showStartScreenTitle, startScreenTitle, menuTransitionType, menuTransitionSpeed, menuTransitionSound, maxChances, chanceIcon, chanceIconColor, diaryShowPlayerAction, diaryAllowExport, enableRetrospective, enableSuggestions, enableTextControl, textReadingFlow, textAnimationType, textSpeed, enableImages, imageTransitionType, imageSpeed]);
+    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableNotes, enableChances, enableTrackers, splashContentAlignment, omitSplashTitle, omitSplashDescription, startScreenBgImage, showStartScreenTitle, startScreenTitle, menuTransitionType, menuTransitionSpeed, menuTransitionSound, maxChances, chanceIcon, chanceIconColor, diaryShowPlayerAction, diaryAllowExport, enableRetrospective, enableSuggestions, enableTextControl, textReadingFlow, textAnimationType, textSpeed, enableImages, imageTransitionType, imageSpeed]);
 
     const handleCreate = () => {
         const startSceneId = 'SCN_OPENING';
@@ -897,6 +901,28 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </label>
                                             </div>
                                         )}
+                                    </div>
+
+                                    {/* SECTION: ANOTAÇÕES */}
+                                    <div className={`p-5 border rounded-xl transition-all ${enableNotes ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/30'}`}>
+                                        <div className="flex items-center gap-4 w-full">
+                                            <button
+                                                type="button"
+                                                onClick={() => setEnableNotes(!enableNotes)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableNotes ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm" style={{ transform: enableNotes ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableNotes ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <FileText className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableNotes ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.notes', 'Bloco de Notas')}</h4>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.notesDesc', 'Permite ao jogador escrever e salvar suas próprias anotações')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* SECTION: RASTREADORES */}

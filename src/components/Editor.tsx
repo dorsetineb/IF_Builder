@@ -1497,6 +1497,8 @@ const Editor: React.FC = () => {
                     suggestionsButtonText={gameData.gameSuggestionsButtonText}
                     inventoryButtonText={gameData.gameInventoryButtonText}
                     diaryButtonText={gameData.gameDiaryButtonText}
+                    notesButtonText={gameData.gameNotesButtonText}
+                    notesPlaceholderText={gameData.gameNotesPlaceholderText}
                     diaryShowSceneImage={gameData.diaryShowSceneImage}
                     diaryShowPlayerAction={gameData.diaryShowPlayerAction}
                     trackersButtonText={gameData.gameTrackersButtonText}

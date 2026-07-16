@@ -301,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionsButton = document.getElementById('suggestions-button');
     const inventoryButton = document.getElementById('inventory-button');
     const diaryButton = document.getElementById('diary-button');
+    const notesButton = document.getElementById('notes-button');
     const trackersButton = document.getElementById('trackers-button');
     const systemButton = document.getElementById('system-button');
     const exportPdfButton = document.getElementById('export-pdf-button');
@@ -323,6 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const diaryModal = document.getElementById('diary-modal');
     const diaryLog = document.getElementById('diary-log');
+    const notesModal = document.getElementById('notes-modal');
+    const notesTextarea = document.getElementById('notes-textarea');
     const trackersModal = document.getElementById('trackers-modal');
     const trackersContent = document.getElementById('trackers-content');
     const itemModal = document.getElementById('item-modal');
@@ -1315,6 +1318,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
         if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
         if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
+        if (notesButton && notesModal) {
+            notesButton.addEventListener('click', () => {
+                notesModal.classList.remove('hidden');
+            });
+        }
+        if (notesTextarea) {
+            notesTextarea.addEventListener('input', () => {
+                autoSaveGame();
+            });
+        }
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         if (exportPdfButton) {
@@ -1494,6 +1507,9 @@ document.addEventListener('DOMContentLoaded', () => {
         chances = gameData.gameMaxChances || 3; 
         trackers = {}; 
         removedObjectsFromScenes = {};
+        if (notesTextarea) {
+            notesTextarea.value = '';
+        }
         isGameEnded = false;
         isGameSessionActive = true;
         gameStartTime = Date.now();
@@ -1570,6 +1586,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 chances = save.chances; 
                 trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
+                if (notesTextarea) {
+                    notesTextarea.value = save.notes || '';
+                }
                 isGameEnded = false;
                 isGameSessionActive = true;
                 standardActionBar.classList.remove('hidden');
@@ -1765,7 +1784,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const autoSaveGame = () => {
         if (isGameEnded) return;
-        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
@@ -1896,7 +1915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const slotKey = gameData.enableSystemMenu
             ? 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas')
             : 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave(slotKey, JSON.stringify(save)); renderSlots('save');
     };
 
@@ -2010,7 +2029,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const performStartScreenSave = (slotIndex) => {
         const slotKey = 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave(slotKey, JSON.stringify(save));
         renderStartScreenSlots();
     };

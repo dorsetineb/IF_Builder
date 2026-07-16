@@ -187,6 +187,7 @@ export interface GameData {
   enableInventory?: boolean;
   enableSuggestions?: boolean;
   enableDiary?: boolean;
+  enableNotes?: boolean;
   enableSystemMenu?: boolean;
   startScreenBgImage?: string;
   showStartScreenTitle?: boolean;
@@ -240,6 +241,8 @@ export interface GameData {
   gameSuggestionsButtonText?: string;
   gameInventoryButtonText?: string;
   gameDiaryButtonText?: string;
+  gameNotesButtonText?: string;
+  gameNotesPlaceholderText?: string;
   gameTrackersButtonText?: string;
   gameSystemButtonText?: string;
   gameSaveMenuTitle?: string;

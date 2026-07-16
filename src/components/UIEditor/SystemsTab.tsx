@@ -7,7 +7,7 @@ import {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Star, Square, Circle, X, Activity, Settings, Upload, Trash2,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Check, BookOpen, TextCursorInput, CopyCheck
+    Check, BookOpen, TextCursorInput, CopyCheck, FileText
 } from 'lucide-react';
 import { GameData } from '../../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,6 +65,8 @@ interface SystemsTabProps {
     setLocalEnableInventory: (val: boolean) => void;
     localEnableDiary: boolean;
     setLocalEnableDiary: (val: boolean) => void;
+    localEnableNotes: boolean;
+    setLocalEnableNotes: (val: boolean) => void;
     localDiaryShowSceneImage: boolean;
     setLocalDiaryShowSceneImage: (val: boolean) => void;
     localDiaryShowPlayerAction: boolean;
@@ -161,6 +163,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     setLocalEnableInventory,
     localEnableDiary,
     setLocalEnableDiary,
+    localEnableNotes,
+    setLocalEnableNotes,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localDiaryShowSceneImage,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -793,6 +797,29 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             </div>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        {/* ANOTAÇÕES */}
+                        <div className="w-full">
+                            <div className={`w-full p-6 bg-card border ${localEnableNotes ? 'border-muted-foreground/50 opacity-100' : 'border-muted-foreground/50 opacity-50 grayscale-[0.5]'} rounded-xl shadow-sm transition-all hover:shadow-md group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '750ms' }}>
+                                <div className="flex items-center gap-4 w-full">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" checked={localEnableNotes} onChange={(e) => setLocalEnableNotes(e.target.checked)} className="sr-only peer" />
+                                        <div className="w-[64px] h-[36px] bg-muted border-2 border-muted-foreground/50 rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                            <div 
+                                                className={`absolute top-[2px] transition-all duration-300 flex items-center justify-center ${localEnableNotes ? 'text-primary-foreground left-[30px]' : 'text-muted-foreground left-1'}`}
+                                                style={{ width: '28px', height: '28px' }}
+                                            >
+                                                <FileText className="w-5 h-5" />
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <div>
+                                        <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableNotes ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.notes', 'Anotações')}</h4>
+                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.notesDesc', 'Permite ao jogador registrar suas próprias anotações livremente')}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

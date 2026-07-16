@@ -123,6 +123,7 @@ export const gameHTML = `
                         __SUGGESTIONS_BUTTON__
                         __INVENTORY_BUTTON__
                         __DIARY_BUTTON__
+                        __NOTES_BUTTON__
                         __TRACKERS_BUTTON__
                         __SYSTEM_BUTTON__
                     </div>
@@ -156,6 +157,15 @@ export const gameHTML = `
             <div class="diary-footer">
                 <button id="export-pdf-button" class="diary-export-button">Exportar</button>
             </div>
+        </div>
+    </div>
+    
+    <!-- Notes Modal -->
+    <div id="notes-modal" class="modal-overlay hidden">
+        <div class="modal-content notes-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="notes-modal-title">__NOTES_BUTTON_TEXT__</h2>
+            <textarea id="notes-textarea" class="notes-textarea" placeholder="__NOTES_TEXTAREA_PLACEHOLDER__"></textarea>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js" onload="console.log('✅ html2pdf.js carregado')" onerror="console.error('❌ Falha ao carregar html2pdf.js do CDN')"></script>
@@ -1004,6 +1014,56 @@ body.font-adjust-gothic { font-size: 1.1em; }
 }
 
 /* Common Icon Style */
+/* Notes Modal Styles */
+.notes-modal-content {
+    max-width: 60vw;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+.notes-textarea {
+    flex: 1;
+    width: 100%;
+    min-height: 250px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.95em;
+    line-height: 1.5;
+    padding: 12px;
+    resize: none;
+    box-sizing: border-box;
+    outline: none;
+}
+.notes-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+@media (max-width: 768px) {
+    body.behavior-immersive #notes-modal .notes-modal-content {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 15px !important;
+        background-color: var(--bg-color) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: none !important;
+    }
+    body.behavior-immersive #notes-modal .modal-close-button {
+        top: 15px !important;
+        right: 15px !important;
+        font-size: 2.2em !important;
+        z-index: 1000 !important;
+        color: var(--text-color) !important;
+    }
+}
 .chance-icon svg { width: 24px; height: 24px; display: block; }
 .chance-icon.lost svg { opacity: 0.3; }
 `;
@@ -1881,6 +1941,7 @@ export const initialGameData: GameData = {
     enableInventory: true,
     enableSuggestions: true,
     enableDiary: true,
+    enableNotes: false,
     enableFixedVerbs: false,
     enableChances: false,
     gameTextReadingFlow: 'paused',
@@ -1932,6 +1993,8 @@ export const initialGameData: GameData = {
     vignettes: [],
     gameSuggestionsEmptyFeedback: '',
     gameInventoryEmptyFeedback: '',
+    gameNotesButtonText: '',
+    gameNotesPlaceholderText: '',
 };
 
 

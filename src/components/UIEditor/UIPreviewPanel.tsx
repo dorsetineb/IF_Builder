@@ -57,6 +57,7 @@ interface UIPreviewPanelProps {
     ditherColors: { primary: string; secondary: string };
     localEnableInventory: boolean;
     localEnableDiary: boolean;
+    localEnableNotes: boolean;
     localEnableTrackers: boolean;
     localGameShowSystemButton: boolean;
     localEnableImages: boolean;
@@ -87,6 +88,8 @@ interface UIPreviewPanelProps {
     localSuggestionsButtonText?: string;
     localInventoryButtonText?: string;
     localDiaryButtonText?: string;
+    localNotesButtonText?: string;
+    localNotesPlaceholderText?: string;
     localTrackersButtonText?: string;
     localActionButtonText?: string;
     localVerbInputPlaceholder?: string;
@@ -121,6 +124,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     ditherColors,
     localEnableInventory,
     localEnableDiary,
+    localEnableNotes,
     localEnableTrackers,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     localGameShowSystemButton,
@@ -149,6 +153,8 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     localSuggestionsButtonText = '',
     localInventoryButtonText = '',
     localDiaryButtonText = '',
+    localNotesButtonText = '',
+    localNotesPlaceholderText = '',
     localTrackersButtonText = '',
     localActionButtonText = '',
     localVerbInputPlaceholder = ''
@@ -432,6 +438,11 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                                         {localEnableDiary && (
                                             <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
                                                 {localDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Diário')}
+                                            </button>
+                                        )}
+                                        {localEnableNotes && (
+                                            <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
+                                                {localNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações')}
                                             </button>
                                         )}
                                         {localEnableTrackers && (

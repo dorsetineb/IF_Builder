@@ -5,7 +5,8 @@ import {
     Lightbulb, 
     Package, 
     Book, 
-    Wrench 
+    Wrench,
+    FileText
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UIPreviewPanel } from './UIPreviewPanel';
@@ -39,6 +40,11 @@ interface TextosTabProps {
     setLocalDiaryButtonText: (val: string) => void;
     localDiaryPlayerName: string;
     setLocalDiaryPlayerName: (val: string) => void;
+    localEnableNotes: boolean;
+    localNotesButtonText: string;
+    setLocalNotesButtonText: (val: string) => void;
+    localNotesPlaceholderText: string;
+    setLocalNotesPlaceholderText: (val: string) => void;
     
     localSystemButtonText: string;
     setLocalSystemButtonText: (val: string) => void;
@@ -138,6 +144,11 @@ export const TextosTab: React.FC<TextosTabProps> = ({
     setLocalDiaryButtonText,
     localDiaryPlayerName,
     setLocalDiaryPlayerName,
+    localEnableNotes,
+    localNotesButtonText,
+    setLocalNotesButtonText,
+    localNotesPlaceholderText,
+    setLocalNotesPlaceholderText,
     
     localSystemButtonText,
     setLocalSystemButtonText,
@@ -360,6 +371,48 @@ export const TextosTab: React.FC<TextosTabProps> = ({
                         <div className="space-y-2">
                             <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diaryPlayerName')}</label>
                             <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} disabled={!localEnableDiary} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* SECTION: ANOTAÇÕES */}
+                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '350ms' }}>
+                    <div className="flex items-center gap-3 mb-6">
+                        <FileText className="w-5 h-5" />
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.notes', 'Anotações')}</h4>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <div className="space-y-2">
+                            <label htmlFor="notesButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.notesButton', 'Botão de Anotações')}</label>
+                            <input 
+                                type="text" 
+                                id="notesButtonText" 
+                                value={localNotesButtonText || ''} 
+                                onChange={e => {
+                                    const val = e.target.value;
+                                    setLocalNotesButtonText(val);
+                                    onUpdate('gameNotesButtonText', val);
+                                }} 
+                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed" 
+                                placeholder={t('UIEditor.textos.notesPlaceholder', 'Anotações')} 
+                                disabled={!localEnableNotes} 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="notesPlaceholderText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.notesTextAreaPlaceholderLabel')}</label>
+                            <input 
+                                type="text" 
+                                id="notesPlaceholderText" 
+                                value={localNotesPlaceholderText || ''} 
+                                onChange={e => {
+                                    const val = e.target.value;
+                                    setLocalNotesPlaceholderText(val);
+                                    onUpdate('gameNotesPlaceholderText', val);
+                                }} 
+                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed" 
+                                placeholder={t('UIEditor.textos.notesTextAreaPlaceholderPlaceholder')} 
+                                disabled={!localEnableNotes} 
+                            />
                         </div>
                     </div>
                 </div>

@@ -258,6 +258,11 @@ DATE:        ${exportDate.toLocaleString()}
         ? `<button id="diary-button">${exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')}</button>`
         : '';
 
+    const notesButtonHTML =
+      exportData.enableNotes
+        ? `<button id="notes-button">${exportData.gameNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações')}</button>`
+        : '';
+
     let htmlContent = gameData.gameHTML
       .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
       .replace(
@@ -282,6 +287,7 @@ DATE:        ${exportDate.toLocaleString()}
       .replace('__SUGGESTIONS_BUTTON__', suggestionsButtonHTML)
       .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
       .replace('__DIARY_BUTTON__', diaryButtonHTML)
+      .replace('__NOTES_BUTTON__', notesButtonHTML)
       .replace(
         /__INVENTORY_BUTTON_TEXT__/g,
         exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder')
@@ -301,6 +307,14 @@ DATE:        ${exportDate.toLocaleString()}
       .replace(
         /__DIARY_BUTTON_TEXT__/g,
         exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')
+      )
+      .replace(
+        /__NOTES_BUTTON_TEXT__/g,
+        exportData.gameNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações')
+      )
+      .replace(
+        /__NOTES_TEXTAREA_PLACEHOLDER__/g,
+        exportData.gameNotesPlaceholderText || t('UIEditor.textos.notesTextAreaPlaceholderDefault', 'Escreva suas anotações aqui...')
       )
       .replace(
         '__SAVE_MENU_TITLE__',
@@ -620,6 +634,11 @@ DATE:        ${exportDate.toLocaleString()}
         ? `<button id="diary-button">${exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')}</button>`
         : '';
 
+    const notesButtonHTML =
+      exportData.enableNotes
+        ? `<button id="notes-button">${exportData.gameNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações')}</button>`
+        : '';
+
     let htmlContent = gameData.gameHTML
       .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
       .replace(
@@ -644,6 +663,7 @@ DATE:        ${exportDate.toLocaleString()}
       .replace('__SUGGESTIONS_BUTTON__', suggestionsButtonHTML)
       .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
       .replace('__DIARY_BUTTON__', diaryButtonHTML)
+      .replace('__NOTES_BUTTON__', notesButtonHTML)
       .replace(
         /__INVENTORY_BUTTON_TEXT__/g,
         exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder')
@@ -663,6 +683,14 @@ DATE:        ${exportDate.toLocaleString()}
       .replace(
         /__DIARY_BUTTON_TEXT__/g,
         exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')
+      )
+      .replace(
+        /__NOTES_BUTTON_TEXT__/g,
+        exportData.gameNotesButtonText || t('UIEditor.textos.notesPlaceholder', 'Anotações')
+      )
+      .replace(
+        /__NOTES_TEXTAREA_PLACEHOLDER__/g,
+        exportData.gameNotesPlaceholderText || t('UIEditor.textos.notesTextAreaPlaceholderDefault', 'Escreva suas anotações aqui...')
       )
       .replace(
         '__SAVE_MENU_TITLE__',

@@ -15,7 +15,7 @@ import { AppearanceTab } from './UIEditor/AppearanceTab';
 import { TextosTab } from './UIEditor/TextosTab';
 import { UIPreviewPanel } from './UIEditor/UIPreviewPanel';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, SquareDashedMousePointer } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, SquareDashedMousePointer, FileText } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -78,6 +78,7 @@ interface UIEditorProps {
     suggestionsButtonText?: string;
     inventoryButtonText?: string;
     diaryButtonText?: string;
+    notesButtonText?: string;
     trackersButtonText?: string;
     gameSystemButtonText?: string;
     gameSaveMenuTitle?: string;
@@ -118,6 +119,7 @@ interface UIEditorProps {
     // New System Props
     enableSuggestions?: boolean;
     enableDiary?: boolean;
+    enableNotes?: boolean;
     enableFixedVerbs?: boolean;
     enableImages?: boolean;
     enableTextControl?: boolean;
@@ -240,7 +242,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         systemButtonColor, systemButtonTextColor, systemButtonBorderColor, systemButtonHoverColor, systemButtonHoverTextColor,
         gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameFrameColor, onUpdate, isDirty, onSetDirty,
         gameShowTrackersUI, gameShowSystemButton, gameInteractionType, suggestionsButtonText, inventoryButtonText,
-        diaryButtonText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
+        diaryButtonText, notesButtonText, notesPlaceholderText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
         gameMainMenuButtonText, gameContinueIndicatorColor, gameViewEndingButtonText, gameRetrospectiveButtonText, title, logo, omitSplashTitle, omitSplashDescription,
         splashImage, splashContentAlignment, splashDescription, backgroundMusic,
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
@@ -248,7 +250,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
         enableSystemMenu, startScreenBgImage, showStartScreenTitle, startScreenTitle, startScreenButtonAlignment, startScreenVerticalAlignment,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onAnnotate, enableTrackers, enableInventory, enableSuggestions, enableDiary, enableFixedVerbs, enableChances,
+        onAnnotate, enableTrackers, enableInventory, enableSuggestions, enableDiary, enableNotes, enableFixedVerbs, enableChances,
         enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction, onNavigateToTrackers,
@@ -277,6 +279,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localSuggestionsButtonText, setLocalSuggestionsButtonText] = useState(suggestionsButtonText);
     const [localInventoryButtonText, setLocalInventoryButtonText] = useState(inventoryButtonText);
     const [localDiaryButtonText, setLocalDiaryButtonText] = useState(diaryButtonText);
+    const [localNotesButtonText, setLocalNotesButtonText] = useState(notesButtonText);
+    const [localNotesPlaceholderText, setLocalNotesPlaceholderText] = useState(notesPlaceholderText);
     const [localTrackersButtonText, setLocalTrackersButtonText] = useState(trackersButtonText);
     const [localSystemButtonText, setLocalSystemButtonText] = useState(gameSystemButtonText);
     const [localSaveMenuTitle, setLocalSaveMenuTitle] = useState(gameSaveMenuTitle);
@@ -420,6 +424,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localEnableInventory, setLocalEnableInventory] = useState(enableInventory ?? true);
     const [localEnableSuggestions, setLocalEnableSuggestions] = useState(enableSuggestions ?? true);
     const [localEnableDiary, setLocalEnableDiary] = useState(enableDiary ?? true);
+    const [localEnableNotes, setLocalEnableNotes] = useState(enableNotes ?? false);
     const [localEnableFixedVerbs, setLocalEnableFixedVerbs] = useState(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
     const [localEnableChances, setLocalEnableChances] = useState(enableChances ?? (gameSystemEnabled === 'chances'));
     const [localEnableImages, setLocalEnableImages] = useState(enableImages ?? true);
@@ -452,6 +457,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalSuggestionsButtonText(suggestionsButtonText); }, [suggestionsButtonText]);
     useEffect(() => { setLocalInventoryButtonText(inventoryButtonText); }, [inventoryButtonText]);
     useEffect(() => { setLocalDiaryButtonText(diaryButtonText); }, [diaryButtonText]);
+    useEffect(() => { setLocalNotesButtonText(notesButtonText); }, [notesButtonText]);
+    useEffect(() => { setLocalNotesPlaceholderText(notesPlaceholderText); }, [notesPlaceholderText]);
     useEffect(() => { setLocalTrackersButtonText(trackersButtonText); }, [trackersButtonText]);
     useEffect(() => { setLocalSystemButtonText(gameSystemButtonText); }, [gameSystemButtonText]);
     useEffect(() => { setLocalMainMenuButtonText(gameMainMenuButtonText); }, [gameMainMenuButtonText]);
@@ -532,6 +539,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalEnableInventory(enableInventory ?? true); }, [enableInventory]);
     useEffect(() => { setLocalEnableSuggestions(enableSuggestions ?? true); }, [enableSuggestions]);
     useEffect(() => { setLocalEnableDiary(enableDiary ?? true); }, [enableDiary]);
+    useEffect(() => { setLocalEnableNotes(enableNotes ?? false); }, [enableNotes]);
     useEffect(() => { setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0)); }, [enableFixedVerbs, fixedVerbs]);
     useEffect(() => { setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances')); }, [enableChances, gameSystemEnabled]);
     useEffect(() => { setLocalEnableImages(enableImages ?? true); }, [enableImages]);
@@ -560,7 +568,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localContinueButtonText, localRestartButtonText, localActionButtonText, localVerbInputPlaceholder,
         localDiaryPlayerName, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI,
         localGameShowSystemButton, localGameInteractionType, localSuggestionsButtonText,
-        localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
+        localInventoryButtonText, localDiaryButtonText, localNotesButtonText, localNotesPlaceholderText, localTrackersButtonText, localSystemButtonText,
         localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText, localRetrospectiveButtonText,
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localActionButtonHoverColor,
@@ -578,7 +586,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localEnableRetrospective, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
-        localDiaryShowSceneImage, localDiaryShowPlayerAction,
+        localDiaryShowSceneImage, localDiaryShowPlayerAction, localEnableNotes,
         localSuggestionsEmptyFeedback, localInventoryEmptyFeedback,
         // Main Menu / System Menu
         localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
@@ -613,7 +621,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localContinueButtonText, localRestartButtonText, localActionButtonText, localVerbInputPlaceholder,
         localDiaryPlayerName, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI,
         localGameShowSystemButton, localGameInteractionType, localSuggestionsButtonText,
-        localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
+        localInventoryButtonText, localDiaryButtonText, localNotesButtonText, localNotesPlaceholderText, localTrackersButtonText, localSystemButtonText,
         localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText, localRetrospectiveButtonText,
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localActionButtonHoverColor,
@@ -631,7 +639,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localEnableRetrospective, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
-        localDiaryShowSceneImage, localDiaryShowPlayerAction,
+        localDiaryShowSceneImage, localDiaryShowPlayerAction, localEnableNotes,
         localSuggestionsEmptyFeedback, localInventoryEmptyFeedback,
         // Main Menu / System Menu
         localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
@@ -657,6 +665,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localSuggestionsButtonText !== suggestionsButtonText) onUpdate('gameSuggestionsButtonText', localSuggestionsButtonText, true);
         if (localInventoryButtonText !== inventoryButtonText) onUpdate('gameInventoryButtonText', localInventoryButtonText, true);
         if (localDiaryButtonText !== diaryButtonText) onUpdate('gameDiaryButtonText', localDiaryButtonText, true);
+        if (localNotesButtonText !== notesButtonText) onUpdate('gameNotesButtonText', localNotesButtonText, true);
+        if (localNotesPlaceholderText !== notesPlaceholderText) onUpdate('gameNotesPlaceholderText', localNotesPlaceholderText, true);
         if (localTrackersButtonText !== trackersButtonText) onUpdate('gameTrackersButtonText', localTrackersButtonText, true);
         if (localSystemButtonText !== gameSystemButtonText) onUpdate('gameSystemButtonText', localSystemButtonText, true);
         if (localSaveMenuTitle !== gameSaveMenuTitle) onUpdate('gameSaveMenuTitle', localSaveMenuTitle, true);
@@ -726,6 +736,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableInventory !== (enableInventory ?? true)) onUpdate('enableInventory', localEnableInventory, true);
         if (localEnableSuggestions !== (enableSuggestions ?? true)) onUpdate('enableSuggestions', localEnableSuggestions, true);
         if (localEnableDiary !== (enableDiary ?? true)) onUpdate('enableDiary', localEnableDiary, true);
+        if (localEnableNotes !== (enableNotes ?? false)) onUpdate('enableNotes', localEnableNotes, true);
         if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
         if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
         if (localEnableRetrospective !== (props.enableRetrospective ?? true)) onUpdate('enableRetrospective', localEnableRetrospective, true);
@@ -782,6 +793,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalSuggestionsButtonText(suggestionsButtonText);
         setLocalInventoryButtonText(inventoryButtonText);
         setLocalDiaryButtonText(diaryButtonText);
+        setLocalNotesButtonText(notesButtonText);
+        setLocalNotesPlaceholderText(notesPlaceholderText);
         setLocalTrackersButtonText(trackersButtonText);
         setLocalSystemButtonText(gameSystemButtonText);
         setLocalSaveMenuTitle(gameSaveMenuTitle);
@@ -844,6 +857,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalEnableInventory(enableInventory ?? true);
         setLocalEnableSuggestions(enableSuggestions ?? true);
         setLocalEnableDiary(enableDiary ?? true);
+        setLocalEnableNotes(enableNotes ?? false);
         setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
         setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
         setLocalEnableImages(enableImages ?? true);
@@ -1072,6 +1086,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalEnableInventory={setLocalEnableInventory}
                             localEnableDiary={localEnableDiary}
                             setLocalEnableDiary={setLocalEnableDiary}
+                            localEnableNotes={localEnableNotes}
+                            setLocalEnableNotes={setLocalEnableNotes}
                             localDiaryShowSceneImage={localDiaryShowSceneImage}
                             setLocalDiaryShowSceneImage={setLocalDiaryShowSceneImage}
                             localDiaryShowPlayerAction={localDiaryShowPlayerAction}
@@ -1251,6 +1267,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 localDiaryButtonText={localDiaryButtonText}
                                 setLocalDiaryButtonText={setLocalDiaryButtonText}
+                                localEnableNotes={localEnableNotes}
+                                localNotesButtonText={localNotesButtonText}
+                                setLocalNotesButtonText={setLocalNotesButtonText}
+                                localNotesPlaceholderText={localNotesPlaceholderText}
+                                setLocalNotesPlaceholderText={setLocalNotesPlaceholderText}
                                 localDiaryPlayerName={localDiaryPlayerName}
                                 setLocalDiaryPlayerName={setLocalDiaryPlayerName}
 
@@ -1355,6 +1376,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         ditherColors={ditherColors}
                         localEnableInventory={localEnableInventory}
                         localEnableDiary={localEnableDiary}
+                        localEnableNotes={localEnableNotes}
                         localEnableTrackers={localEnableTrackers}
                         localGameShowSystemButton={localGameShowSystemButton}
                         localEnableImages={localEnableImages}
@@ -1381,6 +1403,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         localSuggestionsButtonText={localSuggestionsButtonText}
                         localInventoryButtonText={localInventoryButtonText}
                         localDiaryButtonText={localDiaryButtonText}
+                        localNotesButtonText={localNotesButtonText}
+                        localNotesPlaceholderText={localNotesPlaceholderText}
                         localTrackersButtonText={localTrackersButtonText}
                         localActionButtonText={localActionButtonText}
                         localVerbInputPlaceholder={localVerbInputPlaceholder}
