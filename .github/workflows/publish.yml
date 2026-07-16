@@ -50,6 +50,10 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
 
+      - name: Get app version
+        id: get_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
       - name: Build Tauri Desktop App
         uses: tauri-apps/tauri-action@v0
         env:
@@ -57,7 +61,12 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: 'IF Builder v__VERSION__'
-          releaseBody: 'Release automatizada do IF Builder para Windows e Linux.'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
+
+      - name: Generate Release Notes
+        if: matrix.platform == 'ubuntu-latest' # Roda apenas em um dos SOs para não duplicar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "v${{ env.VERSION }}" --generate-notes
