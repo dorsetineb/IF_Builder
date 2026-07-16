@@ -786,7 +786,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     </div>
                                 </div>
                                 {localEnableDiary && (
-                                    <div className="pl-[80px] flex items-center gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="flex items-center gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
                                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryShowPlayerAction(!localDiaryShowPlayerAction)}>
                                                 <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
                                                 <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showPlayerAction')}</span>
@@ -845,9 +845,6 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                 </div>
                                 {localEnableTrackers && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                            {t('UIEditor.sistemas.trackersInfo')}
-                                        </p>
                                         <button
                                             onClick={() => onNavigateToTrackers?.()}
                                             className="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 flex items-center justify-center gap-2"

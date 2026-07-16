@@ -402,7 +402,7 @@
       "chances": "Sistema de Vidas",
       "chancesDesc": "Limitar tentativas e chances",
       "trackers": "Rastreadores",
-      "trackersDesc": "Variáveis numéricas (saúde, dinheiro, sanidade)"
+      "trackersDesc": "Barras de progressão que podem impactar a história"
     },
     "appearance": {
       "layoutScenes": "Layout das Ramificações",
@@ -934,7 +934,7 @@
       "transSlide": "Deslizar (Slide)",
       "transNone": "Nenhuma",
       "trackers": "Rastreadores",
-      "trackersDesc": "Barras de progressão que impactam a história",
+      "trackersDesc": "Barras de progressão que podem impactar a história",
       "retrospective": "Retrospectiva",
       "retrospectiveDesc": "Exibir resumo da jornada no final da ficção",
       "trackersInfo": "Rastreadores são variáveis para pontos de vida alternativos, dinheiro, sanidade, etc.",
@@ -1162,7 +1162,7 @@
     "delete": "Excluir",
     "importing_fiction": "IMPORTANDO FICÇÃO",
     "unsavedChanges": "Alterações não salvas",
-    "unsavedChangesMessage": "Você tem alterações não salvas. Se sair agora, elas serão perdidas...\n\nDeseja continuar?",
+    "unsavedChangesMessage": "O projeto tem alterações que não foram salvas.\nSe sair agora, elas serão perdidas...\n\nDeseja continuar?",
     "confirmLeave": "Sair sem salvar",
     "cancelLeave": "Cancelar",
     "sceneDeletedTitle": "Ramificação excluída",

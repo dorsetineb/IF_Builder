@@ -1902,7 +1902,7 @@ const Editor: React.FC = () => {
       <ConfirmationModal
         isOpen={pendingNavigation !== null}
         title={t('editor.unsavedChanges', 'Alterações não salvas')}
-        message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas. Se sair agora, elas serão perdidas.\n\nDeseja continuar?')}
+        message={t('editor.unsavedChangesMessage', 'O projeto tem alterações que não foram salvas.\nSe sair agora, elas serão perdidas.\n\nDeseja continuar?')}
         onConfirm={() => {
           if (pendingNavigation) executeNavigation(pendingNavigation);
         }}

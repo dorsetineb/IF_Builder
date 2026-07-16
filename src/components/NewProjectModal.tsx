@@ -941,7 +941,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </div>
                                                 <div>
                                                     <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableTrackers ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.trackers', 'Rastreadores')}</h4>
-                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.trackersDesc', 'Variáveis numéricas (saúde, dinheiro, sanidade)')}</p>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.trackersDesc', 'Barras de progressão que podem impactar a história')}</p>
                                                 </div>
                                             </div>
                                         </div>
