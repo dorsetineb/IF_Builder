@@ -4,10 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Pixelon';
+  src: url('/fonts/Pixelon.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @theme {
-  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Silkscreen", "DotGothic16", monospace;
-  --font-body: "Space Mono", "IBM Plex Mono", monospace;
+  --font-sans: "Pixelon", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Pixelon", "DotGothic16", monospace;
+  --font-body: "Pixelon", monospace;
+
+  /* Adjust font sizes for Pixelon consistency */
+  --text-xs: 11px;
+  --text-sm: 11px;
+  --text-base: 11px;
 
   --color-brand-bg: #1a202c;
   --color-brand-sidebar: #232a38;

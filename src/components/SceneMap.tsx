@@ -782,7 +782,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
         <div
           ref={mapTransformRef}
-          className={`will-change-transform`}
+          className=""
           style={{
             transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})`,
             transformOrigin: '0 0',
