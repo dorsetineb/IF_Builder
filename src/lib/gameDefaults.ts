@@ -675,6 +675,14 @@ body.with-spacing .main-wrapper { height: 100%; }
         backdrop-filter: none !important;
         border-radius: 0 !important;
         transition: all 0.2s !important;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    body.behavior-immersive .action-buttons button:first-child:nth-last-child(4),
+    body.behavior-immersive .action-buttons button:first-child:nth-last-child(4) ~ button {
+        flex: 1 1 calc(50% - 6px);
     }
     body.behavior-immersive .action-buttons button:hover,
     body.behavior-immersive .action-buttons button:active {
