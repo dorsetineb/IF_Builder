@@ -12,7 +12,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@react-three/fiber": "^9.5.0",
