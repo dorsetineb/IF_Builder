@@ -159,7 +159,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
 
                 {/* Coluna Direita: Botões */}
                 <div className="w-full lg:w-[400px] flex flex-col justify-center flex-shrink-0">
-                    <p className="text-white text-sm font-bold uppercase tracking-wide mb-6">
+                    <p className="text-white text-xl font-bold uppercase tracking-wide mb-6">
                         {t('welcome.subtitle', 'O que você quer fazer?')}
                     </p>
                     <div className="grid grid-cols-2 gap-3 w-full">
@@ -169,7 +169,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             className="group flex flex-row items-center justify-center gap-3 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20 col-span-2 w-full"
                         >
                             <div className="w-7 h-7 bg-primary group-hover:bg-white transition-colors flex-shrink-0" style={{ maskImage: 'url(/icons/criar.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/criar.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
+                            <span className="font-bold text-zinc-200 text-base uppercase tracking-wide group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
                         </button>
 
                         {/* Botão 2: Jogar a Demo */}
@@ -178,7 +178,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             className="group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                         >
                             <div className="w-6 h-6 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/demo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/demo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('welcome.playDemo', 'Acesse a demo')}</span>
+                            <span className="font-bold text-zinc-200 text-base uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('welcome.playDemo', 'Acesse a demo')}</span>
                         </button>
 
                         {/* Botão 3: Guia Rápido */}
@@ -187,7 +187,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             className="group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full"
                         >
                             <CircleHelp className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+                            <span className="font-bold text-zinc-200 text-base uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
                         </button>
 
                         {/* Botão 4: Baixar Exemplo */}
@@ -199,7 +199,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 }`}
                         >
                             <div className={`w-6 h-6 transition-colors ${isFlashing ? 'bg-white' : 'bg-primary group-hover:bg-white'}`} style={{ maskImage: 'url(/icons/exemplo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/exemplo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
-                            <span className={`font-bold text-sm uppercase tracking-wide transition-colors text-center ${isFlashing ? (theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
+                            <span className={`font-bold text-base uppercase tracking-wide transition-colors text-center ${isFlashing ? (theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                         </button>
 
                         {/* Botão 5: Sobre o Projeto */}
@@ -208,7 +208,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             className="group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full"
                         >
                             <Zap className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                            <span className="font-bold text-zinc-200 text-base uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
                         </button>
                     </div>
                 </div>

@@ -36,9 +36,9 @@ const Header: React.FC<{
           className={`flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${sidebarCollapsed ? 'justify-center' : ''}`}
         >
           {sidebarCollapsed ? (
-            <h1 className="text-xl font-bold text-foreground notranslate" translate="no">IF</h1>
+            <h1 className="text-3xl font-bold text-foreground notranslate" translate="no">IF</h1>
           ) : (
-            <h1 className="text-xl font-bold text-foreground truncate notranslate" translate="no">IF Builder</h1>
+            <h1 className="text-3xl font-bold text-foreground truncate notranslate" translate="no">IF Builder</h1>
           )}
         </div>
 

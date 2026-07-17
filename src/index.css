@@ -12,14 +12,30 @@
 }
 
 @theme {
-  --font-sans: "Pixelon", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Pixelon", "DotGothic16", monospace;
-  --font-body: "Pixelon", monospace;
+  --font-sans: "Silkscreen", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Silkscreen", "DotGothic16", monospace;
+  --font-body: "Silkscreen", monospace;
 
-  /* Adjust font sizes for Pixelon consistency */
-  --text-xs: 12px;
-  --text-sm: 12px;
-  --text-base: 12px;
+  /* Adjust font sizes for Silkscreen */
+  --text-xs: 9px;
+  --text-sm: 9px;
+  --text-base: 11px;
+  --text-lg: 11px;
+  --text-xl: 13px;
+  --text-2xl: 15px;
+  --text-3xl: 17px;
+
+  /* Prevent Faux-Bold on Pixel Fonts (Silkscreen only has 400 weight) */
+  --font-weight-medium: 400;
+  --font-weight-semibold: 400;
+  --font-weight-bold: 400;
+  --font-weight-extrabold: 400;
+  --font-weight-black: 400;
+
+  /* Reduce tracking for Pixel Fonts */
+  --tracking-wider: 0.02em;
+  --tracking-widest: 0.05em;
+
 
   --color-brand-bg: #1a202c;
   --color-brand-sidebar: #232a38;
@@ -561,6 +577,11 @@ textarea:not(:disabled) {
   * {
     @apply border-border outline-ring/50;
     border-radius: 0 !important;
+  }
+
+  /* Override hardcoded text-[10px] to match text-xs (inputs) size as requested */
+  .text-\[10px\] {
+    font-size: 9px !important;
   }
 
   /* 
