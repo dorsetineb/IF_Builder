@@ -1321,6 +1321,15 @@
   },
   "editorInterface": {
     "title": "Editor Interface",
-    "subtitle": "Configure the system language and personalize the editor's appearance by choosing your preferred visual theme."
+    "subtitle": "Configure the system language and personalize the editor's appearance by choosing your preferred visual theme.",
+    "readability": {
+      "title": "Readability",
+      "fontSize": "Font Size",
+      "fontFamily": "Font Family",
+      "sizeSmall": "Small",
+      "sizeMedium": "Medium",
+      "sizeLarge": "Large",
+      "description": "Adjust the overall size and select the primary font of the entire editor interface to suit your vision."
+    }
   }
 }

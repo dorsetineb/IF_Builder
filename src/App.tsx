@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { useTranslation } from 'react-i18next';
 import { Auth } from './components/Auth';
 import { ThemeProvider } from './components/ThemeProvider';
+import { TypographyProvider } from './components/TypographyProvider';
 import { ToastProvider } from './components/ToastContext';
 import Analytics from './components/Analytics';
 
@@ -53,12 +54,14 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
-            <ToastProvider>
-                <Router>
-                    <Analytics />
-                    <AppContent />
-                </Router>
-            </ToastProvider>
+            <TypographyProvider>
+                <ToastProvider>
+                    <Router>
+                        <Analytics />
+                        <AppContent />
+                    </Router>
+                </ToastProvider>
+            </TypographyProvider>
         </ThemeProvider>
     );
 };

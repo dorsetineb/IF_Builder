@@ -1306,6 +1306,15 @@
   },
   "editorInterface": {
     "title": "Interface do Editor",
-    "subtitle": "Configure a linguagem do sistema e personalize a aparência do editor escolhendo seu tema visual preferido."
+    "subtitle": "Configure a linguagem do sistema e personalize a aparência do editor escolhendo seu tema visual preferido.",
+    "readability": {
+      "title": "Legibilidade",
+      "fontSize": "Tamanho da fonte",
+      "fontFamily": "Tipo de fonte",
+      "sizeSmall": "Pequeno",
+      "sizeMedium": "Médio",
+      "sizeLarge": "Grande",
+      "description": "Ajuste o tamanho geral e selecione a fonte principal da interface."
+    }
   }
 }

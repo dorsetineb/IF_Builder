@@ -1252,7 +1252,13 @@ const Editor: React.FC = () => {
 
       {/* Show BIOS animation as an overlay that fades out */}
       {!isBiosFinished && (
-        <div className={`fixed inset-0 z-[10000] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}>
+        <div 
+            className={`fixed inset-0 z-[10000] bg-black text-white font-['Silkscreen'] text-base md:text-lg p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}
+            style={{
+                "--text-base": "13px",
+                "--text-lg": "15px",
+            } as React.CSSProperties}
+        >
           <style>{`
                     @keyframes hard-blink {
                         0%, 100% { opacity: 1; }

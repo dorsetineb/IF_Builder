@@ -1277,5 +1277,18 @@
     "actions": {
       "fix": "Corregir"
     }
+  },
+  "editorInterface": {
+    "title": "Interfaz del Editor",
+    "subtitle": "Configura el idioma del sistema y personaliza la apariencia del editor eligiendo tu tema visual preferido.",
+    "readability": {
+      "title": "Legibilidad",
+      "fontSize": "Tamaño de fuente",
+      "fontFamily": "Tipo de fuente",
+      "sizeSmall": "Pequeño",
+      "sizeMedium": "Medio",
+      "sizeLarge": "Grande",
+      "description": "Ajuste el tamaño general y seleccione la fuente principal de toda la interfaz del editor para que se adapte a su visión."
+    }
   }
 }

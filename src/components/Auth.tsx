@@ -4,6 +4,7 @@ import { Activity, Minus, Square, X, Play, Loader2 } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeProvider';
+import { useTypography, fontScales } from './TypographyProvider';
 import { GameData } from '../types';
 import Preview from './Preview';
 import { getDitherColors } from '../utils/themeStyles';
@@ -54,6 +55,7 @@ export function Auth() {
     }, [activeBg.src]);
 
     const { theme } = useTheme();
+    const { fontFamily } = useTypography();
 
     const ditherColors = getDitherColors(theme);
 
@@ -105,11 +107,11 @@ export function Auth() {
     // Sidebar Component (Left)
     const renderSidebar = () => (
         <div className={`${isMobile ? 'w-full pointer-events-none' : 'w-96'} flex flex-col h-full relative z-20 transition-all duration-300`}>
-            <div className={`flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12 ${isMobile ? '' : ''}`}>
+            <div className={`flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-8 ${isMobile ? '' : ''}`}>
                 {/* Tagline */}
-                <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-[16px] text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>
+                <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-base text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>
                     {isMobile ? (
-                        <div className="text-[16px] text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
+                        <div className="text-base text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                             <p>{t('auth.sidebar.mobile.line1', 'Por uma fresta, você enxerga uma caverna escura.')}</p>
                             <p className="text-primary font-bold mt-2">
                                 &gt; {t('auth.sidebar.mobile.line2', 'ACESSO NEGADO DEVIDO A SMARTPHONE.')}
@@ -137,7 +139,7 @@ export function Auth() {
                                 e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                             }}
                             onClick={() => navigate('/editor')}
-                            className={`w-fit flex items-center justify-start gap-3 px-5 py-3 rounded-xl font-bold text-[16px] transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}
+                            className={`w-fit flex items-center justify-start gap-3 px-5 py-3 rounded-xl font-bold text-base transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}
                         >
                             <div
                                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -150,7 +152,7 @@ export function Auth() {
                         </button>
 
                         {/* Secret Hint Text */}
-                        <div className="text-[16px] text-white/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
+                        <div className="text-base text-white/80 leading-relaxed text-left space-y-1 pt-4 opacity-50 drop-shadow-md">
                             <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                             <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                         </div>
@@ -268,9 +270,24 @@ export function Auth() {
         </div>
     );
 
+    const currentScale = fontScales[fontFamily] || fontScales["Silkscreen"];
+    const mediumOffset = 2; // Fix this screen to always use the "Medium" offset
+
     // Main landing layout with sidebar
     return (
-        <div className="h-screen w-screen flex bg-background font-sans relative overflow-hidden">
+        <div 
+            className="h-screen w-screen flex bg-background font-sans relative overflow-hidden"
+            style={{
+                "--text-xs": `${Math.max(6, currentScale.xs + mediumOffset)}px`,
+                "--text-sm": `${Math.max(6, currentScale.sm + mediumOffset)}px`,
+                "--text-base": `${Math.max(6, currentScale.base + mediumOffset)}px`,
+                "--text-lg": `${Math.max(6, currentScale.lg + mediumOffset)}px`,
+                "--text-xl": `${Math.max(6, currentScale.xl + mediumOffset)}px`,
+                "--text-2xl": `${Math.max(6, currentScale['2xl'] + mediumOffset)}px`,
+                "--text-3xl": `${Math.max(6, currentScale['3xl'] + mediumOffset)}px`,
+                "--text-10px": `${Math.max(6, currentScale['10px'] + mediumOffset)}px`,
+            } as React.CSSProperties}
+        >
             {/* Global Dither Background */}
             <div className="absolute inset-0 z-0 bg-background overflow-hidden pointer-events-none">
                 <DitherShader

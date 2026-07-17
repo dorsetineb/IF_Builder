@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Globe, Sparkles, Moon, Monitor, Leaf, Coffee, Skull, Terminal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../components/ThemeProvider';
+import { useTypography } from '../components/TypographyProvider';
 
 export const EditorInterface: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
     const { theme, setTheme } = useTheme();
+    const { fontFamily, setFontFamily, fontSizeScale, setFontSizeScale } = useTypography();
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
 
     // Change language immediately when select changes
@@ -115,6 +117,60 @@ export const EditorInterface: React.FC<{ hideHeader?: boolean }> = ({ hideHeader
                                     <Skull size={16} className="text-muted-foreground" />
                                     <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'abismo' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.abismo', 'Abismo')}</span>
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Legibilidade Section */}
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both md:col-span-2" style={{ animationDelay: '200ms' }}>
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground mb-6 flex items-center gap-2">
+                            <Terminal className="w-4 h-4" />
+                            {t('editorInterface.readability.title', 'Legibilidade')}
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                    {t('editorInterface.readability.fontFamily', 'Tipo de fonte')}
+                                </label>
+                                <select
+                                    value={fontFamily}
+                                    onChange={(e) => setFontFamily(e.target.value)}
+                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                >
+                                    <option value="Silkscreen">Silkscreen</option>
+                                    <option value="Space Grotesk">Space Grotesk</option>
+                                    <option value="EB Garamond">EB Garamond</option>
+                                </select>
+                                <p className="text-[10px] text-muted-foreground italic leading-relaxed">
+                                    {t('editorInterface.readability.description', 'Ajuste o tamanho geral e selecione a fonte principal da interface.')}
+                                </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">
+                                    {t('editorInterface.readability.fontSize', 'Tamanho da fonte')}
+                                </label>
+                                <div className="flex bg-muted/50 p-1 rounded-lg border border-input">
+                                    <button
+                                        onClick={() => setFontSizeScale('small')}
+                                        className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${fontSizeScale === 'small' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                                    >
+                                        {t('editorInterface.readability.sizeSmall', 'Pequeno')}
+                                    </button>
+                                    <button
+                                        onClick={() => setFontSizeScale('medium')}
+                                        className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${fontSizeScale === 'medium' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                                    >
+                                        {t('editorInterface.readability.sizeMedium', 'Médio')}
+                                    </button>
+                                    <button
+                                        onClick={() => setFontSizeScale('large')}
+                                        className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${fontSizeScale === 'large' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                                    >
+                                        {t('editorInterface.readability.sizeLarge', 'Grande')}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

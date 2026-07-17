@@ -4,26 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-  font-family: 'Pixelon';
-  src: url('/fonts/Pixelon.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
 @theme {
-  --font-sans: "Silkscreen", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Silkscreen", "DotGothic16", monospace;
-  --font-body: "Silkscreen", monospace;
+  --font-sans: var(--app-font-family, "Silkscreen"), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--app-font-family, "Silkscreen"), "DotGothic16", monospace;
+  --font-body: var(--app-font-family, "Silkscreen"), monospace;
 
   /* Adjust font sizes for Silkscreen */
-  --text-xs: 9px;
-  --text-sm: 9px;
-  --text-base: 11px;
-  --text-lg: 11px;
-  --text-xl: 13px;
-  --text-2xl: 15px;
-  --text-3xl: 17px;
+  --text-xs: var(--app-text-xs, 9px);
+  --text-sm: var(--app-text-sm, 9px);
+  --text-base: var(--app-text-base, 11px);
+  --text-lg: var(--app-text-lg, 11px);
+  --text-xl: var(--app-text-xl, 13px);
+  --text-2xl: var(--app-text-2xl, 15px);
+  --text-3xl: var(--app-text-3xl, 17px);
 
   /* Prevent Faux-Bold on Pixel Fonts (Silkscreen only has 400 weight) */
   --font-weight-medium: 400;
@@ -581,7 +574,7 @@ textarea:not(:disabled) {
 
   /* Override hardcoded text-[10px] to match text-xs (inputs) size as requested */
   .text-\[10px\] {
-    font-size: 9px !important;
+    font-size: var(--app-text-10px, 9px) !important;
   }
 
   /* 
