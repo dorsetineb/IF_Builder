@@ -725,14 +725,14 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             <div className="space-y-1 flex-1 min-w-0">
                                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.icon')}</label>
                                                 <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
-                                                    {['heart', 'circle', 'square', 'star', 'cross'].map((icon) => (
+                                                    {['heart', 'circle', 'square', 'diamond', 'cross'].map((icon) => (
                                                         <button
                                                             key={icon}
-                                                            onClick={() => setLocalChanceIcon(icon as unknown as 'circle' | 'cross' | 'heart' | 'square' | 'diamond')}
+                                                            onClick={() => setLocalChanceIcon(icon as 'circle' | 'cross' | 'heart' | 'square' | 'diamond')}
                                                             className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary/10 shadow-sm opacity-100 ring-1 ring-primary/20' : 'opacity-30 grayscale-[50%] hover:opacity-100 hover:grayscale-0 hover:bg-muted/50'}`}
                                                             title={icon}
                                                         >
-                                                            <ChanceIcon type={icon} color={localChanceIconColor} className="w-4 h-4" />
+                                                            <ChanceIcon type={icon as 'circle' | 'cross' | 'heart' | 'square' | 'diamond'} color={localChanceIconColor} className="w-4 h-4" />
                                                         </button>
                                                     ))}
                                                 </div>

@@ -154,7 +154,6 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     localInventoryButtonText = '',
     localDiaryButtonText = '',
     localNotesButtonText = '',
-    localNotesPlaceholderText = '',
     localTrackersButtonText = '',
     localActionButtonText = '',
     localVerbInputPlaceholder = ''

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { GameData, Scene, View } from '../types';
+import { GameData, Scene, View, Interaction } from '../types';
 import { getFontUrl, getFrameClass, getMimeTypeFromFileName } from '../utils/helpers';
 import { prepareGameDataForEngine, gameJS } from '../components/game-engine';
 import {
@@ -944,7 +944,7 @@ DATE:        ${exportDate.toLocaleString()}
         cleanedScenes[id] = {
           ...cleanedScenes[id],
           objectIds: cleanedScenes[id].objectIds || [],
-          interactions: (cleanedScenes[id].interactions || []).map((inter: any) => {
+          interactions: (cleanedScenes[id].interactions || []).map((inter: Interaction) => {
             // Delete legacy custom transitions from interactions to ensure global settings are respected
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { transitionType, transitionSpeed, ...rest } = inter;

@@ -79,6 +79,7 @@ interface UIEditorProps {
     inventoryButtonText?: string;
     diaryButtonText?: string;
     notesButtonText?: string;
+    notesPlaceholderText?: string;
     trackersButtonText?: string;
     gameSystemButtonText?: string;
     gameSaveMenuTitle?: string;
@@ -363,7 +364,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
      * In JavaScript, 1.0 === 1 and 2.0 === 2, so order matters.
      * Steps: 1=Muito Lento(2.0s), 2=Lento(1.0s), 3=Normal(0.5s), 4=Rápido(0.2s)
      */
-    const getImageSpeedStep = (val: any): number => {
+    const getImageSpeedStep = (val: unknown): number => {
         const n = Number(val);
         if (isNaN(n)) return 3;
         // Valid step integers 1-4 are returned as-is (new format)
