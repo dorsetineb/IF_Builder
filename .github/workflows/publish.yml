@@ -70,5 +70,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          NOTES=$(gh api POST /repos/${{ github.repository }}/releases/generate-notes -f tag_name="v${{ env.VERSION }}" -q .body)
+          NOTES=$(gh api -X POST /repos/${{ github.repository }}/releases/generate-notes -f tag_name="v${{ env.VERSION }}" -q .body)
           gh release edit "v${{ env.VERSION }}" --notes "$NOTES"
