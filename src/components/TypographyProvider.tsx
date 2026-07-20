@@ -14,9 +14,9 @@ type TypographyProviderState = {
 }
 
 const initialState: TypographyProviderState = {
-    fontFamily: "Silkscreen",
+    fontFamily: "Space Grotesk",
     setFontFamily: () => null,
-    fontSizeScale: "small",
+    fontSizeScale: "medium",
     setFontSizeScale: () => null,
 }
 
@@ -38,10 +38,10 @@ export const fontScales: Record<string, Record<string, number>> = {
 
 export function TypographyProvider({ children }: TypographyProviderProps) {
     const [fontFamily, setFontFamily] = useState<string>(
-        () => localStorage.getItem("if-builder-font-family") || "Silkscreen"
+        () => localStorage.getItem("if-builder-font-family") || "Space Grotesk"
     )
     const [fontSizeScale, setFontSizeScale] = useState<FontSizeScale>(
-        () => (localStorage.getItem("if-builder-font-size") as FontSizeScale) || "small"
+        () => (localStorage.getItem("if-builder-font-size") as FontSizeScale) || "medium"
     )
 
     useEffect(() => {

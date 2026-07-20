@@ -271,7 +271,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(() => {}); } };
+    const audioBlobCache = new Map();
+    const getAudioSrc = async (src) => {
+        if (!src) return "";
+        if (src.startsWith('blob:') || src.startsWith('data:')) return src;
+        if (audioBlobCache.has(src)) return audioBlobCache.get(src);
+        try {
+            const response = await fetch(src);
+            if (!response.ok) throw new Error('Audio fetch failed');
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            audioBlobCache.set(src, blobUrl);
+            return blobUrl;
+        } catch (e) {
+            console.warn('Failed to fetch audio as blob, falling back to original source:', e);
+            return src;
+        }
+    };
+
+    const playSound = (src) => {
+        if (src && soundEffectAudio) {
+            getAudioSrc(src).then(resolvedSrc => {
+                soundEffectAudio.src = resolvedSrc;
+                soundEffectAudio.play().catch((e) => console.warn("playSound failed:", e));
+            });
+        }
+    };
 
     let bgmFadeInterval = null;
     const playBgm = (src) => {
@@ -315,18 +340,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 50);
         };
 
+        let targetSrc = src;
+        currentBgmSrc = src;
+        if (!src) {
+            fadeOut(() => {
+                bgmAudio.src = "";
+            });
+            return;
+        }
+
         if (bgmAudio.src && !bgmAudio.paused) {
             fadeOut(() => {
-                if (!src) { currentBgmSrc = ""; return; }
-                bgmAudio.src = src;
-                currentBgmSrc = src;
-                fadeIn();
+                getAudioSrc(targetSrc).then(resolvedSrc => {
+                    if (currentBgmSrc !== targetSrc) return;
+                    bgmAudio.src = resolvedSrc;
+                    fadeIn();
+                });
             });
         } else {
-            if (!src) { currentBgmSrc = ""; return; }
-            bgmAudio.src = src;
-            currentBgmSrc = src;
-            fadeIn();
+            getAudioSrc(targetSrc).then(resolvedSrc => {
+                if (currentBgmSrc !== targetSrc) return;
+                bgmAudio.src = resolvedSrc;
+                fadeIn();
+            });
         }
     };
 

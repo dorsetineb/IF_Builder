@@ -878,9 +878,15 @@ const Editor: React.FC = () => {
   // BIOS Animation Sequence (runs once on mount)
   useEffect(() => {
     // Play startup sound
-    const startupSound = new Audio('/787576__nazarhk__pc-startup-sound.mp3');
+    const startupSound = new Audio();
     startupSound.volume = 0.5;
-    startupSound.play().catch((e) => console.warn('BIOS sound autoplay blocked or failed:', e));
+    fetch('/787576__nazarhk__pc-startup-sound.mp3')
+      .then((r) => r.blob())
+      .then((blob) => {
+        startupSound.src = URL.createObjectURL(blob);
+        return startupSound.play();
+      })
+      .catch((e) => console.warn('BIOS sound autoplay blocked or failed:', e));
 
     const fullCommand = 'RUN IF-BUILDER.EXE';
 

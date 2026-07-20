@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--app-font-family, "Silkscreen"), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--app-font-family, "Silkscreen"), "DotGothic16", monospace;
-  --font-body: var(--app-font-family, "Silkscreen"), monospace;
+  --font-sans: var(--app-font-family, "Space Grotesk"), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--app-font-family, "Space Grotesk"), "DotGothic16", monospace;
+  --font-body: var(--app-font-family, "Space Grotesk"), monospace;
 
   /* Adjust font sizes for Silkscreen */
   --text-xs: var(--app-text-xs, 9px);
@@ -118,8 +118,8 @@
 
   body {
     @apply bg-background text-foreground;
-    -webkit-font-smoothing: none;
-    font-smooth: never;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -327,7 +327,12 @@
 input:not([type="checkbox"]):not([type="radio"]):not(:disabled),
 select:not(:disabled),
 textarea:not(:disabled) {
-  color: #ffffff;
+  color: var(--foreground, #ffffff);
+}
+
+select option {
+  background-color: var(--card, #1a1a1a);
+  color: var(--foreground, #ffffff);
 }
 
 .windows {
@@ -601,8 +606,8 @@ textarea:not(:disabled) {
 
   body {
     @apply bg-background text-foreground;
-    -webkit-font-smoothing: none;
-    font-smooth: never;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   button,
