@@ -57,6 +57,7 @@ export interface Scene {
   description: string;
   backgroundMusic?: string; // Base64 data URL for BGM
   backgroundMusicName?: string; // Filename of the uploaded BGM
+  stopBackgroundMusic?: boolean; // If true, stops currently playing BGM upon entering scene
   objectIds: string[]; // References to GameData.globalObjects
   objects?: GameObject[]; // Deprecated: Kept for migration types
   interactions: Interaction[];

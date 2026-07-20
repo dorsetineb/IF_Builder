@@ -1172,7 +1172,8 @@ DATE:        ${exportDate.toLocaleString()}
     setIsImporting(true);
 
     const reader = new FileReader();
-    if (file.name.endsWith('.zip')) {
+    const fileNameLower = file.name.toLowerCase();
+    if (fileNameLower.endsWith('.zip')) {
       reader.onload = async (ev) => {
         try {
           const zip = await JSZip.loadAsync(ev.target?.result);

@@ -859,15 +859,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const glitchEffect = new GlitchEffect();
 
     const init = () => {
-        if (gameData.gameBackgroundMusic) {
-            playBgm(gameData.gameBackgroundMusic);
-        }
-
         const startAudioOnInteraction = () => {
             if (bgmAudio.paused && !isGameEnded && bgmAudio.src && bgmAudio.src !== window.location.href && bgmAudio.src !== "") {
                 bgmAudio.play().catch(() => {});
-            } else if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
-                playBgm(gameData.gameBackgroundMusic);
             }
             document.removeEventListener('mousedown', startAudioOnInteraction);
             document.removeEventListener('keydown', startAudioOnInteraction);
@@ -1437,12 +1431,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
         if (startScene) {
-            if (!startScene.backgroundMusic) {
-                if (!window.isSceneTest) {
-                    playBgm(gameData.gameBackgroundMusic || "");
-                } else {
-                    playBgm(""); 
-                }
+            if (startScene.backgroundMusic) {
+                playBgm(startScene.backgroundMusic);
+            } else if (!window.isSceneTest && (!startScene.vignetteType || startScene.vignetteType === 'none')) {
+                playBgm(gameData.gameBackgroundMusic || "");
+            } else {
+                playBgm(""); 
             }
             loadScene(currentSceneId, false);
         } else {
@@ -2307,7 +2301,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
-        if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
+        if (scene.backgroundMusic) {
+            playBgm(scene.backgroundMusic);
+        } else if (scene.stopBackgroundMusic) {
+            playBgm("");
+        }
         const oldChances = chances;
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);

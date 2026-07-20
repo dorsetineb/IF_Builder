@@ -23,6 +23,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 image: scene.image,
                 description: scene.description,
                 backgroundMusic: scene.backgroundMusic,
+                stopBackgroundMusic: scene.stopBackgroundMusic,
                 interactions: scene.interactions,
                 exits: scene.exits,
                 isEndingScene: scene.isEndingScene,

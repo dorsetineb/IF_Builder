@@ -749,6 +749,7 @@
       }
     },
     "audioLabel": "Banda Sonora (.mp3)",
+    "stopBackgroundMusicLabel": "Interrumpir música de fondo en curso",
     "customAudioSet": "Pista Personalizada Definida",
     "audioLoaded": "Audio cargado con éxito",
     "noAudio": "Ninguna pista seleccionada",

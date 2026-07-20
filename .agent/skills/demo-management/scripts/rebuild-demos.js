@@ -116,7 +116,7 @@ async function rebuild() {
                 console.log(`  [OK] Added cache busting and is-demo class to index.html (v=${timestamp})`);
             }
 
-            // C. Update ZIP file (Using tar)
+            // C. Update ZIP file (Using Python zipfile for true PKZIP format)
             const zipPath = path.join(PUBLIC_DIR, `${demoName}.zip`);
             console.log(`  [ZIP] Updating ${demoName}.zip...`);
 
@@ -124,26 +124,21 @@ async function rebuild() {
                 const absZipPath = path.resolve(zipPath);
                 const absDemoPath = path.resolve(demoPath);
 
-                // Remove existing ZIP first
                 if (fs.existsSync(absZipPath)) fs.unlinkSync(absZipPath);
 
-                // Use tar -a (auto-determine format by extension)
-                // -c (create), -f (file), -C (change directory to demo folder), "." (include all files in demo folder)
-                const tarCommand = `tar -a -c -f "${absZipPath}" -C "${absDemoPath}" .`;
-                execSync(tarCommand, { stdio: 'inherit' });
+                const pyCommand = `python -c "import zipfile, os; z=zipfile.ZipFile(r'${absZipPath}', 'w', zipfile.ZIP_DEFLATED); [z.write(os.path.join(r, f), os.path.relpath(os.path.join(r, f), r'${absDemoPath}')) for r, d, files in os.walk(r'${absDemoPath}') for f in files]; z.close()"`;
+                execSync(pyCommand, { stdio: 'inherit' });
 
-                console.log(`  [OK] ZIP updated successfully via tar`);
+                console.log(`  [OK] ZIP updated successfully via Python zipfile`);
             } catch (err) {
-                console.error(`  [ERROR] Failed to update ZIP via tar: ${err.message}`);
-
-                // Fallback to simpler method if tar fails (though tar is standard on modern Windows)
-                console.log(`  [FALLBACK] Attempting PowerShell Compress-Archive...`);
+                console.error(`  [ERROR] Failed to update ZIP via python: ${err.message}`);
+                // Fallback to PowerShell
                 try {
                     const absZipPath = path.resolve(zipPath);
                     const absDemoPath = path.resolve(demoPath);
                     const psCommand = `powershell -Command "Compress-Archive -Path '${absDemoPath}\\*' -DestinationPath '${absZipPath}' -Force"`;
                     execSync(psCommand, { stdio: 'inherit' });
-                    console.log(`  [OK] ZIP updated successfully via fallback`);
+                    console.log(`  [OK] ZIP updated successfully via PowerShell fallback`);
                 } catch (fallbackErr) {
                     console.error(`  [FATAL] All ZIP methods failed for ${demoName}`);
                 }

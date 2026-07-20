@@ -830,6 +830,7 @@
       }
     },
     "audioLabel": "Soundtrack (.mp3)",
+    "stopBackgroundMusicLabel": "Stop playing background music",
     "customAudioSet": "Custom Soundtrack Set",
     "audioLoaded": "Audio loaded successfully",
     "noAudio": "No soundtrack selected",

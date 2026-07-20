@@ -813,6 +813,7 @@
       "fog": "Neblina"
     },
     "audioLabel": "Trilha Sonora (.mp3)",
+    "stopBackgroundMusicLabel": "Interromper trilha em andamento",
     "customAudioSet": "Trilha Personalizada Definida",
     "audioLoaded": "Áudio carregado com sucesso",
     "noAudio": "Nenhuma trilha selecionada",

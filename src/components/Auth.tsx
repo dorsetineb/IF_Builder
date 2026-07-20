@@ -36,7 +36,21 @@ export function Auth() {
     // Landing page view state
     const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
     const [currentView, setCurrentView] = useState<LandingView>('landing');
-    const [currentBgIndex, setCurrentBgIndex] = useState(() => Math.floor(Math.random() * BACKGROUNDS.length));
+    const [currentBgIndex, setCurrentBgIndex] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = sessionStorage.getItem('if-builder-bg-index');
+            if (saved !== null) {
+                const index = parseInt(saved, 10);
+                if (!isNaN(index) && index >= 0 && index < BACKGROUNDS.length) {
+                    return index;
+                }
+            }
+            const randomIndex = Math.floor(Math.random() * BACKGROUNDS.length);
+            sessionStorage.setItem('if-builder-bg-index', randomIndex.toString());
+            return randomIndex;
+        }
+        return Math.floor(Math.random() * BACKGROUNDS.length);
+    });
     const activeBg = isMobile ? BACKGROUNDS[0] : BACKGROUNDS[currentBgIndex];
     const [demoData, setDemoData] = useState<GameData | null>(null);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
@@ -65,14 +79,6 @@ export function Auth() {
 
         setIsClosing(true);
         setTimeout(() => {
-            setCurrentBgIndex(prev => {
-                if (isMobile) return 0;
-                let next = Math.floor(Math.random() * BACKGROUNDS.length);
-                while (next === prev && BACKGROUNDS.length > 1) {
-                    next = Math.floor(Math.random() * BACKGROUNDS.length);
-                }
-                return next;
-            });
             setCurrentView('landing');
             setIsClosing(false);
             // Optionally clear demo data or keep it for next time

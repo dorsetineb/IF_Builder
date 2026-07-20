@@ -673,7 +673,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                     <div className="flex items-center gap-2 h-[38px] w-full">
                                                         <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-background border border-muted-foreground/50 rounded-lg hover:bg-muted cursor-pointer text-xs font-bold transition-colors">
                                                             <Upload className="w-3.5 h-3.5 mr-2 text-muted-foreground" /> {localMenuTransitionSound ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
-                                                            <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
+                                                            <input type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleSoundUpload} className="hidden" />
                                                         </label>
                                                         {localMenuTransitionSound && (
                                                             <button onClick={() => setLocalMenuTransitionSound?.(undefined)} className="h-full px-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-sm"><Trash2 className="w-4 h-4" /></button>

@@ -939,11 +939,28 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                               ) : (
                                 <label htmlFor="music-upload-side" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
                                   {t('sceneEditor.loadBtn')}
-                                  <input id="music-upload-side" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
+                                  <input id="music-upload-side" type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleMusicUpload} className="hidden" />
                                 </label>
                               )}
                             </div>
                           </div>
+                          {/* Checkbox to stop background music on entry */}
+                          <label className="flex items-center gap-2.5 mt-3 cursor-pointer group select-none">
+                            <input
+                              type="checkbox"
+                              className="custom-checkbox"
+                              checked={!!localScene.stopBackgroundMusic}
+                              onChange={(e) =>
+                                setLocalScene((prev) => ({
+                                  ...prev,
+                                  stopBackgroundMusic: e.target.checked,
+                                }))
+                              }
+                            />
+                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                              {t('sceneEditor.stopBackgroundMusicLabel', 'Interromper trilha em andamento')}
+                            </span>
+                          </label>
                         </div>
                       )}
                     </div>
@@ -1253,7 +1270,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                   <input
                                     id="music-upload"
                                     type="file"
-                                    accept="audio/*"
+                                    accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac"
                                     onChange={handleMusicUpload}
                                     className="hidden"
                                   />
@@ -1261,6 +1278,23 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                               )}
                             </div>
                           </div>
+                          {/* Checkbox to stop background music on entry */}
+                          <label className="flex items-center gap-2.5 mt-3 cursor-pointer group select-none">
+                            <input
+                              type="checkbox"
+                              className="custom-checkbox"
+                              checked={!!localScene.stopBackgroundMusic}
+                              onChange={(e) =>
+                                setLocalScene((prev) => ({
+                                  ...prev,
+                                  stopBackgroundMusic: e.target.checked,
+                                }))
+                              }
+                            />
+                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                              {t('sceneEditor.stopBackgroundMusicLabel', 'Interromper trilha em andamento')}
+                            </span>
+                          </label>
                         </div>
                       )}
                     </div>
