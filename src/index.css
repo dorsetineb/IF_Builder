@@ -324,6 +324,26 @@
   --dither-overlay: #7EE0A1;
 }
 
+.dark,
+.terminal,
+.windows,
+.ether,
+.ristretto,
+.abismo {
+  color-scheme: dark;
+}
+
+.cream {
+  color-scheme: light;
+}
+
+select {
+  color-scheme: dark;
+}
+.cream select {
+  color-scheme: light;
+}
+
 input:not([type="checkbox"]):not([type="radio"]):not(:disabled),
 select:not(:disabled),
 textarea:not(:disabled) {

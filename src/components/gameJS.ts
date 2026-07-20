@@ -2934,19 +2934,29 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
         let foundInteraction = scene.interactions.find(i => {
             if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
-            if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
+            if (i.requiresInInventory) {
+                const reqObj = inventory.find(o => o.id === i.requiresInInventory);
+                if (!reqObj) return false;
+                if (!hasWord(reqObj.name.toLowerCase(), inputLower)) return false;
+            }
             if (i.target) {
-                const obj = sceneObjects.find(o => i.target === o.id) || inventory.find(o => i.target === o.id);
+                const obj = sceneObjects.find(o => i.target === o.id) || inventory.find(o => o.id === i.target);
                 if (!obj) return false;
                 return hasWord(obj.name.toLowerCase(), inputLower);
             }
-            const anyObjectMentioned = [...sceneObjects, ...inventory].some(o => hasWord(o.name.toLowerCase(), inputLower));
+            const anyObjectMentioned = [...sceneObjects, ...inventory]
+                .filter(o => o.id !== i.requiresInInventory)
+                .some(o => hasWord(o.name.toLowerCase(), inputLower));
             return !anyObjectMentioned;
         });
         if (!foundInteraction) {
             foundInteraction = scene.interactions.find(i => {
                 if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
-                if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
+                if (i.requiresInInventory) {
+                    const reqObj = inventory.find(o => o.id === i.requiresInInventory);
+                    if (!reqObj) return false;
+                    if (!hasWord(reqObj.name.toLowerCase(), inputLower)) return false;
+                }
                 if (i.target) return false;
                 return true;
             });

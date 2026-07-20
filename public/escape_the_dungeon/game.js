@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionsButton = document.getElementById('suggestions-button');
     const inventoryButton = document.getElementById('inventory-button');
     const diaryButton = document.getElementById('diary-button');
+    const notesButton = document.getElementById('notes-button');
     const trackersButton = document.getElementById('trackers-button');
     const systemButton = document.getElementById('system-button');
     const exportPdfButton = document.getElementById('export-pdf-button');
@@ -201,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const diaryModal = document.getElementById('diary-modal');
     const diaryLog = document.getElementById('diary-log');
+    const notesModal = document.getElementById('notes-modal');
+    const notesTextarea = document.getElementById('notes-textarea');
     const trackersModal = document.getElementById('trackers-modal');
     const trackersContent = document.getElementById('trackers-content');
     const itemModal = document.getElementById('item-modal');
@@ -270,7 +273,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(() => {}); } };
+    const audioBlobCache = new Map();
+    const getAudioSrc = async (src) => {
+        if (!src) return "";
+        if (src.startsWith('blob:') || src.startsWith('data:')) return src;
+        if (audioBlobCache.has(src)) return audioBlobCache.get(src);
+        try {
+            const response = await fetch(src);
+            if (!response.ok) throw new Error('Audio fetch failed');
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            audioBlobCache.set(src, blobUrl);
+            return blobUrl;
+        } catch (e) {
+            console.warn('Failed to fetch audio as blob, falling back to original source:', e);
+            return src;
+        }
+    };
+
+    const playSound = (src) => {
+        if (src && soundEffectAudio) {
+            getAudioSrc(src).then(resolvedSrc => {
+                soundEffectAudio.src = resolvedSrc;
+                soundEffectAudio.play().catch((e) => console.warn("playSound failed:", e));
+            });
+        }
+    };
 
     let bgmFadeInterval = null;
     const playBgm = (src) => {
@@ -314,18 +342,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 50);
         };
 
+        let targetSrc = src;
+        currentBgmSrc = src;
+        if (!src) {
+            fadeOut(() => {
+                bgmAudio.src = "";
+            });
+            return;
+        }
+
         if (bgmAudio.src && !bgmAudio.paused) {
             fadeOut(() => {
-                if (!src) { currentBgmSrc = ""; return; }
-                bgmAudio.src = src;
-                currentBgmSrc = src;
-                fadeIn();
+                getAudioSrc(targetSrc).then(resolvedSrc => {
+                    if (currentBgmSrc !== targetSrc) return;
+                    bgmAudio.src = resolvedSrc;
+                    fadeIn();
+                });
             });
         } else {
-            if (!src) { currentBgmSrc = ""; return; }
-            bgmAudio.src = src;
-            currentBgmSrc = src;
-            fadeIn();
+            getAudioSrc(targetSrc).then(resolvedSrc => {
+                if (currentBgmSrc !== targetSrc) return;
+                bgmAudio.src = resolvedSrc;
+                fadeIn();
+            });
         }
     };
 
@@ -1193,6 +1232,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
         if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
         if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
+        if (notesButton && notesModal) {
+            notesButton.addEventListener('click', () => {
+                notesModal.classList.remove('hidden');
+            });
+        }
+        if (notesTextarea) {
+            notesTextarea.addEventListener('input', () => {
+                autoSaveGame();
+            });
+        }
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         if (exportPdfButton) {
@@ -1372,6 +1421,9 @@ document.addEventListener('DOMContentLoaded', () => {
         chances = gameData.gameMaxChances || 3; 
         trackers = {}; 
         removedObjectsFromScenes = {};
+        if (notesTextarea) {
+            notesTextarea.value = '';
+        }
         isGameEnded = false;
         isGameSessionActive = true;
         gameStartTime = Date.now();
@@ -1448,6 +1500,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 chances = save.chances; 
                 trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
+                if (notesTextarea) {
+                    notesTextarea.value = save.notes || '';
+                }
                 isGameEnded = false;
                 isGameSessionActive = true;
                 standardActionBar.classList.remove('hidden');
@@ -1643,7 +1698,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const autoSaveGame = () => {
         if (isGameEnded) return;
-        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
@@ -1774,7 +1829,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const slotKey = gameData.enableSystemMenu
             ? 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas')
             : 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave(slotKey, JSON.stringify(save)); renderSlots('save');
     };
 
@@ -1888,7 +1943,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const performStartScreenSave = (slotIndex) => {
         const slotKey = 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave(slotKey, JSON.stringify(save));
         renderStartScreenSlots();
     };
@@ -2881,19 +2936,29 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
         let foundInteraction = scene.interactions.find(i => {
             if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
-            if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
+            if (i.requiresInInventory) {
+                const reqObj = inventory.find(o => o.id === i.requiresInInventory);
+                if (!reqObj) return false;
+                if (!hasWord(reqObj.name.toLowerCase(), inputLower)) return false;
+            }
             if (i.target) {
-                const obj = sceneObjects.find(o => i.target === o.id) || inventory.find(o => i.target === o.id);
+                const obj = sceneObjects.find(o => i.target === o.id) || inventory.find(o => o.id === i.target);
                 if (!obj) return false;
                 return hasWord(obj.name.toLowerCase(), inputLower);
             }
-            const anyObjectMentioned = [...sceneObjects, ...inventory].some(o => hasWord(o.name.toLowerCase(), inputLower));
+            const anyObjectMentioned = [...sceneObjects, ...inventory]
+                .filter(o => o.id !== i.requiresInInventory)
+                .some(o => hasWord(o.name.toLowerCase(), inputLower));
             return !anyObjectMentioned;
         });
         if (!foundInteraction) {
             foundInteraction = scene.interactions.find(i => {
                 if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
-                if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
+                if (i.requiresInInventory) {
+                    const reqObj = inventory.find(o => o.id === i.requiresInInventory);
+                    if (!reqObj) return false;
+                    if (!hasWord(reqObj.name.toLowerCase(), inputLower)) return false;
+                }
                 if (i.target) return false;
                 return true;
             });

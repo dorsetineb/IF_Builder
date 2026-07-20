@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 
 const PROJECT_ROOT = process.cwd();
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
-const ENGINE_FILE = path.join(PROJECT_ROOT, 'src', 'components', 'game-engine.ts');
+const ENGINE_FILE = path.join(PROJECT_ROOT, 'src', 'components', 'gameJS.ts');
 
 const demos = ['fuja_da_masmorra', 'escape_the_dungeon', 'escapa_la_mazmorra'];
 
