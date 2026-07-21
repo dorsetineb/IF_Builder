@@ -27,6 +27,16 @@
     "bullet4Title": "Exporte para .zip ou .html",
     "bullet4Desc": "Gere arquivos independentes de internet. Carregue-os no IF Builder para editá-los, ou execute-os diretamente no navegador."
   },
+  "updater": {
+    "newVersionAvailable": "Nova Atualização Disponível",
+    "currentVersion": "Versão atual:",
+    "latestVersion": "Nova versão:",
+    "promptMessage": "Uma nova versão do IFBuilder está disponível no GitHub. Deseja baixar e atualizar agora?",
+    "changelog": "Notas da Versão",
+    "confirmUpdate": "Baixar e Atualizar",
+    "cancelUpdate": "Agora Não",
+    "downloading": "Baixando..."
+  },
   "common": {
     "back": "Voltar",
     "close": "Fechar",

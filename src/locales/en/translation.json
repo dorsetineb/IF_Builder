@@ -24,6 +24,16 @@
     },
     "loading": "Loading..."
   },
+  "updater": {
+    "newVersionAvailable": "New Update Available",
+    "currentVersion": "Current version:",
+    "latestVersion": "New version:",
+    "promptMessage": "A new version of IFBuilder is available on GitHub. Would you like to download and update now?",
+    "changelog": "Release Notes",
+    "confirmUpdate": "Download and Update",
+    "cancelUpdate": "Not Now",
+    "downloading": "Downloading..."
+  },
   "auth": {
     "errors": {
       "alreadyRegistered": "This user is already registered.",

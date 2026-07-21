@@ -8,6 +8,7 @@ import { useTypography, fontScales } from './TypographyProvider';
 import { GameData } from '../types';
 import Preview from './Preview';
 import { getDitherColors } from '../utils/themeStyles';
+import { APP_VERSION } from '../version';
 
 type LandingView = 'landing' | 'about' | 'play';
 
@@ -36,7 +37,7 @@ export function Auth() {
     // Landing page view state
     const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
     const [currentView, setCurrentView] = useState<LandingView>('landing');
-    const [currentBgIndex, setCurrentBgIndex] = useState(() => {
+    const [currentBgIndex] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = sessionStorage.getItem('if-builder-bg-index');
             if (saved !== null) {
@@ -345,7 +346,7 @@ export function Auth() {
             {currentView === 'play' && renderGamePopup()}
 
             {/* IF Logo - Bottom Right Group */}
-            <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-20">
+            <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-20 flex flex-col items-end">
                 <pre className="font-mono leading-none text-foreground text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
 {`           ██████   █████████
           ░░████   ░█████████
@@ -356,6 +357,9 @@ export function Auth() {
      ██████  ░██            
     ░░░░░░   ░░             `}
                 </pre>
+                <div className="text-[10px] sm:text-xs font-mono text-foreground mt-1 opacity-80">
+                    v.{APP_VERSION}
+                </div>
             </div>
         </div>
     );

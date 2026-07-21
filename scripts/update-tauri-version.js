@@ -15,4 +15,8 @@ tauriConf.version = newVersion;
 // Salva o arquivo modificado
 fs.writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n');
 
-console.log(`✅ tauri.conf.json atualizado para a versão ${newVersion}`);
+// Atualiza a versão no src/version.ts
+const versionTsPath = path.resolve('./src/version.ts');
+fs.writeFileSync(versionTsPath, `export const APP_VERSION = '${newVersion}';\n`);
+
+console.log(`✅ tauri.conf.json e src/version.ts atualizados para a versão ${newVersion}`);

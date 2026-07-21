@@ -41,6 +41,7 @@ import SceneList from './SceneList';
 // import VignettesEditor from './VignettesEditor'; // Removed as integrated into SceneEditor
 import Preview from './Preview';
 import { LoadingOverlay } from './LoadingOverlay';
+import { APP_VERSION } from '../version';
 
 // Lazy Load Heavy Components
 const UIEditor = lazy(() => import('./UIEditor').then((module) => ({ default: module.UIEditor })));
@@ -1288,7 +1289,7 @@ const Editor: React.FC = () => {
     ░░░░░░   ░░         ░░░░░░░░   ░░░░░░░░░░  ░░  ░░░░░░░░ ░░░░░░    ░░░░░░░░  ░░     ░░
 `}
             </pre>
-            <p>IF-BUILDER BIOS V.1.0.0</p>
+            <p>IF-BUILDER v.{APP_VERSION}</p>
             <p className="mb-4">Copyright (C) 2026 @DORSETINEB</p>
 
             <p>System Memory: 640KB OK</p>

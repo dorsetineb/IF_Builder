@@ -14,7 +14,7 @@
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
     "tauri": "tauri",
-    "version": "node scripts/update-tauri-version.js && git add src-tauri/tauri.conf.json",
+    "version": "node scripts/update-tauri-version.js && git add src-tauri/tauri.conf.json src/version.ts",
     "postversion": "git push && git push --tags",
     "release": "npm version patch",
     "release:minor": "npm version minor",

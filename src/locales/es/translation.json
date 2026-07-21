@@ -27,6 +27,16 @@
     "bullet4Title": "Exporta a .zip o .html",
     "bullet4Desc": "Genera archivos .zip independientes de internet o servidores. Solo extrae y juega directamente en el navegador."
   },
+  "updater": {
+    "newVersionAvailable": "Nueva Actualización Disponible",
+    "currentVersion": "Versión actual:",
+    "latestVersion": "Nueva versión:",
+    "promptMessage": "Una nueva versión de IFBuilder está disponible en GitHub. ¿Deseas descargar y actualizar ahora?",
+    "changelog": "Notas de la Versión",
+    "confirmUpdate": "Descargar y Actualizar",
+    "cancelUpdate": "Ahora No",
+    "downloading": "Descargando..."
+  },
   "common": {
     "back": "Volver",
     "close": "Cerrar",
