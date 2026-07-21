@@ -346,10 +346,10 @@ export function Auth() {
             {currentView === 'play' && renderGamePopup()}
 
             {/* IF Logo - Bottom Right Group */}
-            <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-20 flex flex-col items-end">
+            <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-45 flex flex-col items-start">
                 <pre className="font-mono leading-none text-foreground text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
 {`           ██████   █████████
-          ░░████   ░█████████
+          ░░████  ░░█████████
          ░████   ░██         
         ░████   ░█████████   
        ░████   ░█████████   
@@ -357,7 +357,7 @@ export function Auth() {
      ██████  ░██            
     ░░░░░░   ░░             `}
                 </pre>
-                <div className="text-[10px] sm:text-xs font-mono text-foreground mt-1 opacity-80">
+                <div className="text-xs sm:text-sm font-mono text-foreground font-semibold mt-1 pl-[25px] sm:pl-[35px]">
                     v.{APP_VERSION}
                 </div>
             </div>
