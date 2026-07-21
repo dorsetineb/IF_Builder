@@ -53,10 +53,13 @@ export async function checkForUpdates(): Promise<ReleaseInfo | null> {
     endpointsToTry.push(customUrl);
   }
 
-  if (typeof window !== 'undefined' && window.location?.origin) {
+  // Check current origin if NOT localhost
+  if (typeof window !== 'undefined' && window.location?.origin && !window.location.hostname.includes('localhost') && window.location.hostname !== '127.0.0.1') {
     endpointsToTry.push(`${window.location.origin}/api/update`);
   }
 
+  // Production Vercel Serverless Function proxy (has GITHUB_TOKEN & CORS enabled)
+  endpointsToTry.push('https://www.ifbuildr.com/api/update');
   endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
 
   for (const endpoint of endpointsToTry) {
@@ -73,6 +76,9 @@ export async function checkForUpdates(): Promise<ReleaseInfo | null> {
       clearTimeout(timeoutId);
 
       if (!response.ok) continue;
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('json')) continue;
 
       const data = await response.json();
       if (!data) continue;
@@ -124,10 +130,13 @@ export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
     endpointsToTry.push(customUrl);
   }
 
-  if (typeof window !== 'undefined' && window.location?.origin) {
+  // Check current origin if NOT localhost
+  if (typeof window !== 'undefined' && window.location?.origin && !window.location.hostname.includes('localhost') && window.location.hostname !== '127.0.0.1') {
     endpointsToTry.push(`${window.location.origin}/api/update`);
   }
 
+  // Production Vercel Serverless Function proxy (has GITHUB_TOKEN & CORS enabled)
+  endpointsToTry.push('https://www.ifbuildr.com/api/update');
   endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
 
   for (const endpoint of endpointsToTry) {
@@ -144,6 +153,9 @@ export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
       clearTimeout(timeoutId);
 
       if (!response.ok) continue;
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('json')) continue;
 
       const data = await response.json();
       if (!data) continue;

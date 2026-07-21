@@ -24,7 +24,8 @@ export default async function handler(req: any, res: any) {
     });
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: 'Failed to fetch release from GitHub' });
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(response.status).send(JSON.stringify({ error: 'Failed to fetch release from GitHub' }));
     }
 
     const data = await response.json();
@@ -52,11 +53,17 @@ export default async function handler(req: any, res: any) {
       targetAsset = assets[0];
     }
 
-    const downloadUrl = targetAsset?.browser_download_url || data.html_url;
+    const downloadUrl = targetAsset?.browser_download_url || data.html_url || 'https://github.com/dorsetineb/IF_Builder/releases/latest';
 
-    // Redirect to the direct asset download URL
-    return res.redirect(302, downloadUrl);
+    // Redirect to the direct asset download URL using standard Node HTTP headers (Vercel Serverless compatible)
+    res.writeHead(302, { Location: downloadUrl });
+    return res.end();
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(500).send(JSON.stringify({ error: 'Internal Server Error' }));
   }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = handler;
 }

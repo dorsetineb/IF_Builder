@@ -17,21 +17,22 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
-    // Fetch GitHub release notes dynamically when dev log modal opens (only once)
+    // Fetch GitHub release notes dynamically when dev log modal opens
     useEffect(() => {
-        if (isDevLogModalOpen && !hasFetchedRelease && !isLoadingRelease) {
+        if (isDevLogModalOpen && !latestRelease) {
             setIsLoadingRelease(true);
             fetchLatestRelease()
                 .then((res) => {
-                    if (res) setLatestRelease(res);
+                    if (res && res.releaseNotes) {
+                        setLatestRelease(res);
+                    }
                 })
                 .catch((err) => console.error('[AboutProject] Failed to fetch release:', err))
                 .finally(() => {
                     setIsLoadingRelease(false);
-                    setHasFetchedRelease(true);
                 });
         }
-    }, [isDevLogModalOpen, hasFetchedRelease, isLoadingRelease]);
+    }, [isDevLogModalOpen, latestRelease]);
 
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
@@ -403,50 +404,15 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     <span className="text-xs font-mono">{t('common.loading', 'Carregando notas da release...')}</span>
                                 </div>
                             ) : latestRelease?.releaseNotes ? (
-                                <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-mono whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
-                                    <h3 className="text-sm font-bold text-foreground font-sans">
+                                <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
+                                    <h3 className="text-sm font-bold text-foreground border-b border-muted-foreground/20 pb-2 mb-3">
                                         {latestRelease.releaseName || `IF Builder v${APP_VERSION}`}
                                     </h3>
                                     <div>{latestRelease.releaseNotes}</div>
                                 </div>
                             ) : (
-                                <div className="space-y-4 text-xs text-foreground/90 leading-relaxed font-light">
-                                    <h3 className="text-sm font-bold text-foreground">
-                                        {latestRelease?.releaseName || `IF Builder v${APP_VERSION}`}
-                                    </h3>
-
-                                    <div className="space-y-3">
-                                        <div>
-                                            <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
-                                                <span>{t('about.versions.newsTitle', '✨ Novidades')}</span>
-                                            </h4>
-                                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                                                <li>{t('about.versions.newsItem1', 'Sistema de atualização automática no desktop com suporte a repositórios do GitHub.')}</li>
-                                                <li>{t('about.versions.newsItem2', 'Notificação com resumo das notas de versão e confirmação explícita para autorizar download e instalação.')}</li>
-                                                <li>{t('about.versions.newsItem3', 'Download direto dos instaladores para Windows e Linux através da versão web.')}</li>
-                                            </ul>
-                                        </div>
-
-                                        <div>
-                                            <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
-                                                <span>{t('about.versions.uiTitle', '🎨 Melhorias de Interface')}</span>
-                                            </h4>
-                                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                                                <li>{t('about.versions.uiItem1', 'Exibição do número da versão alinhado na tela inicial e na tela de boot.')}</li>
-                                                <li>{t('about.versions.uiItem2', 'Integração da caixa de download e do log de desenvolvimento na aba Sobre o Projeto.')}</li>
-                                            </ul>
-                                        </div>
-
-                                        <div>
-                                            <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
-                                                <span>{t('about.versions.infraTitle', '⚙️ Infraestrutura & Segurança')}</span>
-                                            </h4>
-                                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                                                <li>{t('about.versions.infraItem1', 'Suporte a repositórios privados via Vercel Serverless Function (/api/update e /api/download).')}</li>
-                                                <li>{t('about.versions.infraItem2', 'Sincronização automática de número de versão nos scripts de release.')}</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                <div className="p-8 text-center text-muted-foreground text-xs italic">
+                                    {t('about.versions.noNotes', 'Nenhuma nota de versão cadastrada no GitHub.')}
                                 </div>
                             )}
                         </div>

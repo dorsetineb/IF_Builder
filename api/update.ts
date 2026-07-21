@@ -24,7 +24,8 @@ export default async function handler(req: any, res: any) {
     });
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: 'Failed to fetch release from GitHub' });
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(response.status).send(JSON.stringify({ error: 'Failed to fetch release from GitHub' }));
     }
 
     const data = await response.json();
@@ -40,14 +41,20 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    return res.status(200).json({
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).send(JSON.stringify({
       version: latestTag.replace(/^v/i, ''),
       releaseName: data.name || latestTag,
       releaseNotes: data.body || '',
       htmlUrl: data.html_url,
       downloadUrl
-    });
+    }));
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(500).send(JSON.stringify({ error: 'Internal Server Error' }));
   }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = handler;
 }

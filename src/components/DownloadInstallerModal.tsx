@@ -19,16 +19,11 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
 
   const handleDownload = () => {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
-    if (isLocalhost) {
-      // Em modo de desenvolvimento local (npm run dev), as funções Serverless da Vercel (/api/*) não rodam no Vite.
-      // Portanto, em localhost abrimos a página de releases mais recentes do repositório no GitHub.
-      window.open('https://github.com/dorsetineb/IF_Builder/releases/latest', '_blank');
-    } else {
-      // Em produção (hospedado na Vercel), a Serverless Function /api/download intercepta e redireciona (HTTP 302)
-      // para o download direto do arquivo .exe/.msi ou .AppImage/.deb correspondente.
-      window.location.href = `/api/download?platform=${platform}`;
-    }
+    const downloadApiUrl = isLocalhost
+      ? `https://www.ifbuildr.com/api/download?platform=${platform}`
+      : `/api/download?platform=${platform}`;
+
+    window.location.href = downloadApiUrl;
     onClose();
   };
 
