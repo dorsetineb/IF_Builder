@@ -133,6 +133,26 @@
       "p2": "Here, interactive fictions are written in branches. It's easy to visualize where each choice takes the player and how paths cross. If you want something to happen only if the player has a specific item or made a previous choice, the editor easily handles that.",
       "p3": "When finished, the editor exports a .zip file that works in any browser. Your story leaves the editor and goes straight to whoever wants to play. And if that person uses IF Builder, they can import the .zip file into the editor and see how you created your story. Maybe even make a remix?"
     },
+    "versions": {
+      "desktopBannerTitle": "Download IFBuilder for Desktop",
+      "desktopBannerDesc1": "Use the editor without needing an internet connection.",
+      "desktopBannerDesc2": "Available for Windows and Linux with automatic updates.",
+      "downloadBtn": "Download Desktop App (v{{version}})",
+      "viewLogLink": "view development log",
+      "desktopInstalledNotice": "You are already using the installed desktop version of IFBuilder (v{{version}}).",
+      "changelogTitle": "Development Log",
+      "latestTag": "Latest Version",
+      "newsTitle": "✨ What's New",
+      "newsItem1": "Automatic desktop update system with support for GitHub repositories.",
+      "newsItem2": "Notification with release notes summary and explicit confirmation to authorize download and installation.",
+      "newsItem3": "Direct download of Windows and Linux installers through the web version.",
+      "uiTitle": "🎨 UI Improvements",
+      "uiItem1": "Version number displayed aligned on the initial screen and boot screen.",
+      "uiItem2": "Integration of the download box and development log into the About Project tab.",
+      "infraTitle": "⚙️ Infrastructure & Security",
+      "infraItem1": "Support for private repositories via Vercel Serverless Function (/api/update and /api/download).",
+      "infraItem2": "Automatic version number synchronization in release scripts."
+    },
     "support": {
       "title": "Why support?",
       "p1": "IF Builder is a free, non-profit project, and its operation is funded by the developer.",

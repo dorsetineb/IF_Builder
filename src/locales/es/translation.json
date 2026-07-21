@@ -153,6 +153,26 @@
       "p2": "Aquí, las ficciones interactivas se escriben en ramificaciones. Es fácil visualizar a dónde lleva cada elección al jugador y cómo se cruzan los caminos. Si quieres que algo suceda solo si el jugador tiene un objeto específico o si ha tomado una decisión previa, el editor se encarga de eso.",
       "p3": "Al terminar, el editor exporta un archivo .zip que funciona en cualquier navegador. Tu historia sale del editor y va directo a quien quiera jugar. Y si esa persona usa IF Builder, puede importar el archivo .zip en el editor y ver cómo creaste tu historia. ¿Quién sabe, tal vez hacer un remix?"
     },
+    "versions": {
+      "desktopBannerTitle": "Descarga IFBuilder para Escritorio",
+      "desktopBannerDesc1": "Usa el editor sin necesidad de conexión a internet.",
+      "desktopBannerDesc2": "Disponible para Windows y Linux con actualizaciones automáticas.",
+      "downloadBtn": "Descargar Aplicación de Escritorio (v{{version}})",
+      "viewLogLink": "ver log de desarrollo",
+      "desktopInstalledNotice": "Ya estás usando la versión de escritorio instalada de IFBuilder (v{{version}}).",
+      "changelogTitle": "Registro de Desarrollo",
+      "latestTag": "Última Versión",
+      "newsTitle": "✨ Novedades",
+      "newsItem1": "Sistema de actualización automática en escritorio con soporte para repositorios de GitHub.",
+      "newsItem2": "Notificación con resumen de notas de versión y confirmación explícita para autorizar descarga e instalación.",
+      "newsItem3": "Descarga directa de los instaladores para Windows y Linux a través de la versión web.",
+      "uiTitle": "🎨 Mejorias de Interfaz",
+      "uiItem1": "Visualización del número de versión alineado en la pantalla inicial y en la pantalla de inicio.",
+      "uiItem2": "Integración de la caja de descarga y el log de desarrollo en la pestaña Sobre el Proyecto.",
+      "infraTitle": "⚙️ Infraestructura y Seguridad",
+      "infraItem1": "Soporte para repositorios privados a través de Vercel Serverless Function (/api/update y /api/download).",
+      "infraItem2": "Sincronización automática del número de versión en los scripts de lanzamiento."
+    },
     "support": {
       "title": "¿Por qué apoyar?",
       "p1": "IF Builder es un proyecto gratuito, sin fines de lucro, y su funcionamiento es costeado por el desarrollador.",

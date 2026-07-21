@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, CheckCircle2, Monitor, FileText } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, CheckCircle2, Monitor, FileText, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp } from '../services/autoUpdater';
+import { isDesktopApp, fetchLatestRelease, ReleaseInfo } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
@@ -11,8 +11,27 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [showPixModal, setShowPixModal] = useState(false);
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
     const [isDevLogModalOpen, setIsDevLogModalOpen] = useState(false);
+    const [latestRelease, setLatestRelease] = useState<ReleaseInfo | null>(null);
+    const [isLoadingRelease, setIsLoadingRelease] = useState(false);
+    const [hasFetchedRelease, setHasFetchedRelease] = useState(false);
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
+
+    // Fetch GitHub release notes dynamically when dev log modal opens (only once)
+    useEffect(() => {
+        if (isDevLogModalOpen && !hasFetchedRelease && !isLoadingRelease) {
+            setIsLoadingRelease(true);
+            fetchLatestRelease()
+                .then((res) => {
+                    if (res) setLatestRelease(res);
+                })
+                .catch((err) => console.error('[AboutProject] Failed to fetch release:', err))
+                .finally(() => {
+                    setIsLoadingRelease(false);
+                    setHasFetchedRelease(true);
+                });
+        }
+    }, [isDevLogModalOpen, hasFetchedRelease, isLoadingRelease]);
 
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
@@ -369,49 +388,67 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         <div className="p-6 flex flex-col gap-5 max-h-[65vh] overflow-y-auto">
                             {/* Version Header with Tag to the Right */}
                             <div className="flex items-center gap-3 pb-3 border-b border-muted-foreground/20">
-                                <span className="font-bold text-foreground text-lg">v{APP_VERSION}</span>
+                                <span className="font-bold text-foreground text-lg">
+                                    v{latestRelease?.version || APP_VERSION}
+                                </span>
                                 <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider">
                                     {t('about.versions.latestTag', 'Última Versão')}
                                 </span>
                             </div>
 
-                            {/* Release Notes Content */}
-                            <div className="space-y-4 text-xs text-foreground/90 leading-relaxed font-light">
-                                <h3 className="text-sm font-bold text-foreground">IF Builder v{APP_VERSION}</h3>
+                            {/* Release Notes Content Dynamic Fetch */}
+                            {isLoadingRelease ? (
+                                <div className="flex items-center justify-center p-8 text-muted-foreground gap-2">
+                                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                                    <span className="text-xs font-mono">{t('common.loading', 'Carregando notas da release...')}</span>
+                                </div>
+                            ) : latestRelease?.releaseNotes ? (
+                                <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-mono whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
+                                    <h3 className="text-sm font-bold text-foreground font-sans">
+                                        {latestRelease.releaseName || `IF Builder v${APP_VERSION}`}
+                                    </h3>
+                                    <div>{latestRelease.releaseNotes}</div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4 text-xs text-foreground/90 leading-relaxed font-light">
+                                    <h3 className="text-sm font-bold text-foreground">
+                                        {latestRelease?.releaseName || `IF Builder v${APP_VERSION}`}
+                                    </h3>
 
-                                <div className="space-y-3">
-                                    <div>
-                                        <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
-                                            <span>✨ Novidades</span>
-                                        </h4>
-                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                                            <li>Sistema de atualização automática no desktop com suporte a repositórios do GitHub.</li>
-                                            <li>Notificação com resumo das notas de versão e confirmação explícita para autorizar download e instalação.</li>
-                                            <li>Download direto dos instaladores para Windows e Linux através da versão web.</li>
-                                        </ul>
-                                    </div>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
+                                                <span>{t('about.versions.newsTitle', '✨ Novidades')}</span>
+                                            </h4>
+                                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                                <li>{t('about.versions.newsItem1', 'Sistema de atualização automática no desktop com suporte a repositórios do GitHub.')}</li>
+                                                <li>{t('about.versions.newsItem2', 'Notificação com resumo das notas de versão e confirmação explícita para autorizar download e instalação.')}</li>
+                                                <li>{t('about.versions.newsItem3', 'Download direto dos instaladores para Windows e Linux através da versão web.')}</li>
+                                            </ul>
+                                        </div>
 
-                                    <div>
-                                        <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
-                                            <span>🎨 Melhorias de Interface</span>
-                                        </h4>
-                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                                            <li>Exibição do número da versão alinhado na tela inicial e na tela de boot.</li>
-                                            <li>Integração da caixa de download e do log de desenvolvimento na aba Sobre o Projeto.</li>
-                                        </ul>
-                                    </div>
+                                        <div>
+                                            <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
+                                                <span>{t('about.versions.uiTitle', '🎨 Melhorias de Interface')}</span>
+                                            </h4>
+                                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                                <li>{t('about.versions.uiItem1', 'Exibição do número da versão alinhado na tela inicial e na tela de boot.')}</li>
+                                                <li>{t('about.versions.uiItem2', 'Integração da caixa de download e do log de desenvolvimento na aba Sobre o Projeto.')}</li>
+                                            </ul>
+                                        </div>
 
-                                    <div>
-                                        <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
-                                            <span>⚙️ Infraestrutura & Segurança</span>
-                                        </h4>
-                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
-                                            <li>Suporte a repositórios privados via Vercel Serverless Function (/api/update e /api/download).</li>
-                                            <li>Sincronização automática de número de versão nos scripts de release.</li>
-                                        </ul>
+                                        <div>
+                                            <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
+                                                <span>{t('about.versions.infraTitle', '⚙️ Infraestrutura & Segurança')}</span>
+                                            </h4>
+                                            <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                                <li>{t('about.versions.infraItem1', 'Suporte a repositórios privados via Vercel Serverless Function (/api/update e /api/download).')}</li>
+                                                <li>{t('about.versions.infraItem2', 'Sincronização automática de número de versão nos scripts de release.')}</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Footer */}

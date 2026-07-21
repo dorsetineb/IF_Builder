@@ -108,3 +108,70 @@ export async function checkForUpdates(): Promise<ReleaseInfo | null> {
 
   return null;
 }
+
+/**
+ * Fetches the latest release info from API or GitHub releases endpoint regardless of version comparison.
+ */
+export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return null;
+  }
+
+  const customUrl = import.meta.env.VITE_UPDATE_API_URL;
+  const endpointsToTry: string[] = [];
+
+  if (customUrl) {
+    endpointsToTry.push(customUrl);
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    endpointsToTry.push(`${window.location.origin}/api/update`);
+  }
+
+  endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
+
+  for (const endpoint of endpointsToTry) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+      const response = await fetch(endpoint, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) continue;
+
+      const data = await response.json();
+      if (!data) continue;
+
+      const versionStr = data.version || data.tag_name || data.name || '';
+      if (!versionStr) continue;
+
+      let downloadUrl = data.downloadUrl || data.html_url;
+      if (!downloadUrl && Array.isArray(data.assets) && data.assets.length > 0) {
+        const installerAsset = data.assets.find((asset: { name?: string; browser_download_url?: string }) =>
+          asset.name?.endsWith('.msi') || asset.name?.endsWith('.exe') || asset.name?.endsWith('.setup.exe')
+        ) || data.assets[0];
+        if (installerAsset?.browser_download_url) {
+          downloadUrl = installerAsset.browser_download_url;
+        }
+      }
+
+      return {
+        version: String(versionStr).replace(/^v/i, ''),
+        releaseName: data.releaseName || data.name || versionStr,
+        releaseNotes: data.releaseNotes || data.body || '',
+        htmlUrl: data.htmlUrl || data.html_url || '',
+        downloadUrl: downloadUrl || data.html_url
+      };
+    } catch (error) {
+      console.debug(`[AutoUpdater] Fetch release skipped for ${endpoint}:`, error);
+    }
+  }
+
+  return null;
+}
