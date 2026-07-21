@@ -37,6 +37,15 @@
     "cancelUpdate": "Agora Não",
     "downloading": "Baixando..."
   },
+  "downloadModal": {
+    "title": "Baixar IFBuilder Desktop",
+    "subtitle": "Escolha o sistema operacional para baixar o instalador oficial:",
+    "windowsTitle": "Windows",
+    "windowsDesc": "Instalador .exe / .msi",
+    "linuxTitle": "Linux",
+    "linuxDesc": "Pacote .AppImage / .deb",
+    "confirmBtn": "Baixar Instalador"
+  },
   "common": {
     "back": "Voltar",
     "close": "Fechar",

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, CheckCircle2, Monitor, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { APP_VERSION } from '../version';
+import { isDesktopApp } from '../services/autoUpdater';
+import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
     const [showPixModal, setShowPixModal] = useState(false);
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+    const [isDevLogModalOpen, setIsDevLogModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
@@ -94,23 +99,73 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
                         </div>
 
-
-
-
-                        {/* TAB: SOBRE O PROJETO (NOVO) */}
+                        {/* TAB: SOBRE O PROJETO */}
                         {activeTab === 'about_project' && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
-                                <div className="">
+                                <div>
                                     <div className="flex items-center gap-3 mb-6">
                                         <h2 className="text-lg font-bold text-white">
                                             {t('about.title', 'Sobre o IF Builder')}
                                         </h2>
                                     </div>
-                                    <div className="space-y-6 text-white leading-relaxed font-light text-sm">
+                                    <div className="space-y-6 text-white leading-relaxed font-light text-sm mb-8">
                                         <p>{t('about.project.p1', 'O IF Builder é um editor que desenvolvi para criar ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
                                         <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
                                         <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
                                     </div>
+
+                                    {/* Desktop Installer Banner (Only shown on Web) */}
+                                    {!isDesktopApp() ? (
+                                        <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+                                            <div className="flex items-start justify-between">
+                                                <div className="space-y-2">
+                                                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                        <Monitor className="w-5 h-5 text-primary" />
+                                                        {t('about.versions.desktopBannerTitle', 'Baixe o IFBuilder para Desktop')}
+                                                    </h3>
+                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl space-y-1">
+                                                        <p>{t('about.versions.desktopBannerDesc1', 'Use o editor sem precisar de conexão com a internet.')}</p>
+                                                        <p>{t('about.versions.desktopBannerDesc2', 'Disponível para Windows e Linux com atualizações automáticas.')}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-2 flex items-center flex-wrap gap-4">
+                                                <button
+                                                    onClick={() => setIsDownloadModalOpen(true)}
+                                                    className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
+                                                >
+                                                    <Download className="w-4 h-4" />
+                                                    <span>{t('about.versions.downloadBtn', 'Baixar Aplicativo Desktop (v{{version}})', { version: APP_VERSION })}</span>
+                                                </button>
+
+                                                <button
+                                                    onClick={() => setIsDevLogModalOpen(true)}
+                                                    className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
+                                                >
+                                                    <FileText className="w-4 h-4" />
+                                                    <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-zinc-900/60 border border-emerald-500/40 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 text-emerald-400 text-xs">
+                                            <div className="flex items-center gap-3">
+                                                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                                                <span>
+                                                    {t('about.versions.desktopInstalledNotice', 'Você já está usando a versão desktop instalada do IFBuilder (v{{version}}).', { version: APP_VERSION })}
+                                                </span>
+                                            </div>
+
+                                            <button
+                                                onClick={() => setIsDevLogModalOpen(true)}
+                                                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer"
+                                            >
+                                                <FileText className="w-4 h-4" />
+                                                <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -280,6 +335,92 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 className="text-xs text-white/60 hover:text-white underline"
                             >
                                 {t('about.support.modal.close', 'Fechar')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Download Installer Modal */}
+            <DownloadInstallerModal
+                isOpen={isDownloadModalOpen}
+                onClose={() => setIsDownloadModalOpen(false)}
+            />
+
+            {/* Dev Log Modal */}
+            {isDevLogModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl shadow-2xl overflow-hidden max-w-2xl w-full animate-in fade-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="px-6 py-4 border-b border-muted-foreground/50 flex items-center justify-between">
+                            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-primary" />
+                                {t('about.versions.changelogTitle', 'Log de Desenvolvimento')}
+                            </h2>
+                            <button
+                                onClick={() => setIsDevLogModalOpen(false)}
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 flex flex-col gap-5 max-h-[65vh] overflow-y-auto">
+                            {/* Version Header with Tag to the Right */}
+                            <div className="flex items-center gap-3 pb-3 border-b border-muted-foreground/20">
+                                <span className="font-bold text-foreground text-lg">v{APP_VERSION}</span>
+                                <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider">
+                                    {t('about.versions.latestTag', 'Última Versão')}
+                                </span>
+                            </div>
+
+                            {/* Release Notes Content */}
+                            <div className="space-y-4 text-xs text-foreground/90 leading-relaxed font-light">
+                                <h3 className="text-sm font-bold text-foreground">IF Builder v{APP_VERSION}</h3>
+
+                                <div className="space-y-3">
+                                    <div>
+                                        <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
+                                            <span>✨ Novidades</span>
+                                        </h4>
+                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                            <li>Sistema de atualização automática no desktop com suporte a repositórios do GitHub.</li>
+                                            <li>Notificação com resumo das notas de versão e confirmação explícita para autorizar download e instalação.</li>
+                                            <li>Download direto dos instaladores para Windows e Linux através da versão web.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
+                                            <span>🎨 Melhorias de Interface</span>
+                                        </h4>
+                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                            <li>Exibição do número da versão alinhado na tela inicial e na tela de boot.</li>
+                                            <li>Integração da caixa de download e do log de desenvolvimento na aba Sobre o Projeto.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-bold text-foreground text-xs mb-1.5 flex items-center gap-1.5">
+                                            <span>⚙️ Infraestrutura & Segurança</span>
+                                        </h4>
+                                        <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-1">
+                                            <li>Suporte a repositórios privados via Vercel Serverless Function (/api/update e /api/download).</li>
+                                            <li>Sincronização automática de número de versão nos scripts de release.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex justify-end p-4 border-t border-muted-foreground/50 bg-muted/30">
+                            <button
+                                onClick={() => setIsDevLogModalOpen(false)}
+                                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded transition-colors"
+                            >
+                                {t('common.close', 'Fechar')}
                             </button>
                         </div>
                     </div>

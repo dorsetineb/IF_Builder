@@ -34,6 +34,15 @@
     "cancelUpdate": "Not Now",
     "downloading": "Downloading..."
   },
+  "downloadModal": {
+    "title": "Download IFBuilder Desktop",
+    "subtitle": "Choose your operating system to download the official installer:",
+    "windowsTitle": "Windows",
+    "windowsDesc": "Installer .exe / .msi",
+    "linuxTitle": "Linux",
+    "linuxDesc": "Package .AppImage / .deb",
+    "confirmBtn": "Download Installer"
+  },
   "auth": {
     "errors": {
       "alreadyRegistered": "This user is already registered.",
