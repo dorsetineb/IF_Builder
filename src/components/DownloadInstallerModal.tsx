@@ -18,12 +18,16 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
   if (!isOpen) return null;
 
   const handleDownload = () => {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const downloadApiUrl = isLocalhost
-      ? `https://www.ifbuildr.com/api/download?platform=${platform}`
-      : `/api/download?platform=${platform}`;
+    const fileUrl = platform === 'linux'
+      ? '/downloads/IFBuilder_0.5.0_amd64.deb'
+      : '/downloads/IFBuilder_0.5.0_x64-setup.exe';
 
-    window.location.href = downloadApiUrl;
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileUrl.split('/').pop() || 'installer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     onClose();
   };
 
@@ -66,7 +70,7 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
                 {t('downloadModal.windowsTitle', 'Windows')}
               </span>
               <span className="text-[10px] text-muted-foreground leading-tight block mt-0.5">
-                {t('downloadModal.windowsDesc', 'Instalador .exe / .msi')}
+                {t('downloadModal.windowsDesc', 'Installer .exe')}
               </span>
             </div>
           </button>
@@ -87,7 +91,7 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
                 {t('downloadModal.linuxTitle', 'Linux')}
               </span>
               <span className="text-[10px] text-muted-foreground leading-tight block mt-0.5">
-                {t('downloadModal.linuxDesc', 'Pacote .AppImage / .deb')}
+                {t('downloadModal.linuxDesc', 'Package .deb')}
               </span>
             </div>
           </button>

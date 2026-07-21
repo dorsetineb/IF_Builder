@@ -130,13 +130,11 @@ export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
     endpointsToTry.push(customUrl);
   }
 
-  // Check current origin if NOT localhost
-  if (typeof window !== 'undefined' && window.location?.origin && !window.location.hostname.includes('localhost') && window.location.hostname !== '127.0.0.1') {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    endpointsToTry.push(`${window.location.origin}/releases/latest.json`);
     endpointsToTry.push(`${window.location.origin}/api/update`);
   }
 
-  // Production Vercel Serverless Function proxy (has GITHUB_TOKEN & CORS enabled)
-  endpointsToTry.push('https://www.ifbuildr.com/api/update');
   endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
 
   for (const endpoint of endpointsToTry) {

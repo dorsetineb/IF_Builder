@@ -41,9 +41,9 @@
     "title": "Baixar IFBuilder Desktop",
     "subtitle": "Escolha o sistema operacional para baixar o instalador oficial:",
     "windowsTitle": "Windows",
-    "windowsDesc": "Instalador .exe / .msi",
+    "windowsDesc": "Installer .exe (Windows)",
     "linuxTitle": "Linux",
-    "linuxDesc": "Pacote .AppImage / .deb",
+    "linuxDesc": "Package .deb (Linux)",
     "confirmBtn": "Baixar Instalador"
   },
   "common": {
