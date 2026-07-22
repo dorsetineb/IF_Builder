@@ -70,7 +70,7 @@ export async function checkForUpdates(): Promise<ReleaseInfo | null> {
       const response = await fetch(endpoint, {
         signal: controller.signal,
         headers: {
-          'Accept': 'application/vnd.github.v3+json'
+          'Accept': 'application/json, application/vnd.github.v3+json'
         }
       });
       clearTimeout(timeoutId);
@@ -135,6 +135,8 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
   }
 
   endpointsToTry.push(`https://if-builder.vercel.app/api/update?version=${cleanVersion}`);
+  endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${cleanVersion}`);
+  endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest`);
 
   for (const endpoint of endpointsToTry) {
     try {
@@ -144,7 +146,7 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
       const response = await fetch(endpoint, {
         signal: controller.signal,
         headers: {
-          'Accept': 'application/vnd.github.v3+json'
+          'Accept': 'application/json, application/vnd.github.v3+json'
         }
       });
       clearTimeout(timeoutId);
