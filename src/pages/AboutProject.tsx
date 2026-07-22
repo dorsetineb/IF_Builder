@@ -19,13 +19,13 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
     // Fetch GitHub release notes dynamically for the current app version when dev log modal opens
     useEffect(() => {
-        if (isDevLogModalOpen && !hasFetchedRelease) {
+        if (isDevLogModalOpen && !latestRelease) {
             setIsLoadingRelease(true);
             fetchLatestRelease(APP_VERSION)
                 .then((res) => {
-                    setHasFetchedRelease(true);
                     if (res) {
                         setLatestRelease(res);
+                        setHasFetchedRelease(true);
                     }
                 })
                 .catch((err) => console.error('[AboutProject] Failed to fetch release:', err))
@@ -33,7 +33,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     setIsLoadingRelease(false);
                 });
         }
-    }, [isDevLogModalOpen, hasFetchedRelease]);
+    }, [isDevLogModalOpen, latestRelease]);
 
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {

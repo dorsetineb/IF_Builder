@@ -126,15 +126,21 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
   const cleanVersion = targetVersion.replace(/^v/i, '').trim();
   const endpointsToTry: string[] = [];
 
-  // Primary proxy endpoint (handles authentication via GITHUB_TOKEN on both dev server and production)
-  endpointsToTry.push(`/api/update?version=${cleanVersion}`);
+  // Primary: Production Vercel Proxy endpoint (has GITHUB_TOKEN & CORS enabled)
+  endpointsToTry.push(`https://if-builder.vercel.app/api/update?version=${cleanVersion}`);
+  endpointsToTry.push(`https://if-builder.vercel.app/api/update`);
 
   const customUrl = import.meta.env.VITE_UPDATE_API_URL;
   if (customUrl) {
     endpointsToTry.push(`${customUrl}?version=${cleanVersion}`);
   }
 
-  endpointsToTry.push(`https://if-builder.vercel.app/api/update?version=${cleanVersion}`);
+  // Relative endpoint (for local dev server proxy or direct Vercel deployments)
+  if (typeof window !== 'undefined' && window.location?.origin && !window.location.origin.includes('ifbuildr.com')) {
+    endpointsToTry.push(`${window.location.origin}/api/update?version=${cleanVersion}`);
+  }
+
+  // Fallbacks to GitHub API
   endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${cleanVersion}`);
   endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest`);
 
@@ -182,6 +188,24 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
     } catch (error) {
       console.debug(`[AutoUpdater] Fetch release skipped for ${endpoint}:`, error);
     }
+  }
+
+  // Guaranteed fallback: read static RELEASE_NOTES.md from public folder
+  try {
+    const localRes = await fetch('/RELEASE_NOTES.md');
+    if (localRes.ok) {
+      const notesText = await localRes.text();
+      if (notesText && notesText.trim()) {
+        return {
+          version: cleanVersion,
+          releaseName: `v${cleanVersion}`,
+          releaseNotes: notesText,
+          htmlUrl: 'https://github.com/dorsetineb/IF_Builder/releases'
+        };
+      }
+    }
+  } catch (err) {
+    console.debug('[AutoUpdater] Fallback RELEASE_NOTES.md failed:', err);
   }
 
   return null;

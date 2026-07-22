@@ -36,8 +36,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (platform === 'linux') {
       targetAsset = assets.find((asset: any) =>
-        asset.name?.endsWith('.AppImage') ||
         asset.name?.endsWith('.deb') ||
+        asset.name?.endsWith('.AppImage') ||
         asset.name?.endsWith('.tar.gz')
       );
     } else {
