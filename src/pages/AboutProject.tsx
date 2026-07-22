@@ -3,36 +3,29 @@ import React, { useState, useEffect } from 'react';
 import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, CheckCircle2, Monitor, FileText, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp, fetchLatestRelease, ReleaseInfo } from '../services/autoUpdater';
+import { isDesktopApp } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
+
+const DEVLOG_RELEASE_NOTES = `🎭 Editor de Interações (Cenas e Capítulos)
+
+• Campo Título Opcional: Adicionada a possibilidade de dar um título personalizado para a interação (ex: "Abrir baú trancado"). Quando informado, o título passa a identificar a interação na lista lateral e nos mapas de conexão.
+• Verbos Encapsulados em Tags (Chips): O campo de verbos agora fica posicionado no topo e transforma palavras separadas por vírgula ou Enter em tags visuais dinâmicas com remoção individual.
+• Identificação Limpa na Lista: A lista lateral exibe diretamente o alvo vinculado (ex: Porta) sem o prefixo "Alvo:", e oculta a linha secundária caso não haja nenhum alvo selecionado.
+• Alvo da ação (opcional) + checkbox Remove Alvo alinhados na linha de cima.
+• Requer item do inventário + checkbox Consome item alinhados na linha de baixo.
+• Bloqueio Inteligente de Descrição: O campo "Atualizar descrição da ramificação" é automaticamente desabilitado quando uma ramificação de destino (Ir para Ramificação) é configurada.
+• Card de Efeito Sonoro Refatorado: Botão "Adicionar" quando sem áudio e layout em card com nome do arquivo (.mp3/.wav) e botão de remoção rápida (lixeira) quando carregado.
+
+🎨 Identidade Visual
+• Logotipo IF com a Cor do Tema: O logotipo ASCII IF exibido na tela inicial do aplicativo agora adota dinamicamente a cor da aparência selecionada (Tema), alinhando-se ao visual do logo da tela de BIOS.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
     const [showPixModal, setShowPixModal] = useState(false);
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
     const [isDevLogModalOpen, setIsDevLogModalOpen] = useState(false);
-    const [latestRelease, setLatestRelease] = useState<ReleaseInfo | null>(null);
-    const [isLoadingRelease, setIsLoadingRelease] = useState(false);
-    const [hasFetchedRelease, setHasFetchedRelease] = useState(false);
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
-
-    useEffect(() => {
-        if (isDevLogModalOpen && !latestRelease) {
-            setIsLoadingRelease(true);
-            fetchLatestRelease(APP_VERSION)
-                .then((res) => {
-                    if (res) {
-                        setLatestRelease(res);
-                        setHasFetchedRelease(true);
-                    }
-                })
-                .catch((err) => console.error('[AboutProject] Failed to fetch release:', err))
-                .finally(() => {
-                    setIsLoadingRelease(false);
-                });
-        }
-    }, [isDevLogModalOpen, latestRelease]);
 
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
@@ -390,28 +383,17 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             {/* Version Header with Tag to the Right */}
                             <div className="flex items-center gap-3 pb-3 border-b border-muted-foreground/20">
                                 <span className="font-bold text-foreground text-lg">
-                                    {latestRelease?.releaseName || `v${latestRelease?.version || APP_VERSION}`}
+                                    v{APP_VERSION}
                                 </span>
                                 <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider shrink-0">
                                     {t('about.versions.latestTag', 'Última Versão')}
                                 </span>
                             </div>
 
-                            {/* Release Notes Content Dynamic Fetch */}
-                            {isLoadingRelease ? (
-                                <div className="flex items-center justify-center p-8 text-muted-foreground gap-2">
-                                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                                    <span className="text-xs font-mono">{t('common.loading', 'Carregando notas da release...')}</span>
-                                </div>
-                            ) : (latestRelease && latestRelease.releaseNotes && latestRelease.releaseNotes.trim() !== '') ? (
-                                <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
-                                    <div>{latestRelease.releaseNotes}</div>
-                                </div>
-                            ) : (
-                                <div className="p-8 text-center text-muted-foreground text-xs italic">
-                                    {t('about.versions.noNotes', 'Nenhuma nota de versão cadastrada no GitHub.')}
-                                </div>
-                            )}
+                            {/* Release Notes Content */}
+                            <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
+                                {DEVLOG_RELEASE_NOTES}
+                            </div>
                         </div>
 
                         {/* Footer */}
