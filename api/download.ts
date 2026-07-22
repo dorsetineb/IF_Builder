@@ -53,12 +53,45 @@ export default async function handler(req: any, res: any) {
       targetAsset = assets[0];
     }
 
-    const downloadUrl = targetAsset?.browser_download_url || data.html_url || 'https://github.com/dorsetineb/IF_Builder/releases/latest';
+    if (!targetAsset || !targetAsset.url) {
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(404).send(JSON.stringify({ error: 'No installer asset found in release' }));
+    }
 
-    // Redirect to the direct asset download URL using standard Node HTTP headers (Vercel Serverless compatible)
-    res.writeHead(302, { Location: downloadUrl });
-    return res.end();
+    // Fetch the asset binary directly from GitHub API using octet-stream for private repositories
+    const assetHeaders: Record<string, string> = {
+      'Accept': 'application/octet-stream',
+      'User-Agent': 'IFBuilder-Downloader'
+    };
+
+    if (githubToken) {
+      assetHeaders['Authorization'] = `Bearer ${githubToken}`;
+    }
+
+    const fileRes = await fetch(targetAsset.url, {
+      headers: assetHeaders,
+      redirect: 'follow'
+    });
+
+    if (!fileRes.ok) {
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(fileRes.status).send(JSON.stringify({ error: `Failed to fetch asset binary from GitHub API (${fileRes.status})` }));
+    }
+
+    const contentType = fileRes.headers.get('content-type') || 'application/octet-stream';
+    const contentLength = fileRes.headers.get('content-length');
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${targetAsset.name}"`);
+    if (contentLength) {
+      res.setHeader('Content-Length', contentLength);
+    }
+
+    const arrayBuffer = await fileRes.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return res.status(200).send(buffer);
   } catch (error) {
+    console.error('[Download API Error]:', error);
     res.setHeader('Content-Type', 'application/json');
     return res.status(500).send(JSON.stringify({ error: 'Internal Server Error' }));
   }

@@ -124,23 +124,17 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
   }
 
   const cleanVersion = targetVersion.replace(/^v/i, '').trim();
-  const customUrl = import.meta.env.VITE_UPDATE_API_URL;
   const endpointsToTry: string[] = [];
 
+  // Primary proxy endpoint (handles authentication via GITHUB_TOKEN on both dev server and production)
+  endpointsToTry.push(`/api/update?version=${cleanVersion}`);
+
+  const customUrl = import.meta.env.VITE_UPDATE_API_URL;
   if (customUrl) {
-    endpointsToTry.push(customUrl);
+    endpointsToTry.push(`${customUrl}?version=${cleanVersion}`);
   }
 
-  // Primary: Tag-specific release directly from GitHub API
-  endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${cleanVersion}`);
-  // Secondary: Latest published release on GitHub
-  endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
-
-  // Serverless Vercel API proxies if not running on localhost
-  if (typeof window !== 'undefined' && window.location?.origin && !window.location.hostname.includes('localhost') && window.location.hostname !== '127.0.0.1') {
-    endpointsToTry.push(`${window.location.origin}/api/update`);
-  }
-  endpointsToTry.push('https://www.ifbuildr.com/api/update');
+  endpointsToTry.push(`https://www.ifbuildr.com/api/update?version=${cleanVersion}`);
 
   for (const endpoint of endpointsToTry) {
     try {

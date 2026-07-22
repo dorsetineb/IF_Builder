@@ -18,13 +18,15 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
   if (!isOpen) return null;
 
   const handleDownload = () => {
-    const fileUrl = platform === 'linux'
-      ? '/downloads/IFBuilder_0.5.0_amd64.deb'
-      : '/downloads/IFBuilder_0.5.0_x64-setup.exe';
+    const fileName = platform === 'linux'
+      ? `IFBuilder_${APP_VERSION}_amd64.deb`
+      : `IFBuilder_${APP_VERSION}_x64-setup.exe`;
+
+    const downloadUrl = `/api/download?platform=${platform}`;
 
     const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileUrl.split('/').pop() || 'installer';
+    link.href = downloadUrl;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

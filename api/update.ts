@@ -8,6 +8,7 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
+  const requestedVersion = (req.query?.version || req.query?.tag || '').toString().replace(/^v/i, '').trim();
   const githubToken = process.env.GITHUB_TOKEN;
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
@@ -19,9 +20,18 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const response = await fetch('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest', {
-      headers
-    });
+    let response: any = null;
+
+    if (requestedVersion) {
+      response = await fetch(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${requestedVersion}`, { headers });
+      if (!response.ok) {
+        response = await fetch(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/${requestedVersion}`, { headers });
+      }
+    }
+
+    if (!response || !response.ok) {
+      response = await fetch('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest', { headers });
+    }
 
     if (!response.ok) {
       res.setHeader('Content-Type', 'application/json');
