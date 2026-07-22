@@ -35,11 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let targetAsset: any = null;
 
     if (platform === 'linux') {
-      targetAsset = assets.find((asset: any) =>
-        asset.name?.endsWith('.deb') ||
-        asset.name?.endsWith('.AppImage') ||
-        asset.name?.endsWith('.tar.gz')
-      );
+      targetAsset = assets.find((asset: any) => asset.name?.endsWith('.deb'));
     } else {
       targetAsset = assets.find((asset: any) =>
         asset.name?.endsWith('.msi') ||
@@ -48,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
     }
 
-    if (!targetAsset && assets.length > 0) {
+    if (!targetAsset && assets.length > 0 && platform !== 'linux') {
       targetAsset = assets[0];
     }
 

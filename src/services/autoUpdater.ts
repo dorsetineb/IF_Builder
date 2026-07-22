@@ -190,23 +190,5 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
     }
   }
 
-  // Guaranteed fallback: read static RELEASE_NOTES.md from public folder
-  try {
-    const localRes = await fetch('/RELEASE_NOTES.md');
-    if (localRes.ok) {
-      const notesText = await localRes.text();
-      if (notesText && notesText.trim()) {
-        return {
-          version: cleanVersion,
-          releaseName: `v${cleanVersion}`,
-          releaseNotes: notesText,
-          htmlUrl: 'https://github.com/dorsetineb/IF_Builder/releases'
-        };
-      }
-    }
-  } catch (err) {
-    console.debug('[AutoUpdater] Fallback RELEASE_NOTES.md failed:', err);
-  }
-
   return null;
 }

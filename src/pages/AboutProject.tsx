@@ -17,7 +17,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
-    // Fetch GitHub release notes dynamically for the current app version when dev log modal opens
     useEffect(() => {
         if (isDevLogModalOpen && !latestRelease) {
             setIsLoadingRelease(true);

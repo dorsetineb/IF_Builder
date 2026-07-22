@@ -116,7 +116,7 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
             releaseName: `IF Builder v${currentVersion}`,
             releaseNotes: '',
             htmlUrl: `https://github.com/dorsetineb/IF_Builder/releases/tag/v${currentVersion}`,
-            downloadUrl: `https://github.com/dorsetineb/IF_Builder/releases/download/v${currentVersion}/IFBuilder_${currentVersion}_x64-setup.exe`
+            downloadUrl: `https://github.com/dorsetineb/IF_Builder/releases/download/v${currentVersion}/IFBuilder_${currentVersion}_amd64.deb`
           }));
           return;
         }
@@ -141,7 +141,7 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
               const assets = data.assets || [];
               let targetAsset: any = null;
               if (platform === 'linux') {
-                targetAsset = assets.find((asset: any) => asset.name?.endsWith('.AppImage') || asset.name?.endsWith('.deb'));
+                targetAsset = assets.find((asset: any) => asset.name?.endsWith('.deb'));
               } else {
                 targetAsset = assets.find((asset: any) => asset.name?.endsWith('.msi') || asset.name?.endsWith('.exe') || asset.name?.endsWith('.setup.exe'));
               }
