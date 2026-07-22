@@ -347,7 +347,7 @@ export function Auth() {
 
             {/* IF Logo - Bottom Right Group */}
             <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-45 flex flex-col items-start">
-                <pre className="font-mono leading-none text-foreground text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
+                <pre className="font-mono leading-none text-primary text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
 {`           ██████   █████████
           ░░████  ░░█████████
          ░████   ░██         

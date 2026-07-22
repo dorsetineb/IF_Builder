@@ -48,7 +48,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
 
             {/* Static IF Logo - Bottom Right */}
             <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-10 opacity-20">
-                <pre className="font-mono leading-none text-white text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
+                <pre className="font-mono leading-none text-primary text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
 {`           ██████   █████████
           ░░████   ░█████████
          ░████   ░██         

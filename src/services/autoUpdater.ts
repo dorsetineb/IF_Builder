@@ -118,11 +118,12 @@ export async function checkForUpdates(): Promise<ReleaseInfo | null> {
 /**
  * Fetches the latest release info from API or GitHub releases endpoint regardless of version comparison.
  */
-export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
+export async function fetchLatestRelease(targetVersion: string = APP_VERSION): Promise<ReleaseInfo | null> {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     return null;
   }
 
+  const cleanVersion = targetVersion.replace(/^v/i, '').trim();
   const customUrl = import.meta.env.VITE_UPDATE_API_URL;
   const endpointsToTry: string[] = [];
 
@@ -130,12 +131,16 @@ export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
     endpointsToTry.push(customUrl);
   }
 
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    endpointsToTry.push(`${window.location.origin}/releases/latest.json`);
+  // Primary: Tag-specific release directly from GitHub API
+  endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${cleanVersion}`);
+  // Secondary: Latest published release on GitHub
+  endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
+
+  // Serverless Vercel API proxies if not running on localhost
+  if (typeof window !== 'undefined' && window.location?.origin && !window.location.hostname.includes('localhost') && window.location.hostname !== '127.0.0.1') {
     endpointsToTry.push(`${window.location.origin}/api/update`);
   }
-
-  endpointsToTry.push('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest');
+  endpointsToTry.push('https://www.ifbuildr.com/api/update');
 
   for (const endpoint of endpointsToTry) {
     try {

@@ -1,9 +1,9 @@
 {
-  "version": "0.5.0",
-  "releaseName": "IF Builder v0.5.0",
-  "releaseNotes": "Atualização Automática & Downloads Diretos da Web\n\nEsta versão traz grandes melhorias na experiência de distribuição e atualização do IF Builder, integrando verificações automáticas no desktop, downloads diretos pela versão web e aprimoramentos visuais.\n\n📌 Novidades & Recursos\n- 🖥️ Sistema de Atualização Automática (Desktop): Notificação automática ao iniciar o aplicativo quando uma nova versão estiver disponível no GitHub, exibindo o resumo das notas de versão e solicitando confirmação explícita do usuário para atualizar.\n- 📥 Download Direto pela Versão Web: Modal dedicado para baixar os instaladores oficiais do Windows (.exe / .msi) e Linux (.AppImage / .deb) diretamente da página do aplicativo, sem precisar navegar pela interface do GitHub.\n- 📜 Log de Desenvolvimento Integrado: Acesso ao log de lançamentos e notas de versão diretamente na aba \"Sobre o Projeto\", com carregamento dinâmico dos dados oficiais do repositório.\n\n🎨 Interface & UX\n- 🏷️ Indicadores de Versão: Exibição elegante e alinhada do número da versão (v0.5.0) na tela inicial (abaixo do logo IF) e na tela de boot do editor.\n- 🌐 Internacionalização (i18n): Suporte completo em Português, Inglês e Espanhol para as telas de atualização, modais de download e logs de desenvolvimento.\n\n⚙️ Infraestrutura & Segurança\n- 🔐 Serverless Endpoints (Vercel): Rotas seguras via Vercel Serverless Functions (/api/update e /api/download) com suporte transparente a repositórios públicos e privados.\n- 🔄 Sincronização de Versões: Scripts de release mantêm package.json, tauri.conf.json e src/version.ts perfeitamente alinhados a cada atualização.",
+  "version": "0.6.0",
+  "releaseName": "IF Builder v0.6.0",
+  "releaseNotes": "",
   "downloads": {
-    "windows": "/downloads/IFBuilder_0.5.0_x64-setup.exe",
-    "linux": "/downloads/IFBuilder_0.5.0_amd64.deb"
+    "windows": "/downloads/IFBuilder_0.6.0_x64-setup.exe",
+    "linux": "/downloads/IFBuilder_0.6.0_amd64.deb"
   }
 }

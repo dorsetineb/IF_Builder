@@ -19,4 +19,19 @@ fs.writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n');
 const versionTsPath = path.resolve('./src/version.ts');
 fs.writeFileSync(versionTsPath, `export const APP_VERSION = '${newVersion}';\n`);
 
-console.log(`✅ tauri.conf.json e src/version.ts atualizados para a versão ${newVersion}`);
+// Atualiza a versão no public/releases/latest.json se existir
+const latestJsonPath = path.resolve('./public/releases/latest.json');
+if (fs.existsSync(latestJsonPath)) {
+  const latestJson = JSON.parse(fs.readFileSync(latestJsonPath, 'utf-8'));
+  latestJson.version = newVersion;
+  latestJson.releaseName = `IF Builder v${newVersion}`;
+  latestJson.releaseNotes = '';
+  if (latestJson.downloads) {
+    latestJson.downloads.windows = `/downloads/IFBuilder_${newVersion}_x64-setup.exe`;
+    latestJson.downloads.linux = `/downloads/IFBuilder_${newVersion}_amd64.deb`;
+  }
+  fs.writeFileSync(latestJsonPath, JSON.stringify(latestJson, null, 2) + '\n');
+}
+
+console.log(`✅ tauri.conf.json, src/version.ts e public/releases/latest.json atualizados para a versão ${newVersion}`);
+

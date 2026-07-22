@@ -17,13 +17,14 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
-    // Fetch GitHub release notes dynamically when dev log modal opens
+    // Fetch GitHub release notes dynamically for the current app version when dev log modal opens
     useEffect(() => {
-        if (isDevLogModalOpen && !latestRelease) {
+        if (isDevLogModalOpen && !hasFetchedRelease) {
             setIsLoadingRelease(true);
-            fetchLatestRelease()
+            fetchLatestRelease(APP_VERSION)
                 .then((res) => {
-                    if (res && res.releaseNotes) {
+                    setHasFetchedRelease(true);
+                    if (res) {
                         setLatestRelease(res);
                     }
                 })
@@ -32,7 +33,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     setIsLoadingRelease(false);
                 });
         }
-    }, [isDevLogModalOpen, latestRelease]);
+    }, [isDevLogModalOpen, hasFetchedRelease]);
 
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
@@ -390,7 +391,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             {/* Version Header with Tag to the Right */}
                             <div className="flex items-center gap-3 pb-3 border-b border-muted-foreground/20">
                                 <span className="font-bold text-foreground text-lg">
-                                    v{latestRelease?.version || APP_VERSION}
+                                    v{APP_VERSION}
                                 </span>
                                 <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider">
                                     {t('about.versions.latestTag', 'Última Versão')}
@@ -403,7 +404,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     <Loader2 className="w-5 h-5 animate-spin text-primary" />
                                     <span className="text-xs font-mono">{t('common.loading', 'Carregando notas da release...')}</span>
                                 </div>
-                            ) : latestRelease?.releaseNotes ? (
+                            ) : (latestRelease && (latestRelease.version.replace(/^v/i, '') === APP_VERSION.replace(/^v/i, '')) && latestRelease.releaseNotes && latestRelease.releaseNotes.trim() !== '') ? (
                                 <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
                                     <h3 className="text-sm font-bold text-foreground border-b border-muted-foreground/20 pb-2 mb-3">
                                         {latestRelease.releaseName || `IF Builder v${APP_VERSION}`}
