@@ -1,4 +1,6 @@
-export default async function handler(req: any, res: any) {
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,7 +9,7 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  const platform = (req.query?.platform || 'windows').toLowerCase();
+  const platform = ((req.query?.platform as string) || 'windows').toLowerCase();
   const githubToken = process.env.GITHUB_TOKEN;
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
@@ -19,16 +21,15 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const response = await fetch('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest', {
+    const ghResponse = await fetch('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest', {
       headers
     });
 
-    if (!response.ok) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(response.status).send(JSON.stringify({ error: 'Failed to fetch release from GitHub' }));
+    if (!ghResponse.ok) {
+      return res.status(ghResponse.status).json({ error: 'Failed to fetch release from GitHub' });
     }
 
-    const data = await response.json();
+    const data = await ghResponse.json();
     const assets = data.assets || [];
 
     let targetAsset: any = null;
@@ -40,7 +41,6 @@ export default async function handler(req: any, res: any) {
         asset.name?.endsWith('.tar.gz')
       );
     } else {
-      // Default to windows
       targetAsset = assets.find((asset: any) =>
         asset.name?.endsWith('.msi') ||
         asset.name?.endsWith('.exe') ||
@@ -48,17 +48,14 @@ export default async function handler(req: any, res: any) {
       );
     }
 
-    // Fallback to first asset if platform specific asset not explicitly matched
     if (!targetAsset && assets.length > 0) {
       targetAsset = assets[0];
     }
 
     if (!targetAsset || !targetAsset.url) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(404).send(JSON.stringify({ error: 'No installer asset found in release' }));
+      return res.status(404).json({ error: 'No installer asset found in release' });
     }
 
-    // Fetch the asset binary directly from GitHub API using octet-stream for private repositories
     const assetHeaders: Record<string, string> = {
       'Accept': 'application/octet-stream',
       'User-Agent': 'IFBuilder-Downloader'
@@ -74,8 +71,9 @@ export default async function handler(req: any, res: any) {
     });
 
     if (!fileRes.ok) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(fileRes.status).send(JSON.stringify({ error: `Failed to fetch asset binary from GitHub API (${fileRes.status})` }));
+      return res.status(fileRes.status).json({
+        error: `Failed to fetch asset binary from GitHub API (${fileRes.status})`
+      });
     }
 
     const contentType = fileRes.headers.get('content-type') || 'application/octet-stream';
@@ -90,13 +88,8 @@ export default async function handler(req: any, res: any) {
     const arrayBuffer = await fileRes.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     return res.status(200).send(buffer);
-  } catch (error) {
-    console.error('[Download API Error]:', error);
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(500).send(JSON.stringify({ error: 'Internal Server Error' }));
+  } catch (error: any) {
+    console.error('[Download API Error]:', error?.message || error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = handler;
 }

@@ -1,5 +1,6 @@
-export default async function handler(req: any, res: any) {
-  // Configurar cabeçalhos CORS para permitir chamadas do app desktop Tauri e Web
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,7 +9,10 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  const requestedVersion = (req.query?.version || req.query?.tag || '').toString().replace(/^v/i, '').trim();
+  const requestedVersion = (
+    (req.query?.version as string) || (req.query?.tag as string) || ''
+  ).replace(/^v/i, '').trim();
+
   const githubToken = process.env.GITHUB_TOKEN;
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
@@ -20,25 +24,36 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    let response: any = null;
+    let ghResponse: Response | null = null;
 
     if (requestedVersion) {
-      response = await fetch(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${requestedVersion}`, { headers });
-      if (!response.ok) {
-        response = await fetch(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/${requestedVersion}`, { headers });
+      ghResponse = await fetch(
+        `https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${requestedVersion}`,
+        { headers }
+      );
+      if (!ghResponse.ok) {
+        ghResponse = await fetch(
+          `https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/${requestedVersion}`,
+          { headers }
+        );
       }
     }
 
-    if (!response || !response.ok) {
-      response = await fetch('https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest', { headers });
+    if (!ghResponse || !ghResponse.ok) {
+      ghResponse = await fetch(
+        'https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest',
+        { headers }
+      );
     }
 
-    if (!response.ok) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(response.status).send(JSON.stringify({ error: 'Failed to fetch release from GitHub' }));
+    if (!ghResponse.ok) {
+      return res.status(ghResponse.status).json({
+        error: 'Failed to fetch release from GitHub',
+        status: ghResponse.status
+      });
     }
 
-    const data = await response.json();
+    const data = await ghResponse.json();
     const latestTag = data.tag_name || data.name || '';
 
     let downloadUrl = data.html_url;
@@ -51,20 +66,15 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(200).send(JSON.stringify({
+    return res.status(200).json({
       version: latestTag.replace(/^v/i, ''),
       releaseName: data.name || latestTag,
       releaseNotes: data.body || '',
       htmlUrl: data.html_url,
       downloadUrl
-    }));
-  } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(500).send(JSON.stringify({ error: 'Internal Server Error' }));
+    });
+  } catch (error: any) {
+    console.error('[Update API Error]:', error?.message || error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = handler;
 }

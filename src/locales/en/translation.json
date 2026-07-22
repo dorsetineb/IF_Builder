@@ -38,9 +38,9 @@
     "title": "Download IFBuilder Desktop",
     "subtitle": "Choose your operating system to download the official installer:",
     "windowsTitle": "Windows",
-    "windowsDesc": "Installer .exe (Windows)",
+    "windowsDesc": "Installer .exe",
     "linuxTitle": "Linux",
-    "linuxDesc": "Package .deb (Linux)",
+    "linuxDesc": "Package .deb",
     "confirmBtn": "Download Installer"
   },
   "auth": {
