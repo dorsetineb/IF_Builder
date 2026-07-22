@@ -16,11 +16,13 @@ export interface TrackerEffect {
 
 export interface Interaction {
   id: string;
+  title?: string; // Optional custom display title for interaction
   verbs: string[]; // e.g., ['usar', 'abrir']
   target: string; // ID of object in scene, e.g., 'obj_porta'
   requiresInInventory?: string; // ID of object in inventory, e.g., 'obj_chave_de_ferro'
   successMessage?: string;
   soundEffect?: string; // base64 data URL for interaction sound
+  soundEffectName?: string; // Filename of the uploaded sound effect
   // --- Outcomes ---
   addsToInventory?: boolean;
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?

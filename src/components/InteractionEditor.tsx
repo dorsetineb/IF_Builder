@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Plus, Trash2, Upload, Search, MousePointer2, Box, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Sword, Key, Map as MapIcon, Eye, FlaskConical } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, MousePointer2, Box, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Sword, Key, Map as MapIcon, Eye, FlaskConical, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
@@ -111,6 +111,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
         return interactions.map((inter, index) => ({ inter, index })).filter(({ inter }) => {
             const searchLower = searchTerm.toLowerCase();
             return (
+                (inter.title && inter.title.toLowerCase().includes(searchLower)) ||
                 inter.verbs.join(' ').toLowerCase().includes(searchLower) ||
                 (inter.target && sceneObjects.find(o => o.id === inter.target)?.name.toLowerCase().includes(searchLower))
             );
@@ -124,9 +125,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
     // Sync local input state when selection changes
     useEffect(() => {
-        if (selectedInteraction) {
-            setVerbsInput(selectedInteraction.verbs.join(', '));
-        }
+        setVerbsInput('');
         setIsIconPickerOpen(false);
     }, [selectedInteraction]);
 
@@ -139,25 +138,20 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             handleUpdate(selectedIndex, { ...selectedInteraction, [field]: value });
         };
 
-        const handleVerbsBlur = () => {
-            const newVerbs = verbsInput.split(',').map(v => v.trim()).filter(Boolean);
-            // Only update if different to avoid cycles if we were doing this in effect
-            if (JSON.stringify(newVerbs) !== JSON.stringify(selectedInteraction.verbs)) {
-                handleInteractionChange('verbs', newVerbs);
-            }
-            // Optional: Re-format input formatting on blur
-            setVerbsInput(newVerbs.join(', '));
-        };
-
         const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     if (event.target && typeof event.target.result === 'string') {
-                        handleInteractionChange('soundEffect', event.target.result);
+                        handleUpdate(selectedIndex, {
+                            ...selectedInteraction,
+                            soundEffect: event.target.result,
+                            soundEffectName: file.name
+                        });
                     }
                 };
-                reader.readAsDataURL(e.target.files[0]);
+                reader.readAsDataURL(file);
             }
         };
 
@@ -185,12 +179,84 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                     {/* Soft top gradient */}
                     <div className="sticky top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-10 -ml-6 -mr-6" />
                     <div className="max-w-xl mx-auto flex flex-col gap-6">
-                        {/* Row 1: Icon & Verbs */}
+                        {/* Row 1: Verbs (as encapsulated tags) */}
+                        <div className="space-y-1.5">
+                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.verbsLabel', 'Verbos (separados por vírgula)')}</label>
+                            <div className="min-h-[42px] w-full bg-input border border-input rounded-lg p-1.5 flex flex-wrap items-center gap-1.5 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                                {selectedInteraction.verbs.map((verb, idx) => (
+                                    <span
+                                        key={idx}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/20 text-primary border border-primary/30 text-xs font-semibold select-none group/tag animate-in fade-in zoom-in-95 duration-100"
+                                    >
+                                        <span>{verb}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newVerbs = selectedInteraction.verbs.filter((_, i) => i !== idx);
+                                                handleInteractionChange('verbs', newVerbs);
+                                            }}
+                                            className="text-primary/70 hover:text-red-400 p-0.5 rounded transition-colors"
+                                            title={t('common.delete', 'Remover')}
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                ))}
+                                <input
+                                    type="text"
+                                    value={verbsInput}
+                                    onChange={e => {
+                                        const val = e.target.value;
+                                        if (val.includes(',')) {
+                                            const parts = val.split(',');
+                                            const added = parts.map(p => p.trim()).filter(Boolean);
+                                            if (added.length > 0) {
+                                                const updatedVerbs = Array.from(new Set([...selectedInteraction.verbs, ...added]));
+                                                handleInteractionChange('verbs', updatedVerbs);
+                                            }
+                                            setVerbsInput(parts[parts.length - 1].trim());
+                                        } else {
+                                            setVerbsInput(val);
+                                        }
+                                    }}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter' || e.key === ',') {
+                                            e.preventDefault();
+                                            const added = verbsInput.split(',').map(p => p.trim()).filter(Boolean);
+                                            if (added.length > 0) {
+                                                const updatedVerbs = Array.from(new Set([...selectedInteraction.verbs, ...added]));
+                                                handleInteractionChange('verbs', updatedVerbs);
+                                                setVerbsInput('');
+                                            }
+                                        } else if (e.key === 'Backspace' && verbsInput === '' && selectedInteraction.verbs.length > 0) {
+                                            const newVerbs = selectedInteraction.verbs.slice(0, -1);
+                                            handleInteractionChange('verbs', newVerbs);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        if (verbsInput.trim()) {
+                                            const added = verbsInput.split(',').map(p => p.trim()).filter(Boolean);
+                                            if (added.length > 0) {
+                                                const updatedVerbs = Array.from(new Set([...selectedInteraction.verbs, ...added]));
+                                                handleInteractionChange('verbs', updatedVerbs);
+                                            }
+                                            setVerbsInput('');
+                                        }
+                                    }}
+                                    className="flex-1 min-w-[120px] bg-transparent border-none p-1 text-xs text-foreground focus:outline-none focus:ring-0 placeholder:text-muted-foreground"
+                                    placeholder={selectedInteraction.verbs.length === 0 ? t('interactionEditor.verbsPlaceholder', 'Digite um verbo e pressione Enter ou vírgula...') : ''}
+                                />
+                            </div>
+                            <p className="text-[10px] text-zinc-600">{t('interactionEditor.verbsDesc', 'O jogador deve digitar um destes para iniciar a ação.')}</p>
+                        </div>
+
+                        {/* Row 2: Icon & Title */}
                         <div className="flex gap-4 items-start">
                             {/* Icon Picker */}
                             <div className="space-y-1.5 shrink-0 relative">
                                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.iconLabel', 'Ícone')}</label>
                                 <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setIsIconPickerOpen(!isIconPickerOpen);
@@ -208,6 +274,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                         {INTERACTION_ICONS.map(icon => (
                                             <button
                                                 key={icon.name}
+                                                type="button"
                                                 onClick={() => { handleInteractionChange('icon', icon.name); setIsIconPickerOpen(false); }}
                                                 className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name || (!selectedInteraction.icon && icon.name === 'mouse') ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
                                                 title={icon.name}
@@ -219,79 +286,52 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 )}
                             </div>
 
-                            {/* Verbs */}
+                            {/* Title (Optional) */}
                             <div className="flex-1 space-y-1.5">
-                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.verbsLabel', 'Verbos (separados por vírgula)')}</label>
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.titleLabel', 'Título (Opcional)')}</label>
                                 <input
                                     type="text"
-                                    value={verbsInput}
-                                    onChange={e => setVerbsInput(e.target.value)}
-                                    onBlur={handleVerbsBlur}
-                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground"
-                                    placeholder={t('interactionEditor.verbsPlaceholder', 'ex: pegar, usar, abrir')}
+                                    value={selectedInteraction.title || ''}
+                                    onChange={e => handleInteractionChange('title', e.target.value)}
+                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground h-10"
+                                    placeholder={t('interactionEditor.titlePlaceholder', 'ex: Abrir baú trancado')}
                                 />
-                                <p className="text-[10px] text-zinc-600">{t('interactionEditor.verbsDesc', 'O jogador deve digitar um destes para iniciar a ação.')}</p>
                             </div>
                         </div>
 
-                        {/* Row 2: Requirement & Checkboxes */}
-                        <div className="flex gap-4 items-end">
-                            <div className="flex-1 space-y-1.5">
-                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.requiresItemLabel', 'Requer Item (Inventário)')}</label>
-                                <select
-                                    value={selectedInteraction.requiresInInventory || ''}
-                                    onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
-                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
-                                >
-                                    <option value="">{t('interactionEditor.noItemRequired', 'Não requer item')}</option>
-                                    {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
-                                </select>
-                            </div>
-
-                            <div className="pb-2.5 pr-2">
-                                <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={!!selectedInteraction.consumesItem}
-                                            onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
-                                            disabled={!selectedInteraction.requiresInInventory}
-                                            className="custom-checkbox"
-                                        />
-                                    </div>
-                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.consumesItem', 'Consome item')}</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        {/* Row 3: Target */}
+                        {/* Row 3: Target & Remove Target */}
                         <div className="space-y-3">
-                            <div className="space-y-1.5">
-                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Objeto alvo da Ação (Opcional)')}</label>
-                                <select
-                                    value={selectedInteraction.target}
-                                    onChange={e => handleInteractionChange('target', e.target.value)}
-                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
-                                >
-                                    <option value="">{t('interactionEditor.noTarget', 'Nenhum (Ação no ambiente)')}</option>
-                                    {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
-                                </select>
+                            <div className="flex gap-4 items-end">
+                                <div className="flex-1 space-y-1.5">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Alvo da ação (opcional)')}</label>
+                                    <select
+                                        value={selectedInteraction.target}
+                                        onChange={e => handleInteractionChange('target', e.target.value)}
+                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
+                                    >
+                                        <option value="">{t('interactionEditor.noTarget', 'Nenhum (Ação no ambiente)')}</option>
+                                        {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="pb-2.5 pr-2">
+                                    <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.target && 'opacity-30 pointer-events-none'}`}>
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={!!selectedInteraction.removesTargetFromScene}
+                                                onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
+                                                disabled={!selectedInteraction.target}
+                                                className="custom-checkbox"
+                                            />
+                                        </div>
+                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove Alvo')}</span>
+                                    </label>
+                                </div>
                             </div>
 
                             {/* Target Checkboxes */}
                             <div className="flex flex-row items-center gap-6">
-                                <label className="flex items-center gap-2 cursor-pointer group">
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={!!selectedInteraction.removesTargetFromScene}
-                                            onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
-                                            className="custom-checkbox"
-                                        />
-                                    </div>
-                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove objeto')}</span>
-                                </label>
-
                                 <label className="flex items-center gap-2 cursor-pointer group">
                                     <div className="relative flex items-center">
                                         <input
@@ -319,6 +359,36 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             </div>
                         </div>
 
+                        {/* Row 4: Requirement & Consumes Item */}
+                        <div className="flex gap-4 items-end">
+                            <div className="flex-1 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.requiresItemLabel', 'Requer item do inventário')}</label>
+                                <select
+                                    value={selectedInteraction.requiresInInventory || ''}
+                                    onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
+                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
+                                >
+                                    <option value="">{t('interactionEditor.noItemRequired', 'Não requer item')}</option>
+                                    {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                </select>
+                            </div>
+
+                            <div className="pb-2.5 pr-2">
+                                <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!selectedInteraction.consumesItem}
+                                            onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
+                                            disabled={!selectedInteraction.requiresInInventory}
+                                            className="custom-checkbox"
+                                        />
+                                    </div>
+                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.consumesItem', 'Consome item')}</span>
+                                </label>
+                            </div>
+                        </div>
+
                         {/* Row 5: Go To Scene & Sound Effect */}
                         <div className="flex gap-4 items-start">
                             <div className="w-2/3 space-y-1.5">
@@ -330,26 +400,58 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             </div>
                             <div className="w-1/3 space-y-1.5">
                                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.soundEffectLabel', 'Efeito Sonoro (.mp3)')}</label>
-                                <div className="flex items-center gap-2 h-[42px]">
-                                    <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-input border border-input rounded hover:bg-muted cursor-pointer text-xs font-medium transition-colors">
-                                        <Upload className="w-3 h-3 mr-2 text-muted-foreground" /> {selectedInteraction.soundEffect ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
-                                        <input type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleSoundUpload} className="hidden" />
-                                    </label>
-                                    {selectedInteraction.soundEffect && (
-                                        <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="h-full px-3 bg-red-600 hover:bg-red-700 text-white rounded transition-colors shadow-sm"><Trash2 className="w-4 h-4" /></button>
-                                    )}
-                                </div>
+                                {selectedInteraction.soundEffect ? (
+                                    <div className="flex items-center gap-2.5 p-2 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors h-[42px]">
+                                        <div className="w-7 h-7 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
+                                            <Volume2 className="w-3.5 h-3.5 text-primary" />
+                                        </div>
+                                        <div className="flex-grow min-w-0">
+                                            <div className="flex flex-col">
+                                                <span className="text-[11px] font-semibold text-foreground truncate leading-tight" title={selectedInteraction.soundEffectName || t('interactionEditor.customAudioSet', 'Efeito Sonoro')}>
+                                                    {selectedInteraction.soundEffectName || t('interactionEditor.customAudioSet', 'Efeito Sonoro')}
+                                                </span>
+                                                <span className="text-[9px] text-green-500 truncate leading-none">{t('interactionEditor.audioLoaded', 'Áudio carregado')}</span>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                handleUpdate(selectedIndex, {
+                                                    ...selectedInteraction,
+                                                    soundEffect: undefined,
+                                                    soundEffectName: undefined
+                                                });
+                                            }}
+                                            className="p-1.5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all flex-shrink-0"
+                                            title={t('common.delete', 'Excluir')}
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 h-[42px]">
+                                        <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-input border border-input rounded hover:bg-muted cursor-pointer text-xs font-medium transition-colors">
+                                            <Upload className="w-3.5 h-3.5 mr-2 text-muted-foreground" /> {t('interactionEditor.addAudioBtn', 'Adicionar')}
+                                            <input type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleSoundUpload} className="hidden" />
+                                        </label>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* Row 6: Update Scene Description */}
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da ramificação')}</label>
+                            <label className={`block text-[10px] font-bold uppercase tracking-widest ${selectedInteraction.goToScene ? 'text-zinc-600' : 'text-zinc-400'}`}>{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da ramificação')}</label>
                             <textarea
                                 value={selectedInteraction.successMessage || ''} // Using legacy field for backward compatibility, UI says "Description"
                                 onChange={e => handleInteractionChange('successMessage', e.target.value)}
+                                disabled={!!selectedInteraction.goToScene}
                                 rows={2}
-                                className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground resize-y min-h-[40px] max-h-[250px]"
+                                className={`w-full border border-input rounded p-2.5 text-xs text-foreground resize-y min-h-[40px] max-h-[250px] transition-all ${
+                                    selectedInteraction.goToScene
+                                        ? 'bg-muted/50 text-muted-foreground opacity-50 cursor-not-allowed border-dashed'
+                                        : 'bg-input'
+                                }`}
                                 placeholder={t('interactionEditor.updateSceneDescPlaceholder', 'Descreve o que acontece...')}
                             />
                         </div>
@@ -460,11 +562,13 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary-foreground' : 'text-foreground'}`}>
-                                        {inter.verbs.join(', ')}
+                                        {inter.title && inter.title.trim() !== '' ? inter.title : (inter.verbs.length > 0 ? inter.verbs.join(', ') : t('interactionEditor.noVerbs', '(Sem verbos)'))}
                                     </div>
-                                    <div className={`text-[10px] truncate flex items-center gap-1 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                                        {inter.target ? `${t('interactionEditor.targetPrefix', 'Alvo: ')}${sceneObjects.find(o => o.id === inter.target)?.name || '?'}` : t('interactionEditor.generalTarget', 'Geral')}
-                                    </div>
+                                    {inter.target && sceneObjects.find(o => o.id === inter.target)?.name && (
+                                        <div className={`text-[10px] truncate ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                                            {sceneObjects.find(o => o.id === inter.target)?.name}
+                                        </div>
+                                    )}
                                 </div>
                                 <div
                                     onClick={(e) => {

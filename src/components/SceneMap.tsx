@@ -200,7 +200,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
               items.push({
                 id: i.id,
                 targetId: i.vignetteId,
-                label: i.verbs?.[0] || t('sceneMap.vignette', 'Capítulo'),
+                label: i.title || i.verbs?.[0] || t('sceneMap.vignette', 'Capítulo'),
                 type: 'vignette',
                 original: i,
               });
@@ -208,7 +208,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
               items.push({
                 id: i.id,
                 targetId: i.goToScene,
-                label: i.verbs?.[0] || t('branchingPreview.thisScene', 'Ir para'),
+                label: i.title || i.verbs?.[0] || t('branchingPreview.thisScene', 'Ir para'),
                 type: 'scene',
                 original: i,
               });

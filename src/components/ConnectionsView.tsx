@@ -59,7 +59,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                     const targetName = targetObject ? targetObject.name : (inter.target || '-');
                     return (
                       <div key={inter.id} className="grid grid-cols-3 gap-2 text-muted-foreground bg-background/80 p-2 rounded-md border border-muted-foreground/50 items-center text-[11px]">
-                        <span className="truncate font-medium text-purple-400" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
+                        <span className="truncate font-medium text-purple-400" title={inter.title || inter.verbs.join(', ')}>{inter.title || inter.verbs.join(', ')}</span>
                         <span className="truncate" title={targetName}>{targetName}</span>
                         <span className="truncate italic text-muted-foreground/70" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
                           {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
