@@ -391,9 +391,9 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             {/* Version Header with Tag to the Right */}
                             <div className="flex items-center gap-3 pb-3 border-b border-muted-foreground/20">
                                 <span className="font-bold text-foreground text-lg">
-                                    v{latestRelease?.version || APP_VERSION}
+                                    {latestRelease?.releaseName || `v${latestRelease?.version || APP_VERSION}`}
                                 </span>
-                                <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider">
+                                <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider shrink-0">
                                     {t('about.versions.latestTag', 'Última Versão')}
                                 </span>
                             </div>
@@ -406,9 +406,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 </div>
                             ) : (latestRelease && latestRelease.releaseNotes && latestRelease.releaseNotes.trim() !== '') ? (
                                 <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
-                                    <h3 className="text-sm font-bold text-foreground border-b border-muted-foreground/20 pb-2 mb-3">
-                                        {latestRelease.releaseName || `IF Builder v${latestRelease.version || APP_VERSION}`}
-                                    </h3>
                                     <div>{latestRelease.releaseNotes}</div>
                                 </div>
                             ) : (
