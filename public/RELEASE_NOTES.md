@@ -1,7 +1,7 @@
-# IF Builder v0.8.1
+# IF Builder v0.8.2
 
-🚀 Atualizações e Melhorias da Versão v0.8.1
+🚀 Atualizações e Melhorias da Versão v0.8.2
 
-- **Sincronização de Release no `latest.json`**: Atualização automática do arquivo `public/releases/latest.json` com notas de versão e rotas de instaladores sincronizados durante a esteira de release.
-- **Aprimoramento da Skill de Versionamento**: Protocolo atualizado da skill `release-versioning` para incluir staging prévio do `latest.json` antes de disparar o script `npm run release`.
-- **Refinamentos de Estabilidade**: Validações adicionais no fluxo de auto-atualização do desktop.
+- **Suporte Multilíngue no Devlog**: O modal de notas de desenvolvimento agora é totalmente traduzido em tempo real ao alternar entre Português, Inglês e Espanhol na interface.
+- **Preservação de Changelog no `latest.json`**: Correção no script de automação de release para manter as notas de versão intactas no arquivo de atualização do aplicativo desktop.
+- **Otimização da Esteira de Versionamento**: Skill `release-versioning` aprimorada para registrar traduções e sincronizar os instaladores desktop antes de disparar o lançamento.

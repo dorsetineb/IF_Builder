@@ -1,9 +1,9 @@
 {
-  "version": "0.8.1",
-  "releaseName": "IF Builder v0.8.1",
-  "releaseNotes": "",
+  "version": "0.8.2",
+  "releaseName": "IF Builder v0.8.2",
+  "releaseNotes": "🚀 Atualizações e Melhorias da Versão v0.8.2\n\n- Suporte Multilíngue no Devlog: O modal de notas de desenvolvimento agora é totalmente traduzido em tempo real ao alternar entre Português, Inglês e Espanhol na interface.\n- Preservação de Changelog no latest.json: Correção no script de automação de release para manter as notas de versão intactas no arquivo de atualização do aplicativo desktop.\n- Otimização da Esteira de Versionamento: Skill release-versioning aprimorada para registrar traduções e sincronizar os instaladores desktop antes de disparar o lançamento.",
   "downloads": {
-    "windows": "/downloads/IFBuilder_0.8.1_x64-setup.exe",
-    "linux": "/downloads/IFBuilder_0.8.1_amd64.deb"
+    "windows": "/downloads/IFBuilder_0.8.2_x64-setup.exe",
+    "linux": "/downloads/IFBuilder_0.8.2_amd64.deb"
   }
 }

@@ -164,7 +164,7 @@
       "desktopInstalledNotice": "Você está utilizando a versão IFBuilder v{{version}}",
       "changelogTitle": "Log de Desenvolvimento",
       "latestTag": "Última Versão",
-      "devlogContent": "🚀 Atualizações e Melhorias da Versão v0.8.1\n\n• Sincronização de Release no latest.json: Atualização automática do arquivo public/releases/latest.json com notas de versão e rotas de instaladores sincronizados durante a esteira de release.\n• Aprimoramento da Skill de Versionamento: Protocolo atualizado da skill release-versioning para incluir staging prévio do latest.json antes de disparar o script npm run release.\n• Refinamentos de Estabilidade: Validações adicionais no fluxo de auto-atualização do desktop.",
+      "devlogContent": "🚀 Atualizações e Melhorias da Versão v0.8.2\n\n• Suporte Multilíngue no Devlog: O modal de notas de desenvolvimento agora é totalmente traduzido em tempo real ao alternar entre Português, Inglês e Espanhol na interface.\n• Preservação de Changelog no latest.json: Correção no script de automação de release para manter as notas de versão intactas no arquivo de atualização do aplicativo desktop.\n• Otimização da Esteira de Versionamento: Skill release-versioning aprimorada para registrar traduções e sincronizar os instaladores desktop antes de disparar o lançamento.",
       "newsTitle": "✨ Novidades",
       "newsItem1": "Sistema de atualização automática no desktop com suporte a repositórios do GitHub.",
       "newsItem2": "Notificação com resumo das notas de versão e confirmação explícita para autorizar download e instalação.",
