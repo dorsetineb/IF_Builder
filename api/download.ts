@@ -36,25 +36,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let targetAsset: any = null;
 
     if (platform === 'linux') {
-      targetAsset = assets.find((asset: any) =>
-        asset.name?.endsWith('.deb') ||
-        asset.name?.endsWith('.AppImage') ||
-        asset.name?.endsWith('.tar.gz')
-      );
+      // Strictly select .deb file for Linux
+      targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.deb'));
     } else {
-      targetAsset = assets.find((asset: any) =>
-        asset.name?.endsWith('.msi') ||
-        asset.name?.endsWith('.exe') ||
-        asset.name?.endsWith('.setup.exe')
-      );
-    }
-
-    if (!targetAsset && assets.length > 0) {
-      targetAsset = assets[0];
+      // Strictly select .exe file for Windows (e.g., .exe, .setup.exe)
+      targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.exe'));
     }
 
     if (!targetAsset || !targetAsset.url) {
-      return res.status(404).json({ error: 'No installer asset found in release' });
+      const requiredFormat = platform === 'linux' ? '.deb' : '.exe';
+      return res.status(404).json({ error: `No installer asset (${requiredFormat}) found in release` });
     }
 
     const assetHeaders: Record<string, string> = {

@@ -141,11 +141,10 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
               const assets = data.assets || [];
               let targetAsset: any = null;
               if (platform === 'linux') {
-                targetAsset = assets.find((asset: any) => asset.name?.endsWith('.deb'));
+                targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.deb'));
               } else {
-                targetAsset = assets.find((asset: any) => asset.name?.endsWith('.msi') || asset.name?.endsWith('.exe') || asset.name?.endsWith('.setup.exe'));
+                targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.exe'));
               }
-              if (!targetAsset && assets.length > 0) targetAsset = assets[0];
 
               if (targetAsset && targetAsset.url) {
                 const assetHeaders: Record<string, string> = {
