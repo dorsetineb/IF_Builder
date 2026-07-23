@@ -193,37 +193,37 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="bg-zinc-900 border border-muted-foreground/30 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 text-white text-xs">
-                                            <div className="flex items-center gap-4 flex-wrap">
+                                        <div className="bg-zinc-900 border border-muted-foreground/30 rounded-xl p-4 flex flex-col gap-3 text-white text-xs">
+                                            <div className="flex items-center justify-between flex-wrap gap-3">
                                                 <span className="font-medium text-white/90">
                                                     {t('about.versions.desktopInstalledNotice', 'Você está utilizando a versão IFBuilder v{{version}}', { version: APP_VERSION })}
                                                 </span>
 
                                                 <button
-                                                    onClick={() => setIsDevLogModalOpen(true)}
-                                                    className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
+                                                    onClick={handleCheckForUpdates}
+                                                    disabled={isCheckingUpdate}
+                                                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5 disabled:opacity-50"
                                                 >
-                                                    <FileText className="w-4 h-4" />
-                                                    <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
+                                                    {isCheckingUpdate ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            <span>Buscando...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <RefreshCw className="w-4 h-4" />
+                                                            <span>Buscar atualização</span>
+                                                        </>
+                                                    )}
                                                 </button>
                                             </div>
 
                                             <button
-                                                onClick={handleCheckForUpdates}
-                                                disabled={isCheckingUpdate}
-                                                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5 disabled:opacity-50"
+                                                onClick={() => setIsDevLogModalOpen(true)}
+                                                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
                                             >
-                                                {isCheckingUpdate ? (
-                                                    <>
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                        <span>Buscando...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <RefreshCw className="w-4 h-4" />
-                                                        <span>Buscar atualização</span>
-                                                    </>
-                                                )}
+                                                <FileText className="w-4 h-4" />
+                                                <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
                                             </button>
                                         </div>
                                     )}
