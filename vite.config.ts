@@ -147,10 +147,27 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
               }
               if (!targetAsset && assets.length > 0) targetAsset = assets[0];
 
-              if (targetAsset && targetAsset.browser_download_url) {
-                res.writeHead(302, { Location: targetAsset.browser_download_url });
-                res.end();
-                return;
+              if (targetAsset && targetAsset.url) {
+                const assetHeaders: Record<string, string> = {
+                  'Accept': 'application/octet-stream',
+                  'User-Agent': 'IFBuilder-Downloader'
+                };
+                if (githubToken) {
+                  assetHeaders['Authorization'] = `Bearer ${githubToken}`;
+                }
+                const fileRes = await fetch(targetAsset.url, { headers: assetHeaders, redirect: 'follow' });
+                if (fileRes.ok && fileRes.body) {
+                  res.setHeader('Content-Type', 'application/octet-stream');
+                  res.setHeader('Content-Disposition', `attachment; filename="${targetAsset.name}"`);
+                  const contentLength = fileRes.headers.get('content-length');
+                  if (contentLength) res.setHeader('Content-Length', contentLength);
+
+                  const { Readable } = await import('stream');
+                  // @ts-ignore
+                  const stream = typeof Readable.fromWeb === 'function' ? Readable.fromWeb(fileRes.body) : Readable.from(fileRes.body);
+                  stream.pipe(res);
+                  return;
+                }
               }
             }
           } catch (e) {}
