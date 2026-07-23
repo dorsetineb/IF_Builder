@@ -1,9 +1,9 @@
 {
-  "version": "0.6.2",
-  "releaseName": "IF Builder v0.6.2",
+  "version": "0.7.0",
+  "releaseName": "IF Builder v0.7.0",
   "releaseNotes": "",
   "downloads": {
-    "windows": "/downloads/IFBuilder_0.6.2_x64-setup.exe",
-    "linux": "/downloads/IFBuilder_0.6.2_amd64.deb"
+    "windows": "/downloads/IFBuilder_0.7.0_x64-setup.exe",
+    "linux": "/downloads/IFBuilder_0.7.0_amd64.deb"
   }
 }
