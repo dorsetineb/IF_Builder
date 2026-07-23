@@ -162,7 +162,7 @@
       "desktopInstalledNotice": "Estás utilizando la versión IFBuilder v{{version}}",
       "changelogTitle": "Registro de Desarrollo",
       "latestTag": "Última Versión",
-      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.2\n\n• Soporte Multilingüe en el Devlog: El modal de notas de desarrollo agora se traduce completamente en tiempo real al cambiar entre portugués, inglés y español.\n• Preservación del Changelog en latest.json: Corrección en el script de automatización de lanzamientos para mantener las notas de versión intactas en el archivo de actualización del escritorio.\n• Optimización de la Canalización de Versionado: Skill release-versioning mejorada para registrar traducciones y sincronizar instaladores de escritorio antes del lanzamiento.",
+      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.3\n\n• Corrección de Descarga Desktop (Error 503): La ruta /api/download ahora realiza un redireccionamiento HTTP 302 directo a la URL oficial en GitHub Releases, evitando el límite de memoria serverless de Vercel.\n• Corrección de la Aplicación Desktop en Linux: Se agregaron los permisos de los plugins updater y process en capabilities/default.json y se configuró la clave de Tauri 2, solucionando la falla de inicio de la app en Linux.",
       "newsTitle": "✨ Novedades",
       "newsItem1": "Sistema de actualización automática en escritorio con soporte para repositorios de GitHub.",
       "newsItem2": "Notificación con resumen de notas de versión y confirmación explícita para autorizar descarga e instalación.",

@@ -34,58 +34,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let targetAsset: any = null;
 
-    if (platform === 'linux') {
-      targetAsset = assets.find((asset: any) => asset.name?.endsWith('.deb'));
-    } else {
-      targetAsset = assets.find((asset: any) =>
-        asset.name?.endsWith('.msi') ||
-        asset.name?.endsWith('.exe') ||
-        asset.name?.endsWith('.setup.exe')
-      );
+    if (data.assets && Array.isArray(data.assets)) {
+      if (platform === 'linux') {
+        targetAsset = assets.find((asset: any) => asset.name?.endsWith('.deb'));
+      } else {
+        targetAsset = assets.find((asset: any) =>
+          asset.name?.endsWith('.msi') ||
+          asset.name?.endsWith('.exe') ||
+          asset.name?.endsWith('.setup.exe')
+        );
+      }
+      if (!targetAsset && assets.length > 0 && platform !== 'linux') {
+        targetAsset = assets[0];
+      }
     }
 
-    if (!targetAsset && assets.length > 0 && platform !== 'linux') {
-      targetAsset = assets[0];
+    if (targetAsset && targetAsset.browser_download_url) {
+      return res.redirect(302, targetAsset.browser_download_url);
     }
 
-    if (!targetAsset || !targetAsset.url) {
-      return res.status(404).json({ error: 'No installer asset found in release' });
-    }
-
-    const assetHeaders: Record<string, string> = {
-      'Accept': 'application/octet-stream',
-      'User-Agent': 'IFBuilder-Downloader'
-    };
-
-    if (githubToken) {
-      assetHeaders['Authorization'] = `Bearer ${githubToken}`;
-    }
-
-    const fileRes = await fetch(targetAsset.url, {
-      headers: assetHeaders,
-      redirect: 'follow'
-    });
-
-    if (!fileRes.ok) {
-      return res.status(fileRes.status).json({
-        error: `Failed to fetch asset binary from GitHub API (${fileRes.status})`
-      });
-    }
-
-    const contentType = fileRes.headers.get('content-type') || 'application/octet-stream';
-    const contentLength = fileRes.headers.get('content-length');
-
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', `attachment; filename="${targetAsset.name}"`);
-    if (contentLength) {
-      res.setHeader('Content-Length', contentLength);
-    }
-
-    const arrayBuffer = await fileRes.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    return res.status(200).send(buffer);
+    const tag = data.tag_name || 'latest';
+    const fallbackFileName = platform === 'linux' ? `IFBuilder_${tag.replace(/^v/i, '')}_amd64.deb` : `IFBuilder_${tag.replace(/^v/i, '')}_x64-setup.exe`;
+    return res.redirect(302, `https://github.com/dorsetineb/IF_Builder/releases/download/${tag}/${fallbackFileName}`);
   } catch (error: any) {
     console.error('[Download API Error]:', error?.message || error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.redirect(302, 'https://github.com/dorsetineb/IF_Builder/releases/latest');
   }
 }

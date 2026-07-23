@@ -1,7 +1,6 @@
-# IF Builder v0.8.2
+# IF Builder v0.8.3
 
-🚀 Atualizações e Melhorias da Versão v0.8.2
+🚀 Atualizações e Melhorias da Versão v0.8.3
 
-- **Suporte Multilíngue no Devlog**: O modal de notas de desenvolvimento agora é totalmente traduzido em tempo real ao alternar entre Português, Inglês e Espanhol na interface.
-- **Preservação de Changelog no `latest.json`**: Correção no script de automação de release para manter as notas de versão intactas no arquivo de atualização do aplicativo desktop.
-- **Otimização da Esteira de Versionamento**: Skill `release-versioning` aprimorada para registrar traduções e sincronizar os instaladores desktop antes de disparar o lançamento.
+- **Correção de Download Desktop (Erro 503)**: A rota de download `/api/download` agora realiza um redirecionamento HTTP 302 direto para a URL oficial no GitHub Releases, evitando o limite de memória serverless do Vercel.
+- **Correção do Aplicativo Desktop no Linux**: Adicionadas as permissões dos plugins `updater` e `process` em `capabilities/default.json` e configurada a chave do Tauri 2, resolvendo a falha na inicialização do app no Linux.

@@ -142,7 +142,7 @@
       "desktopInstalledNotice": "You are using IFBuilder version v{{version}}",
       "changelogTitle": "Development Log",
       "latestTag": "Latest Version",
-      "devlogContent": "🚀 Version v0.8.2 Updates and Improvements\n\n• Multilingual Support in Devlog: The development notes modal is now fully translated in real time when switching between Portuguese, English, and Spanish.\n• Changelog Preservation in latest.json: Fix in the release automation script to keep version notes intact in the desktop app update file.\n• Release Pipeline Optimization: Enhanced release-versioning skill to record translations and sync desktop installers before launching.",
+      "devlogContent": "🚀 Version v0.8.3 Updates and Improvements\n\n• Desktop Download Fix (503 Error): The /api/download route now performs a direct HTTP 302 redirect to the official GitHub Releases URL, preventing Vercel serverless memory payload errors.\n• Linux Desktop App Launch Fix: Added updater and process plugin permissions in capabilities/default.json and configured Tauri 2 keys, fixing the app launch failure on Linux.",
       "newsTitle": "✨ What's New",
       "newsItem1": "Automatic desktop update system with support for GitHub repositories.",
       "newsItem2": "Notification with release notes summary and explicit confirmation to authorize download and installation.",
