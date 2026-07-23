@@ -441,7 +441,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                             {/* Release Notes Content */}
                             <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
-                                {DEVLOG_RELEASE_NOTES}
+                                {t('about.versions.devlogContent', DEVLOG_RELEASE_NOTES)}
                             </div>
                         </div>
 
