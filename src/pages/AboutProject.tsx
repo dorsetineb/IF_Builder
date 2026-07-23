@@ -6,10 +6,10 @@ import { APP_VERSION } from '../version';
 import { isDesktopApp } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.5
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.6
 
-• Redesenho do Bloco Desktop: Remoção do auto-update interno e do log de desenvolvimento no aplicativo desktop, substituídos por um card direcionando para o site oficial www.ifbuildr.com.
-• Ajuste na Descrição Web: Texto atualizado para "Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.".`;
+• Navegação Externa no Desktop: Integração com o plugin @tauri-apps/plugin-opener permitindo abrir o navegador padrão do sistema ao clicar no link www.ifbuildr.com.
+• Ajuste de Formatação de Texto: Remoção da quebra de linha no texto explicativo do card da versão desktop, mantendo a frase em uma única linha.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();

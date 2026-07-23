@@ -162,7 +162,7 @@
       "desktopAppDesc": "Esta es la versión v{{version}} de la aplicación. Para descargar la última versión, busque el enlace en la página Sobre el Proyecto.",
       "changelogTitle": "Registro de Desarrollo",
       "latestTag": "Última Versión",
-      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.5\n\n• Rediseño del Bloque Desktop: Eliminación del auto-update interno y del log de desarrollo dentro de la aplicación de escritorio, reemplazados por una tarjeta que dirige a www.ifbuildr.com.\n• Ajuste de Texto Web: Descripción actualizada a \"Usa el editor sin necesidad de conexión a internet. Disponible para Windows y Linux.\".",
+      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.6\n\n• Navegación Externa en Desktop: Integración con el plugin @tauri-apps/plugin-opener para abrir el navegador predeterminado del sistema al hacer clic en www.ifbuildr.com.\n• Ajuste de Formato de Texto: Eliminación del salto de línea en el texto explicativo de la versión desktop, manteniendo la frase en una sola línea.",
       "newsTitle": "✨ Novedades",
       "newsItem1": "Sistema de actualización automática en escritorio con soporte para repositorios de GitHub.",
       "newsItem2": "Notificación con resumen de notas de versión y confirmación explícita para autorizar descarga e instalación.",

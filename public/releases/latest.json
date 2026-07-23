@@ -1,9 +1,9 @@
 {
-  "version": "0.8.5",
-  "releaseName": "IF Builder v0.8.5",
-  "releaseNotes": "🚀 Atualizações e Melhorias da Versão v0.8.5\n\n- Redesenho do Bloco Desktop: Remoção do auto-update interno e do log de desenvolvimento no aplicativo desktop, substituídos por um card direcionando para o site oficial www.ifbuildr.com.\n- Ajuste na Descrição Web: Texto atualizado para \"Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.\".",
+  "version": "0.8.6",
+  "releaseName": "IF Builder v0.8.6",
+  "releaseNotes": "🚀 Atualizações e Melhorias da Versão v0.8.6\n\n- Navegação Externa no Desktop: Integração com o plugin @tauri-apps/plugin-opener permitindo abrir o navegador padrão do sistema ao clicar no link www.ifbuildr.com.\n- Ajuste de Formatação de Texto: Remoção da quebra de linha no texto explicativo do card da versão desktop, mantendo a frase em uma única linha.",
   "downloads": {
-    "windows": "/downloads/IFBuilder_0.8.5_x64-setup.exe",
-    "linux": "/downloads/IFBuilder_0.8.5_amd64.deb"
+    "windows": "/downloads/IFBuilder_0.8.6_x64-setup.exe",
+    "linux": "/downloads/IFBuilder_0.8.6_amd64.deb"
   }
 }
