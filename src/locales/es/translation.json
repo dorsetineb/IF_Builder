@@ -162,7 +162,7 @@
       "desktopInstalledNotice": "Estás utilizando la versión IFBuilder v{{version}}",
       "changelogTitle": "Registro de Desarrollo",
       "latestTag": "Última Versión",
-      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.3\n\n• Corrección de Descarga Desktop (Error 503): La ruta /api/download ahora realiza un redireccionamiento HTTP 302 directo a la URL oficial en GitHub Releases, evitando el límite de memoria serverless de Vercel.\n• Corrección de la Aplicación Desktop en Linux: Se agregaron los permisos de los plugins updater y process en capabilities/default.json y se configuró la clave de Tauri 2, solucionando la falla de inicio de la app en Linux.",
+      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.4\n\n• Descarga Desktop por Streaming Directo: La API /api/download ahora transmite el binario del instalador directamente sin cargar todo el archivo en memoria, eliminando definitivamente el error 503 en Vercel.\n• Selección Estricta de Formato: Windows descarga exclusivamente .exe y Linux descarga exclusivamente .deb, sin respaldo a formatos no deseados.\n• Compatibilidad con ifbuildr.com: El enlace de descarga ahora apunta directamente al endpoint de Vercel, garantizando que la descarga funcione en todos los dominios.\n• Mejora de Layout (Desktop): El enlace 'ver log de desarrollo' se movió debajo del texto de la versión instalada.",
       "newsTitle": "✨ Novedades",
       "newsItem1": "Sistema de actualización automática en escritorio con soporte para repositorios de GitHub.",
       "newsItem2": "Notificación con resumen de notas de versión y confirmación explícita para autorizar descarga e instalación.",

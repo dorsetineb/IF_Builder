@@ -1,6 +1,8 @@
-# IF Builder v0.8.3
+# IF Builder v0.8.4
 
-🚀 Atualizações e Melhorias da Versão v0.8.3
+🚀 Atualizações e Melhorias da Versão v0.8.4
 
-- **Correção de Download Desktop (Erro 503)**: A rota de download `/api/download` agora realiza um redirecionamento HTTP 302 direto para a URL oficial no GitHub Releases, evitando o limite de memória serverless do Vercel.
-- **Correção do Aplicativo Desktop no Linux**: Adicionadas as permissões dos plugins `updater` e `process` em `capabilities/default.json` e configurada a chave do Tauri 2, resolvendo a falha na inicialização do app no Linux.
+- **Download Desktop via Streaming Direto**: A API `/api/download` agora realiza streaming direto do instalador binário sem carregar todo o arquivo em memória, eliminando definitivamente o erro 503 no Vercel.
+- **Seleção Estrita de Formato**: Windows baixa exclusivamente `.exe` e Linux baixa exclusivamente `.deb`, sem fallbacks para formatos indesejados (.msi, .AppImage).
+- **Compatibilidade com ifbuildr.com**: O link de download agora aponta diretamente para o endpoint do Vercel (`if-builder.vercel.app`), garantindo que o download funcione tanto no domínio principal quanto no deployment do Vercel.
+- **Melhoria de Layout (Desktop)**: O link "ver log de desenvolvimento" foi movido para baixo do texto da versão instalada, melhorando a organização visual da página Sobre o Projeto.

@@ -7,10 +7,12 @@ import { isDesktopApp, checkForUpdates, performInAppUpdate, ReleaseInfo } from '
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 import { UpdateModal } from '../components/UpdateModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.3
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.4
 
-• Correção de Download Desktop (Erro 503): A rota de download /api/download agora realiza um redirecionamento HTTP 302 direto para a URL oficial no GitHub Releases, evitando o limite de memória serverless do Vercel.
-• Correção do Aplicativo Desktop no Linux: Adicionadas as permissões dos plugins updater e process em capabilities/default.json e configurada a chave do Tauri 2, resolvendo a falha na inicialização do app no Linux.`;
+• Download Desktop via Streaming Direto: A API /api/download agora realiza streaming direto do instalador binário sem carregar todo o arquivo em memória, eliminando definitivamente o erro 503 no Vercel.
+• Seleção Estrita de Formato: Windows baixa exclusivamente .exe e Linux baixa exclusivamente .deb, sem fallbacks para formatos indesejados.
+• Compatibilidade com ifbuildr.com: O link de download agora aponta diretamente para o endpoint do Vercel, garantindo que o download funcione em todos os domínios.
+• Melhoria de Layout (Desktop): O link "ver log de desenvolvimento" foi movido para baixo do texto da versão instalada.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
