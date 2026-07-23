@@ -22,7 +22,7 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
       ? `IFBuilder_${APP_VERSION}_amd64.deb`
       : `IFBuilder_${APP_VERSION}_x64-setup.exe`;
 
-    const downloadUrl = `/api/download?platform=${platform}`;
+    const downloadUrl = `https://if-builder.vercel.app/api/download?platform=${platform}`;
 
     const link = document.createElement('a');
     link.href = downloadUrl;
