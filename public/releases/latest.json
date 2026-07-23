@@ -1,9 +1,9 @@
 {
-  "version": "0.8.4",
-  "releaseName": "IF Builder v0.8.4",
-  "releaseNotes": "🚀 Atualizações e Melhorias da Versão v0.8.4\n\n- Download Direto sem Redirecionamento (Streaming): A API do Vercel realiza o download do instalador via streaming em tempo real a partir do repositório privado, eliminando o erro 503 e sem redirecionar para o GitHub.\n- Seleção Estrita de Formatos: Garantido o download exclusivo de pacotes .deb para Linux e instaladores .exe para Windows, sem fallbacks para outros formatos.\n- Suporte ao Domínio ifbuildr.com: Conexão direta entre o site oficial e a API de download do Vercel para acionar o download imediato no navegador.\n- Ajuste de Interface: Reposicionamento do link do log de desenvolvimento para ficar localizado abaixo do texto da versão instalada no aplicativo.",
+  "version": "0.8.5",
+  "releaseName": "IF Builder v0.8.5",
+  "releaseNotes": "🚀 Atualizações e Melhorias da Versão v0.8.5\n\n- Redesenho do Bloco Desktop: Remoção do auto-update interno e do log de desenvolvimento no aplicativo desktop, substituídos por um card direcionando para o site oficial www.ifbuildr.com.\n- Ajuste na Descrição Web: Texto atualizado para \"Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.\".",
   "downloads": {
-    "windows": "/downloads/IFBuilder_0.8.4_x64-setup.exe",
-    "linux": "/downloads/IFBuilder_0.8.4_amd64.deb"
+    "windows": "/downloads/IFBuilder_0.8.5_x64-setup.exe",
+    "linux": "/downloads/IFBuilder_0.8.5_amd64.deb"
   }
 }

@@ -142,7 +142,7 @@
       "desktopAppDesc": "This is version v{{version}} of the app. To download the latest version, look for the link on the About Project page.",
       "changelogTitle": "Development Log",
       "latestTag": "Latest Version",
-      "devlogContent": "🚀 Version v0.8.4 Updates and Improvements\n\n• Direct Streaming Download: The Vercel API streams installer binaries in real time from the private repository, fixing 503 memory payload errors without redirecting to GitHub.\n• Strict Format Selection: Guaranteed exclusive download of .deb packages for Linux and .exe installers for Windows.\n• ifbuildr.com Domain Support: Direct connection between the main website and Vercel download API to trigger instant browser downloads.\n• UI Improvement: Positioned the development log link directly below the installed version text in the desktop app view.",
+      "devlogContent": "🚀 Version v0.8.5 Updates and Improvements\n\n• Desktop Card Redesign: Removed in-app auto-update and devlog link inside the desktop app, replaced with a web portal card directing to www.ifbuildr.com.\n• Web Version Text Adjustment: Updated description text to \"Use the editor without needing an internet connection. Available for Windows and Linux.\".",
       "newsTitle": "✨ What's New",
       "newsItem1": "Automatic desktop update system with support for GitHub repositories.",
       "newsItem2": "Notification with release notes summary and explicit confirmation to authorize download and installation.",

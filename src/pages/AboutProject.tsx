@@ -6,12 +6,10 @@ import { APP_VERSION } from '../version';
 import { isDesktopApp } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.4
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.5
 
-• Download Direto sem Redirecionamento (Streaming): A API do Vercel realiza o download do instalador via streaming em tempo real a partir do repositório privado, eliminando o erro 503 e sem redirecionar para o GitHub.
-• Seleção Estrita de Formatos: Garantido o download exclusivo de pacotes .deb para Linux e instaladores .exe para Windows, sem fallbacks para outros formatos.
-• Suporte ao Domínio ifbuildr.com: Conexão direta entre o site oficial e a API de download do Vercel para acionar o download imediato no navegador.
-• Ajuste de Interface: Reposicionamento do link do log de desenvolvimento para ficar localizado abaixo do texto da versão instalada no aplicativo.`;
+• Redesenho do Bloco Desktop: Remoção do auto-update interno e do log de desenvolvimento no aplicativo desktop, substituídos por um card direcionando para o site oficial www.ifbuildr.com.
+• Ajuste na Descrição Web: Texto atualizado para "Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.".`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();

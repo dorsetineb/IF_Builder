@@ -162,7 +162,7 @@
       "desktopAppDesc": "Esta es la versión v{{version}} de la aplicación. Para descargar la última versión, busque el enlace en la página Sobre el Proyecto.",
       "changelogTitle": "Registro de Desarrollo",
       "latestTag": "Última Versión",
-      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.4\n\n• Descarga Directa por Streaming: La API de Vercel transmite binarios de instalación en tiempo real desde el repositorio privado, corrigiendo el error 503 sin redirigir a GitHub.\n• Selección Estricta de Formatos: Descarga exclusiva garantizada de paquetes .deb para Linux e instaladores .exe para Windows.\n• Soporte para ifbuildr.com: Conexión directa entre el sitio oficial y la API de Vercel para iniciar la descarga inmediata en el navegador.\n• Mejora de Interfaz: Reposicionamiento del enlace del registro de desarrollo debajo del texto de la versión instalada.",
+      "devlogContent": "🚀 Actualizaciones y Mejoras de la Versión v0.8.5\n\n• Rediseño del Bloque Desktop: Eliminación del auto-update interno y del log de desarrollo dentro de la aplicación de escritorio, reemplazados por una tarjeta que dirige a www.ifbuildr.com.\n• Ajuste de Texto Web: Descripción actualizada a \"Usa el editor sin necesidad de conexión a internet. Disponible para Windows y Linux.\".",
       "newsTitle": "✨ Novedades",
       "newsItem1": "Sistema de actualización automática en escritorio con soporte para repositorios de GitHub.",
       "newsItem2": "Notificación con resumen de notas de versión y confirmación explícita para autorizar descarga e instalación.",
