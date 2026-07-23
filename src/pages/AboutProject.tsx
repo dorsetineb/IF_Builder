@@ -28,10 +28,24 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
     };
 
+    const handleOpenWebsite = async () => {
+        const url = 'https://www.ifbuildr.com';
+        if (isDesktopApp()) {
+            try {
+                const { openUrl } = await import('@tauri-apps/plugin-opener');
+                await openUrl(url);
+                return;
+            } catch (e) {
+                console.error('[AboutProject] Failed to open URL via plugin-opener:', e);
+            }
+        }
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const DonationButton = ({ onClick, href, icon: Icon, label, variant = 'primary' }: { onClick?: () => void, href?: string, icon?: any, label: string, variant?: 'primary' | 'secondary' }) => {
         const handleClick = () => {
-            if (href) window.open(href, '_blank', 'noopener,noreferrer');
+            if (href) handleOpenWebsite();
             if (onClick) onClick();
         };
 
@@ -157,15 +171,15 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                         <Globe className="w-5 h-5 text-primary" />
                                                         {t('about.versions.desktopAppTitle', 'Acesse o IFBuilder na web')}
                                                     </h3>
-                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl">
-                                                        <p>{t('about.versions.desktopAppDesc', 'Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.', { version: APP_VERSION })}</p>
+                                                    <div className="text-xs text-white/70 leading-relaxed max-w-none">
+                                                        <p className="whitespace-normal xl:whitespace-nowrap">{t('about.versions.desktopAppDesc', 'Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.', { version: APP_VERSION })}</p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="pt-2 flex items-center flex-wrap gap-4">
                                                 <button
-                                                    onClick={() => window.open('https://www.ifbuildr.com', '_blank', 'noopener,noreferrer')}
+                                                    onClick={handleOpenWebsite}
                                                     className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
                                                 >
                                                     <span>www.ifbuildr.com</span>
