@@ -139,7 +139,7 @@
       "desktopBannerDesc2": "Available for Windows and Linux with automatic updates.",
       "downloadBtn": "Download Desktop App (v{{version}})",
       "viewLogLink": "view development log",
-      "desktopInstalledNotice": "You are already using the installed desktop version of IFBuilder (v{{version}}).",
+      "desktopInstalledNotice": "You are using IFBuilder version v{{version}}",
       "changelogTitle": "Development Log",
       "latestTag": "Latest Version",
       "newsTitle": "✨ What's New",

@@ -66,6 +66,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    const target = req.query?.target as string;
+    if (target) {
+      return res.status(200).json({
+        version: latestTag.startsWith('v') ? latestTag : `v${latestTag}`,
+        notes: data.body || '',
+        pub_date: data.published_at || new Date().toISOString(),
+        platforms: {
+          'linux-x86_64': {
+            signature: '',
+            url: 'https://if-builder.vercel.app/api/download?platform=linux'
+          },
+          'windows-x86_64': {
+            signature: '',
+            url: 'https://if-builder.vercel.app/api/download?platform=windows'
+          }
+        }
+      });
+    }
+
     return res.status(200).json({
       version: latestTag.replace(/^v/i, ''),
       releaseName: data.name || latestTag,

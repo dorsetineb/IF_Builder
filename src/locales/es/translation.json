@@ -159,7 +159,7 @@
       "desktopBannerDesc2": "Disponible para Windows y Linux con actualizaciones automáticas.",
       "downloadBtn": "Descargar Aplicación de Escritorio (v{{version}})",
       "viewLogLink": "ver log de desarrollo",
-      "desktopInstalledNotice": "Ya estás usando la versión de escritorio instalada de IFBuilder (v{{version}}).",
+      "desktopInstalledNotice": "Estás utilizando la versión IFBuilder v{{version}}",
       "changelogTitle": "Registro de Desarrollo",
       "latestTag": "Última Versión",
       "newsTitle": "✨ Novedades",

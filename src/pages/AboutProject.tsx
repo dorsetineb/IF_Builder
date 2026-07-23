@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, CheckCircle2, Monitor, FileText, Loader2 } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText, Loader2, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp } from '../services/autoUpdater';
+import { isDesktopApp, checkForUpdates, performInAppUpdate, ReleaseInfo } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
+import { UpdateModal } from '../components/UpdateModal';
 
 const DEVLOG_RELEASE_NOTES = `🎭 Editor de Interações (Cenas e Capítulos)
 
@@ -27,6 +28,15 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
+    // In-app update states
+    const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+    const [updateReleaseInfo, setUpdateReleaseInfo] = useState<ReleaseInfo | null>(null);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [isUpdatingApp, setIsUpdatingApp] = useState(false);
+    const [downloadProgress, setDownloadProgress] = useState(0);
+    const [downloadStatusText, setDownloadStatusText] = useState('Baixando atualização...');
+    const [showNoUpdateModal, setShowNoUpdateModal] = useState(false);
+
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
         setSupportMethod(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
@@ -34,10 +44,39 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
     const handleCopyPix = () => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
-        // Simple alert or toast could happen here, but keeping it simple as per original
     };
 
+    const handleCheckForUpdates = async () => {
+        setIsCheckingUpdate(true);
+        try {
+            const release = await checkForUpdates();
+            if (release) {
+                setUpdateReleaseInfo(release);
+                setIsUpdateModalOpen(true);
+            } else {
+                setShowNoUpdateModal(true);
+            }
+        } catch (err) {
+            console.error('[AboutProject] Update check error:', err);
+            setShowNoUpdateModal(true);
+        } finally {
+            setIsCheckingUpdate(false);
+        }
+    };
 
+    const handleConfirmInAppUpdate = async () => {
+        setIsUpdatingApp(true);
+        setDownloadProgress(0);
+        setDownloadStatusText('Baixando atualização...');
+
+        await performInAppUpdate((percent, statusText) => {
+            setDownloadProgress(percent);
+            setDownloadStatusText(statusText);
+        });
+
+        setIsUpdatingApp(false);
+        setIsUpdateModalOpen(false);
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const DonationButton = ({ onClick, href, icon: Icon, label, variant = 'primary' }: { onClick?: () => void, href?: string, icon?: any, label: string, variant?: 'primary' | 'secondary' }) => {
@@ -162,20 +201,37 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="bg-zinc-900/60 border border-emerald-500/40 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 text-emerald-400 text-xs">
-                                            <div className="flex items-center gap-3">
-                                                <CheckCircle2 className="w-5 h-5 shrink-0" />
-                                                <span>
-                                                    {t('about.versions.desktopInstalledNotice', 'Você já está usando a versão desktop instalada do IFBuilder (v{{version}}).', { version: APP_VERSION })}
+                                        <div className="bg-zinc-900 border border-muted-foreground/30 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 text-white text-xs">
+                                            <div className="flex items-center gap-4 flex-wrap">
+                                                <span className="font-medium text-white/90">
+                                                    {t('about.versions.desktopInstalledNotice', 'Você está utilizando a versão IFBuilder v{{version}}', { version: APP_VERSION })}
                                                 </span>
+
+                                                <button
+                                                    onClick={() => setIsDevLogModalOpen(true)}
+                                                    className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
+                                                >
+                                                    <FileText className="w-4 h-4" />
+                                                    <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
+                                                </button>
                                             </div>
 
                                             <button
-                                                onClick={() => setIsDevLogModalOpen(true)}
-                                                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer"
+                                                onClick={handleCheckForUpdates}
+                                                disabled={isCheckingUpdate}
+                                                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5 disabled:opacity-50"
                                             >
-                                                <FileText className="w-4 h-4" />
-                                                <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
+                                                {isCheckingUpdate ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <span>Buscando...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <RefreshCw className="w-4 h-4" />
+                                                        <span>Buscar atualização</span>
+                                                    </>
+                                                )}
                                             </button>
                                         </div>
                                     )}
@@ -405,6 +461,35 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 {t('common.close', 'Fechar')}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* In-App Update Confirmation & Progress Modal */}
+            <UpdateModal
+                isOpen={isUpdateModalOpen}
+                releaseInfo={updateReleaseInfo}
+                onConfirm={handleConfirmInAppUpdate}
+                onCancel={() => setIsUpdateModalOpen(false)}
+                isUpdating={isUpdatingApp}
+                downloadProgress={downloadProgress}
+                downloadStatusText={downloadStatusText}
+            />
+
+            {/* No Update Available Modal */}
+            {showNoUpdateModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-zinc-900 border-2 border-muted-foreground/20 rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-center animate-in fade-in zoom-in-95 duration-200">
+                        <h3 className="text-base font-bold text-white">Versão Mais Recente</h3>
+                        <p className="text-xs text-zinc-400 leading-relaxed">
+                            Você já está utilizando a versão mais recente do IFBuilder (v{APP_VERSION}).
+                        </p>
+                        <button
+                            onClick={() => setShowNoUpdateModal(false)}
+                            className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                        >
+                            Fechar
+                        </button>
                     </div>
                 </div>
             )}
