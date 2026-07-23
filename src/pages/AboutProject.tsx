@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText, Loader2, RefreshCw } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp, checkForUpdates, performInAppUpdate, ReleaseInfo } from '../services/autoUpdater';
+import { isDesktopApp } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
-import { UpdateModal } from '../components/UpdateModal';
 
 const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.4
 
@@ -22,15 +21,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
-    // In-app update states
-    const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
-    const [updateReleaseInfo, setUpdateReleaseInfo] = useState<ReleaseInfo | null>(null);
-    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-    const [isUpdatingApp, setIsUpdatingApp] = useState(false);
-    const [downloadProgress, setDownloadProgress] = useState(0);
-    const [downloadStatusText, setDownloadStatusText] = useState('Baixando atualização...');
-    const [showNoUpdateModal, setShowNoUpdateModal] = useState(false);
-
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
         setSupportMethod(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
@@ -38,38 +28,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
     const handleCopyPix = () => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
-    };
-
-    const handleCheckForUpdates = async () => {
-        setIsCheckingUpdate(true);
-        try {
-            const release = await checkForUpdates();
-            if (release) {
-                setUpdateReleaseInfo(release);
-                setIsUpdateModalOpen(true);
-            } else {
-                setShowNoUpdateModal(true);
-            }
-        } catch (err) {
-            console.error('[AboutProject] Update check error:', err);
-            setShowNoUpdateModal(true);
-        } finally {
-            setIsCheckingUpdate(false);
-        }
-    };
-
-    const handleConfirmInAppUpdate = async () => {
-        setIsUpdatingApp(true);
-        setDownloadProgress(0);
-        setDownloadStatusText('Baixando atualização...');
-
-        await performInAppUpdate((percent, statusText) => {
-            setDownloadProgress(percent);
-            setDownloadStatusText(statusText);
-        });
-
-        setIsUpdatingApp(false);
-        setIsUpdateModalOpen(false);
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
@@ -160,7 +118,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
                                     </div>
 
-                                    {/* Desktop Installer Banner (Only shown on Web) */}
+                                    {/* Desktop Installer Banner (Web vs Desktop App) */}
                                     {!isDesktopApp() ? (
                                         <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
                                             <div className="flex items-start justify-between">
@@ -169,9 +127,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                         <Monitor className="w-5 h-5 text-primary" />
                                                         {t('about.versions.desktopBannerTitle', 'Baixe o IFBuilder para Desktop')}
                                                     </h3>
-                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl space-y-1">
-                                                        <p>{t('about.versions.desktopBannerDesc1', 'Use o editor sem precisar de conexão com a internet.')}</p>
-                                                        <p>{t('about.versions.desktopBannerDesc2', 'Disponível para Windows e Linux com atualizações automáticas.')}</p>
+                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl">
+                                                        <p>{t('about.versions.desktopBannerDesc', 'Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.')}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -195,38 +152,28 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="bg-zinc-900 border border-muted-foreground/30 rounded-xl p-4 flex flex-col gap-3 text-white text-xs">
-                                            <div className="flex items-center justify-between flex-wrap gap-3">
-                                                <span className="font-medium text-white/90">
-                                                    {t('about.versions.desktopInstalledNotice', 'Você está utilizando a versão IFBuilder v{{version}}', { version: APP_VERSION })}
-                                                </span>
-
-                                                <button
-                                                    onClick={handleCheckForUpdates}
-                                                    disabled={isCheckingUpdate}
-                                                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5 disabled:opacity-50"
-                                                >
-                                                    {isCheckingUpdate ? (
-                                                        <>
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                            <span>Buscando...</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <RefreshCw className="w-4 h-4" />
-                                                            <span>Buscar atualização</span>
-                                                        </>
-                                                    )}
-                                                </button>
+                                        <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+                                            <div className="flex items-start justify-between">
+                                                <div className="space-y-2">
+                                                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                        <Globe className="w-5 h-5 text-primary" />
+                                                        {t('about.versions.desktopAppTitle', 'Acesse o IFBuilder na web')}
+                                                    </h3>
+                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl">
+                                                        <p>{t('about.versions.desktopAppDesc', 'Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.', { version: APP_VERSION })}</p>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <button
-                                                onClick={() => setIsDevLogModalOpen(true)}
-                                                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
-                                            >
-                                                <FileText className="w-4 h-4" />
-                                                <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
-                                            </button>
+                                            <div className="pt-2 flex items-center flex-wrap gap-4">
+                                                <button
+                                                    onClick={() => window.open('https://www.ifbuildr.com', '_blank', 'noopener,noreferrer')}
+                                                    className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
+                                                >
+                                                    <span>www.ifbuildr.com</span>
+                                                    <ExternalLink className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -455,35 +402,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 {t('common.close', 'Fechar')}
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* In-App Update Confirmation & Progress Modal */}
-            <UpdateModal
-                isOpen={isUpdateModalOpen}
-                releaseInfo={updateReleaseInfo}
-                onConfirm={handleConfirmInAppUpdate}
-                onCancel={() => setIsUpdateModalOpen(false)}
-                isUpdating={isUpdatingApp}
-                downloadProgress={downloadProgress}
-                downloadStatusText={downloadStatusText}
-            />
-
-            {/* No Update Available Modal */}
-            {showNoUpdateModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-zinc-900 border-2 border-muted-foreground/20 rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4 text-center animate-in fade-in zoom-in-95 duration-200">
-                        <h3 className="text-base font-bold text-white">Versão Mais Recente</h3>
-                        <p className="text-xs text-zinc-400 leading-relaxed">
-                            Você já está utilizando a versão mais recente do IFBuilder (v{APP_VERSION}).
-                        </p>
-                        <button
-                            onClick={() => setShowNoUpdateModal(false)}
-                            className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer"
-                        >
-                            Fechar
-                        </button>
                     </div>
                 </div>
             )}
