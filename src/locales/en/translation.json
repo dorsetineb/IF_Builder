@@ -142,7 +142,7 @@
       "desktopInstalledNotice": "You are using IFBuilder version v{{version}}",
       "changelogTitle": "Development Log",
       "latestTag": "Latest Version",
-      "devlogContent": "🚀 Version v0.8.4 Updates and Improvements\n\n• Direct Streaming Desktop Download: The /api/download API now streams the installer binary directly without loading the entire file into memory, definitively eliminating the Vercel 503 error.\n• Strict Format Selection: Windows downloads exclusively .exe and Linux downloads exclusively .deb, with no fallbacks to unwanted formats.\n• ifbuildr.com Compatibility: The download link now points directly to the Vercel endpoint, ensuring downloads work across all domains.\n• Desktop Layout Improvement: The 'view development log' link has been moved below the installed version text.",
+      "devlogContent": "🚀 Version v0.8.4 Updates and Improvements\n\n• Direct Streaming Download: The Vercel API streams installer binaries in real time from the private repository, fixing 503 memory payload errors without redirecting to GitHub.\n• Strict Format Selection: Guaranteed exclusive download of .deb packages for Linux and .exe installers for Windows.\n• ifbuildr.com Domain Support: Direct connection between the main website and Vercel download API to trigger instant browser downloads.\n• UI Improvement: Positioned the development log link directly below the installed version text in the desktop app view.",
       "newsTitle": "✨ What's New",
       "newsItem1": "Automatic desktop update system with support for GitHub repositories.",
       "newsItem2": "Notification with release notes summary and explicit confirmation to authorize download and installation.",
