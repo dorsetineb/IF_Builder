@@ -1,9 +1,9 @@
 {
-  "version": "0.7.0",
-  "releaseName": "IF Builder v0.7.0",
-  "releaseNotes": "",
+  "version": "0.8.1",
+  "releaseName": "IF Builder v0.8.1",
+  "releaseNotes": "🚀 Atualizações e Melhorias da Versão v0.8.1\n\n- Sincronização de Release no latest.json: Atualização automática do arquivo public/releases/latest.json com notas de versão e rotas de instaladores sincronizados durante a esteira de release.\n- Aprimoramento da Skill de Versionamento: Protocolo atualizado da skill release-versioning para incluir staging prévio do latest.json antes de disparar o script npm run release.\n- Refinamentos de Estabilidade: Validações adicionais no fluxo de auto-atualização do desktop.",
   "downloads": {
-    "windows": "/downloads/IFBuilder_0.7.0_x64-setup.exe",
-    "linux": "/downloads/IFBuilder_0.7.0_amd64.deb"
+    "windows": "/downloads/IFBuilder_0.8.1_x64-setup.exe",
+    "linux": "/downloads/IFBuilder_0.8.1_amd64.deb"
   }
 }

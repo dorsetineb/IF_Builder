@@ -1,9 +1,7 @@
-# IF Builder v0.8.0
+# IF Builder v0.8.1
 
-🚀 Atualizações e Melhorias da Versão v0.8.0
+🚀 Atualizações e Melhorias da Versão v0.8.1
 
-- **Sistema de Atualização Interna no Desktop**: Atualização automática in-app tanto para Windows (.exe) quanto para Linux (.deb), permitindo atualizar o aplicativo sem necessidade de baixar um novo instalador externo.
-- **Lembrete de Segurança de Projeto**: Modal de atualização com alerta em destaque orientando o usuário a salvar as alterações do projeto antes de iniciar o download.
-- **Barra de Progresso Dinâmica**: Exibição visual de progresso em tempo real (0% a 100%) durante o download e aplicação dos pacotes da nova versão.
-- **Novo Banner de Versão Instalada**: Visual reformulado e limpo na aba Sobre o Projeto ("Você está utilizando a versão IFBuilder v0.8.0") com acesso direto ao Devlog e botão Buscar Atualização.
-- **Skill de Versionamento Automatizado**: Inclusão da nova skill de release-versioning para gerenciamento de changelogs e automação de builds.
+- **Sincronização de Release no `latest.json`**: Atualização automática do arquivo `public/releases/latest.json` com notas de versão e rotas de instaladores sincronizados durante a esteira de release.
+- **Aprimoramento da Skill de Versionamento**: Protocolo atualizado da skill `release-versioning` para incluir staging prévio do `latest.json` antes de disparar o script `npm run release`.
+- **Refinamentos de Estabilidade**: Validações adicionais no fluxo de auto-atualização do desktop.
