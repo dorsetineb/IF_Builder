@@ -3,7 +3,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -64,6 +64,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (installerAsset?.browser_download_url) {
         downloadUrl = installerAsset.browser_download_url;
       }
+    }
+
+    const target = req.query?.target as string;
+    if (target) {
+      return res.status(200).json({
+        version: latestTag.startsWith('v') ? latestTag : `v${latestTag}`,
+        notes: data.body || '',
+        pub_date: data.published_at || new Date().toISOString(),
+        platforms: {
+          'linux-x86_64': {
+            signature: '',
+            url: 'https://if-builder.vercel.app/api/download?platform=linux'
+          },
+          'windows-x86_64': {
+            signature: '',
+            url: 'https://if-builder.vercel.app/api/download?platform=windows'
+          }
+        }
+      });
     }
 
     return res.status(200).json({

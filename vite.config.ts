@@ -116,7 +116,7 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
             releaseName: `IF Builder v${currentVersion}`,
             releaseNotes: '',
             htmlUrl: `https://github.com/dorsetineb/IF_Builder/releases/tag/v${currentVersion}`,
-            downloadUrl: `https://github.com/dorsetineb/IF_Builder/releases/download/v${currentVersion}/IFBuilder_${currentVersion}_x64-setup.exe`
+            downloadUrl: `https://github.com/dorsetineb/IF_Builder/releases/download/v${currentVersion}/IFBuilder_${currentVersion}_amd64.deb`
           }));
           return;
         }
@@ -141,11 +141,10 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
               const assets = data.assets || [];
               let targetAsset: any = null;
               if (platform === 'linux') {
-                targetAsset = assets.find((asset: any) => asset.name?.endsWith('.AppImage') || asset.name?.endsWith('.deb'));
+                targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.deb'));
               } else {
-                targetAsset = assets.find((asset: any) => asset.name?.endsWith('.msi') || asset.name?.endsWith('.exe') || asset.name?.endsWith('.setup.exe'));
+                targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.exe'));
               }
-              if (!targetAsset && assets.length > 0) targetAsset = assets[0];
 
               if (targetAsset && targetAsset.url) {
                 const assetHeaders: Record<string, string> = {
@@ -156,12 +155,16 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
                   assetHeaders['Authorization'] = `Bearer ${githubToken}`;
                 }
                 const fileRes = await fetch(targetAsset.url, { headers: assetHeaders, redirect: 'follow' });
-                if (fileRes.ok) {
-                  const arrayBuffer = await fileRes.arrayBuffer();
-                  const buffer = Buffer.from(arrayBuffer);
+                if (fileRes.ok && fileRes.body) {
                   res.setHeader('Content-Type', 'application/octet-stream');
                   res.setHeader('Content-Disposition', `attachment; filename="${targetAsset.name}"`);
-                  res.end(buffer);
+                  const contentLength = fileRes.headers.get('content-length');
+                  if (contentLength) res.setHeader('Content-Length', contentLength);
+
+                  const { Readable } = await import('stream');
+                  // @ts-ignore
+                  const stream = typeof Readable.fromWeb === 'function' ? Readable.fromWeb(fileRes.body) : Readable.from(fileRes.body);
+                  stream.pipe(res);
                   return;
                 }
               }

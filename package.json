@@ -1,7 +1,7 @@
 {
   "name": "if-builder",
   "private": true,
-  "version": "0.6.1",
+  "version": "0.8.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -24,6 +24,9 @@
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
     "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-opener": "^2.5.4",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-updater": "^2.10.1",
     "@tisoap/react-flow-smart-edge": "^4.0.1",
     "@types/dompurify": "^3.0.5",
     "@xyflow/react": "^12.10.1",

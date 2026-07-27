@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "if-builder",
-  "version": "0.6.1",
+  "version": "0.8.6",
   "identifier": "com.ifbuildr.editor",
   "build": {
     "frontendDist": "../dist",
@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "IF Builder",
         "width": 1280,
         "height": 720,
@@ -35,6 +36,14 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IGF1dG91cGRhdGUgcHVibGljIGtleQpSV1N5T2E4WUpYNEI0bmdqOUNwZnhmUTlhQ2cyeERiR1Z0MHB2Qnh6RkYwV1BkWG9XQnhwK0k2Wg==",
+      "endpoints": [
+        "https://if-builder.vercel.app/api/update?target={{target}}&arch={{arch}}&current_version={{current_version}}"
+      ]
     }
   }
 }

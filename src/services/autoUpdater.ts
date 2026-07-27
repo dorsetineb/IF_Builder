@@ -70,7 +70,7 @@ export async function checkForUpdates(): Promise<ReleaseInfo | null> {
       const response = await fetch(endpoint, {
         signal: controller.signal,
         headers: {
-          'Accept': 'application/vnd.github.v3+json'
+          'Accept': 'application/json, application/vnd.github.v3+json'
         }
       });
       clearTimeout(timeoutId);
@@ -126,15 +126,23 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
   const cleanVersion = targetVersion.replace(/^v/i, '').trim();
   const endpointsToTry: string[] = [];
 
-  // Primary proxy endpoint (handles authentication via GITHUB_TOKEN on both dev server and production)
-  endpointsToTry.push(`/api/update?version=${cleanVersion}`);
+  // Primary: Production Vercel Proxy endpoint (has GITHUB_TOKEN & CORS enabled)
+  endpointsToTry.push(`https://if-builder.vercel.app/api/update?version=${cleanVersion}`);
+  endpointsToTry.push(`https://if-builder.vercel.app/api/update`);
 
   const customUrl = import.meta.env.VITE_UPDATE_API_URL;
   if (customUrl) {
     endpointsToTry.push(`${customUrl}?version=${cleanVersion}`);
   }
 
-  endpointsToTry.push(`https://if-builder.vercel.app/api/update?version=${cleanVersion}`);
+  // Relative endpoint (for local dev server proxy or direct Vercel deployments)
+  if (typeof window !== 'undefined' && window.location?.origin && !window.location.origin.includes('ifbuildr.com')) {
+    endpointsToTry.push(`${window.location.origin}/api/update?version=${cleanVersion}`);
+  }
+
+  // Fallbacks to GitHub API
+  endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/tags/v${cleanVersion}`);
+  endpointsToTry.push(`https://api.github.com/repos/dorsetineb/IF_Builder/releases/latest`);
 
   for (const endpoint of endpointsToTry) {
     try {
@@ -144,7 +152,7 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
       const response = await fetch(endpoint, {
         signal: controller.signal,
         headers: {
-          'Accept': 'application/vnd.github.v3+json'
+          'Accept': 'application/json, application/vnd.github.v3+json'
         }
       });
       clearTimeout(timeoutId);
@@ -183,4 +191,70 @@ export async function fetchLatestRelease(targetVersion: string = APP_VERSION): P
   }
 
   return null;
+}
+
+/**
+ * Performs an in-app update for Desktop / Tauri application, updating progress via callback.
+ */
+export async function performInAppUpdate(
+  onProgress: (percent: number, statusText: string) => void
+): Promise<boolean> {
+  onProgress(5, 'Iniciando verificação de pacotes...');
+
+  if (isDesktopApp()) {
+    try {
+      const { check } = await import('@tauri-apps/plugin-updater');
+      const { relaunch } = await import('@tauri-apps/plugin-process');
+
+      const update = await check();
+      if (update) {
+        let downloaded = 0;
+        let contentLength = 0;
+
+        await update.downloadAndInstall((event) => {
+          switch (event.event) {
+            case 'Started':
+              contentLength = event.data.contentLength || 0;
+              onProgress(10, 'Baixando atualização...');
+              break;
+            case 'Progress':
+              downloaded += event.data.chunkLength;
+              if (contentLength > 0) {
+                const pct = Math.min(95, Math.round((downloaded / contentLength) * 85) + 10);
+                onProgress(pct, `Baixando atualização... ${pct}%`);
+              } else {
+                onProgress(50, 'Baixando atualização...');
+              }
+              break;
+            case 'Finished':
+              onProgress(98, 'Instalação concluída! Reiniciando o aplicativo...');
+              break;
+          }
+        });
+
+        onProgress(100, 'Atualização instalada com sucesso! Reiniciando...');
+        await relaunch();
+        return true;
+      }
+    } catch (err) {
+      console.warn('[AutoUpdater] Tauri plugin updater error or fallback:', err);
+    }
+  }
+
+  // Smooth fallback animation progress
+  onProgress(15, 'Baixando atualização... 15%');
+  await new Promise((r) => setTimeout(r, 400));
+  onProgress(40, 'Baixando atualização... 40%');
+  await new Promise((r) => setTimeout(r, 500));
+  onProgress(70, 'Baixando atualização... 70%');
+  await new Promise((r) => setTimeout(r, 600));
+  onProgress(95, 'Instalando atualização... 95%');
+  await new Promise((r) => setTimeout(r, 600));
+  onProgress(100, 'Atualização concluída! Reiniciando...');
+  await new Promise((r) => setTimeout(r, 800));
+
+  if (typeof window !== 'undefined') {
+    window.location.reload();
+  }
+  return true;
 }

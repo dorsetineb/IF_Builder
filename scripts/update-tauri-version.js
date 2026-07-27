@@ -25,7 +25,10 @@ if (fs.existsSync(latestJsonPath)) {
   const latestJson = JSON.parse(fs.readFileSync(latestJsonPath, 'utf-8'));
   latestJson.version = newVersion;
   latestJson.releaseName = `IF Builder v${newVersion}`;
-  latestJson.releaseNotes = '';
+  const releaseNotesPath = path.resolve('./public/RELEASE_NOTES.md');
+  if (!latestJson.releaseNotes && fs.existsSync(releaseNotesPath)) {
+    latestJson.releaseNotes = fs.readFileSync(releaseNotesPath, 'utf-8');
+  }
   if (latestJson.downloads) {
     latestJson.downloads.windows = `/downloads/IFBuilder_${newVersion}_x64-setup.exe`;
     latestJson.downloads.linux = `/downloads/IFBuilder_${newVersion}_amd64.deb`;

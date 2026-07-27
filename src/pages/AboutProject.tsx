@@ -1,39 +1,23 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, CheckCircle2, Monitor, FileText, Loader2 } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp, fetchLatestRelease, ReleaseInfo } from '../services/autoUpdater';
+import { isDesktopApp } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
+
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.6
+
+• Navegação Externa no Desktop: Integração com o plugin @tauri-apps/plugin-opener permitindo abrir o navegador padrão do sistema ao clicar no link www.ifbuildr.com.
+• Ajuste de Formatação de Texto: Remoção da quebra de linha no texto explicativo do card da versão desktop, mantendo a frase em uma única linha.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
     const [showPixModal, setShowPixModal] = useState(false);
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
     const [isDevLogModalOpen, setIsDevLogModalOpen] = useState(false);
-    const [latestRelease, setLatestRelease] = useState<ReleaseInfo | null>(null);
-    const [isLoadingRelease, setIsLoadingRelease] = useState(false);
-    const [hasFetchedRelease, setHasFetchedRelease] = useState(false);
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
-
-    // Fetch GitHub release notes dynamically for the current app version when dev log modal opens
-    useEffect(() => {
-        if (isDevLogModalOpen && !hasFetchedRelease) {
-            setIsLoadingRelease(true);
-            fetchLatestRelease(APP_VERSION)
-                .then((res) => {
-                    setHasFetchedRelease(true);
-                    if (res) {
-                        setLatestRelease(res);
-                    }
-                })
-                .catch((err) => console.error('[AboutProject] Failed to fetch release:', err))
-                .finally(() => {
-                    setIsLoadingRelease(false);
-                });
-        }
-    }, [isDevLogModalOpen, hasFetchedRelease]);
 
     // Automatically update the default selected tab if the user switches languages
     useEffect(() => {
@@ -42,15 +26,26 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
     const handleCopyPix = () => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
-        // Simple alert or toast could happen here, but keeping it simple as per original
     };
 
-
+    const handleOpenWebsite = async () => {
+        const url = 'https://www.ifbuildr.com';
+        if (isDesktopApp()) {
+            try {
+                const { openUrl } = await import('@tauri-apps/plugin-opener');
+                await openUrl(url);
+                return;
+            } catch (e) {
+                console.error('[AboutProject] Failed to open URL via plugin-opener:', e);
+            }
+        }
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const DonationButton = ({ onClick, href, icon: Icon, label, variant = 'primary' }: { onClick?: () => void, href?: string, icon?: any, label: string, variant?: 'primary' | 'secondary' }) => {
         const handleClick = () => {
-            if (href) window.open(href, '_blank', 'noopener,noreferrer');
+            if (href) handleOpenWebsite();
             if (onClick) onClick();
         };
 
@@ -135,7 +130,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
                                     </div>
 
-                                    {/* Desktop Installer Banner (Only shown on Web) */}
+                                    {/* Desktop Installer Banner (Web vs Desktop App) */}
                                     {!isDesktopApp() ? (
                                         <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
                                             <div className="flex items-start justify-between">
@@ -144,9 +139,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                         <Monitor className="w-5 h-5 text-primary" />
                                                         {t('about.versions.desktopBannerTitle', 'Baixe o IFBuilder para Desktop')}
                                                     </h3>
-                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl space-y-1">
-                                                        <p>{t('about.versions.desktopBannerDesc1', 'Use o editor sem precisar de conexão com a internet.')}</p>
-                                                        <p>{t('about.versions.desktopBannerDesc2', 'Disponível para Windows e Linux com atualizações automáticas.')}</p>
+                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl">
+                                                        <p>{t('about.versions.desktopBannerDesc', 'Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.')}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -170,21 +164,28 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="bg-zinc-900/60 border border-emerald-500/40 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 text-emerald-400 text-xs">
-                                            <div className="flex items-center gap-3">
-                                                <CheckCircle2 className="w-5 h-5 shrink-0" />
-                                                <span>
-                                                    {t('about.versions.desktopInstalledNotice', 'Você já está usando a versão desktop instalada do IFBuilder (v{{version}}).', { version: APP_VERSION })}
-                                                </span>
+                                        <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+                                            <div className="flex items-start justify-between">
+                                                <div className="space-y-2">
+                                                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                        <Globe className="w-5 h-5 text-primary" />
+                                                        {t('about.versions.desktopAppTitle', 'Acesse o IFBuilder na web')}
+                                                    </h3>
+                                                    <div className="text-xs text-white/70 leading-relaxed max-w-none">
+                                                        <p className="whitespace-normal xl:whitespace-nowrap">{t('about.versions.desktopAppDesc', 'Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.', { version: APP_VERSION })}</p>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <button
-                                                onClick={() => setIsDevLogModalOpen(true)}
-                                                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer"
-                                            >
-                                                <FileText className="w-4 h-4" />
-                                                <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
-                                            </button>
+                                            <div className="pt-2 flex items-center flex-wrap gap-4">
+                                                <button
+                                                    onClick={handleOpenWebsite}
+                                                    className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
+                                                >
+                                                    <span>www.ifbuildr.com</span>
+                                                    <ExternalLink className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -391,28 +392,17 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             {/* Version Header with Tag to the Right */}
                             <div className="flex items-center gap-3 pb-3 border-b border-muted-foreground/20">
                                 <span className="font-bold text-foreground text-lg">
-                                    {latestRelease?.releaseName || `v${latestRelease?.version || APP_VERSION}`}
+                                    v{APP_VERSION}
                                 </span>
                                 <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-semibold uppercase tracking-wider shrink-0">
                                     {t('about.versions.latestTag', 'Última Versão')}
                                 </span>
                             </div>
 
-                            {/* Release Notes Content Dynamic Fetch */}
-                            {isLoadingRelease ? (
-                                <div className="flex items-center justify-center p-8 text-muted-foreground gap-2">
-                                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                                    <span className="text-xs font-mono">{t('common.loading', 'Carregando notas da release...')}</span>
-                                </div>
-                            ) : (latestRelease && latestRelease.releaseNotes && latestRelease.releaseNotes.trim() !== '') ? (
-                                <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
-                                    <div>{latestRelease.releaseNotes}</div>
-                                </div>
-                            ) : (
-                                <div className="p-8 text-center text-muted-foreground text-xs italic">
-                                    {t('about.versions.noNotes', 'Nenhuma nota de versão cadastrada no GitHub.')}
-                                </div>
-                            )}
+                            {/* Release Notes Content */}
+                            <div className="space-y-3 text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-wrap bg-muted/20 p-4 rounded-lg border border-muted-foreground/20 max-h-[50vh] overflow-y-auto">
+                                {t('about.versions.devlogContent', DEVLOG_RELEASE_NOTES)}
+                            </div>
                         </div>
 
                         {/* Footer */}
