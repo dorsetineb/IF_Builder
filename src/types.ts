@@ -14,6 +14,21 @@ export interface TrackerEffect {
   valueChange: number;
 }
 
+export type DiceType = 'd6' | 'd20';
+
+export interface DiceOutcomeRange {
+  id: string;
+  min: number;
+  max: number;
+  label?: string;
+  successMessage?: string;
+  goToScene?: string;
+  trackerEffects?: TrackerEffect[];
+  addsToInventory?: boolean;
+  removesTargetFromScene?: boolean;
+  soundEffect?: string;
+}
+
 export interface Interaction {
   id: string;
   title?: string; // Optional custom display title for interaction
@@ -35,6 +50,9 @@ export interface Interaction {
   transitionSpeed?: number;
   showObjectImage?: boolean;
   icon?: string; // Icon name from Lucide
+  // --- Dice Rolling ---
+  enableDiceTest?: boolean;
+  diceOutcomeRanges?: DiceOutcomeRange[];
 }
 
 export interface Choice {
@@ -85,6 +103,16 @@ export interface Scene {
   vignetteShowDescription?: boolean;
   creditsText?: string;
   creditsScrollEnabled?: boolean;
+  allowDiceRollInScene?: boolean;
+  diceRollConfig?: DiceRollConfig;
+}
+
+export interface DiceRollConfig {
+  cutoffValue: number;
+  successVerb: string;
+  successLabel?: string;
+  failureVerb: string;
+  failureLabel?: string;
 }
 
 export interface FixedVerb {
@@ -200,6 +228,9 @@ export interface GameData {
   enableFixedVerbs?: boolean;
   enableChances?: boolean; // Legacy/Basic system
   enableRetrospective?: boolean;
+  enableDiceRoll?: boolean;
+  diceType?: DiceType;
+  diceRollTextPrefix?: string;
 
   // Inventory Config
   inventoryCapacity?: number;

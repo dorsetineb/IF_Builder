@@ -7,9 +7,9 @@ import {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Star, Square, Circle, X, Activity, Settings, Upload, Trash2,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Check, BookOpen, TextCursorInput, CopyCheck, FileText
+    Check, BookOpen, TextCursorInput, CopyCheck, FileText, Dices
 } from 'lucide-react';
-import { GameData } from '../../types';
+import { GameData, DiceType } from '../../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UIPreviewPanel } from './UIPreviewPanel';
 
@@ -77,6 +77,10 @@ interface SystemsTabProps {
     setLocalEnableTrackers: (val: boolean) => void;
     localEnableRetrospective: boolean;
     setLocalEnableRetrospective: (val: boolean) => void;
+    localEnableDiceRoll?: boolean;
+    setLocalEnableDiceRoll?: (val: boolean) => void;
+    localDiceType?: DiceType;
+    setLocalDiceType?: (val: DiceType) => void;
     localEnableSystemMenu: boolean;
     setLocalEnableSystemMenu: (val: boolean) => void;
     localStartScreenBgImage: string;
@@ -177,6 +181,10 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     setLocalEnableTrackers,
     localEnableRetrospective,
     setLocalEnableRetrospective,
+    localEnableDiceRoll = false,
+    setLocalEnableDiceRoll,
+    localDiceType = 'd20',
+    setLocalDiceType,
     localEnableSystemMenu,
     setLocalEnableSystemMenu,
     localStartScreenBgImage,
@@ -758,6 +766,49 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                         placeholder="#FF0000"
                                                     />
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ROLAGEM DE DADOS */}
+                        <div className="w-full">
+                            <div className={`w-full p-6 bg-card border ${localEnableDiceRoll ? 'border-muted-foreground/50 opacity-100' : 'border-muted-foreground/50 opacity-50 grayscale-[0.5]'} rounded-xl shadow-sm transition-all hover:shadow-md group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '600ms' }}>
+                                <div className="flex items-center gap-4 w-full">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" checked={localEnableDiceRoll} onChange={(e) => setLocalEnableDiceRoll?.(e.target.checked)} className="sr-only peer" />
+                                        <div className="w-[64px] h-[36px] bg-muted border-2 border-muted-foreground/50 rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                            <div 
+                                                className={`absolute top-[2px] transition-all duration-300 flex items-center justify-center ${localEnableDiceRoll ? 'text-primary-foreground left-[30px]' : 'text-muted-foreground left-1'}`}
+                                                style={{ width: '28px', height: '28px' }}
+                                            >
+                                                <Dices className="w-5 h-5" />
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <div>
+                                        <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableDiceRoll ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diceRollTitle', 'Rolagem de Dados')}</h4>
+                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diceRollDesc', 'Habilita testes de sorte/habilidade utilizando dados em interações.')}</p>
+                                    </div>
+                                </div>
+                                {localEnableDiceRoll && (
+                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="flex items-center gap-4 w-full">
+                                            <div className="space-y-1.5 flex-1 max-w-xs">
+                                                <label htmlFor="diceType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                    {t('UIEditor.sistemas.diceType', 'Tipo de Dado')}
+                                                </label>
+                                                <select
+                                                    id="diceType"
+                                                    value={localDiceType}
+                                                    onChange={(e) => setLocalDiceType?.(e.target.value as DiceType)}
+                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground font-bold focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    <option value="d6">D6 (Dado de 6 Lados)</option>
+                                                    <option value="d20">D20 (Dado de 20 Lados)</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>

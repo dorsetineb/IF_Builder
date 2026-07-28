@@ -253,8 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
     vignetteDiaryButton.id = 'vignette-diary-button';
     vignetteDiaryButton.className = 'ending-restart-button hidden';
     vignetteDiaryButton.style.cssText = btnStyle + ' margin-top: 10px;';
-    vignetteDiaryButton.textContent = gameData.gameTranslations.view_diary_btn;
-    vignetteContinueButton.parentElement.appendChild(vignetteDiaryButton);
+    vignetteDiaryButton.textContent = (gameData.gameTranslations && gameData.gameTranslations.view_diary_btn) || 'Ver Diário';
+    if (vignetteContinueButton && vignetteContinueButton.parentElement) {
+        vignetteContinueButton.parentElement.appendChild(vignetteDiaryButton);
+    }
     vignetteDiaryButton.addEventListener('click', () => showDiary(true));
 
     // Also add to standard ending screens
@@ -1407,6 +1409,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const startGame = () => {
         removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
+        if ((!currentSceneId || !gameData.cenas[currentSceneId]) && gameData.cenas && Object.keys(gameData.cenas).length > 0) {
+            currentSceneId = Object.keys(gameData.cenas)[0];
+        }
         inventory = []; 
         visitedScenes = []; 
         actionLog = []; 
@@ -1441,18 +1446,18 @@ document.addEventListener('DOMContentLoaded', () => {
              console.error("Start scene not found:", currentSceneId);
         }
 
-        standardActionBar.classList.remove('hidden');
-        endingActionBar.classList.add('hidden');
+        if (standardActionBar) standardActionBar.classList.remove('hidden');
+        if (endingActionBar) endingActionBar.classList.add('hidden');
         
         const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
         
-        if (!isVignette) {
+        if (gameContainer && !isVignette) {
             gameContainer.classList.remove('hidden');
             if (window.isSceneTest) {
                 const hasImage = startScene && startScene.image && gameData.enableImages !== false;
                 
                 const showGame = () => {
-                     gameContainer.classList.add('ready');
+                     if (gameContainer) gameContainer.classList.add('ready');
                 };
 
                 if (hasImage) {
@@ -1542,7 +1547,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const savesBtn = document.getElementById('start-saves-btn');
         const gearBtn = document.getElementById('gear-system-button');
 
-        if (!startScreen) return;
+        if (!startScreen) {
+            startGame();
+            return;
+        }
 
         if (!skipTransition) {
             const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
@@ -2298,6 +2306,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
+        if (!sceneId || !gameData.cenas || !gameData.cenas[sceneId]) {
+            const keys = Object.keys((gameData && gameData.cenas) || {});
+            if (keys.length > 0) sceneId = keys[0];
+            else return;
+        }
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
@@ -2821,6 +2834,37 @@ document.addEventListener('DOMContentLoaded', () => {
             choicesContainer.style.gap = '10px';
             choicesContainer.style.marginTop = '10px';
             
+            // Remove any parser dice button if leftover
+            const parserDiceBtn = document.getElementById('parser-dice-roll-button');
+            if (parserDiceBtn) parserDiceBtn.remove();
+
+            const isDiceAllowed = gameData.enableDiceRoll && scene.allowDiceRollInScene !== false;
+            if (isDiceAllowed) {
+                const diceBtn = document.createElement('button');
+                diceBtn.textContent = '🎲 Rolar ' + (gameData.diceType || 'd20').toUpperCase();
+                diceBtn.className = 'choice-button dice-roll-btn';
+                diceBtn.style.padding = '12px 16px';
+                diceBtn.style.textAlign = 'center';
+                diceBtn.style.backgroundColor = 'var(--primary, #58a6ff)';
+                diceBtn.style.color = '#ffffff';
+                diceBtn.style.border = '2px solid var(--primary, #58a6ff)';
+                diceBtn.style.borderRadius = '0px';
+                diceBtn.style.fontFamily = 'var(--font-family)';
+                diceBtn.style.fontSize = '1em';
+                diceBtn.style.fontWeight = 'bold';
+                diceBtn.style.cursor = 'pointer';
+                diceBtn.style.transition = 'all 0.2s';
+                diceBtn.style.width = '100%';
+                diceBtn.style.textTransform = 'uppercase';
+
+                diceBtn.onclick = () => {
+                    diceBtn.disabled = true;
+                    diceBtn.style.opacity = '0.5';
+                    triggerDiceRoll(scene);
+                };
+                choicesContainer.appendChild(diceBtn);
+            }
+
             if (scene.choices && scene.choices.length > 0) {
                 scene.choices.forEach(choice => {
                     const btn = document.createElement('button');
@@ -2871,9 +2915,33 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const inputArea = document.querySelector('.input-area');
             if (inputArea) inputArea.classList.remove('hidden');
+            if (suggestionsButton) suggestionsButton.classList.remove('hidden');
+            if (inventoryButton) inventoryButton.classList.remove('hidden');
+
             // Remove any leftover choices container
             const oldChoices = document.getElementById('choices-container');
             if (oldChoices) oldChoices.remove();
+
+            // PARSER MODE DICE ROLL BUTTON INJECTION (To the RIGHT of Action button)
+            let parserDiceBtn = document.getElementById('parser-dice-roll-button');
+            const isDiceAllowed = gameData.enableDiceRoll && scene.allowDiceRollInScene !== false;
+            if (isDiceAllowed) {
+                if (!parserDiceBtn && inputArea) {
+                    parserDiceBtn = document.createElement('button');
+                    parserDiceBtn.id = 'parser-dice-roll-button';
+                    parserDiceBtn.className = 'dice-roll-btn-parser';
+                    inputArea.appendChild(parserDiceBtn);
+                }
+                if (parserDiceBtn) {
+                    parserDiceBtn.textContent = '🎲 Rolar ' + (gameData.diceType || 'd20').toUpperCase();
+                    parserDiceBtn.classList.remove('hidden');
+                    parserDiceBtn.onclick = () => {
+                        triggerDiceRoll(scene);
+                    };
+                }
+            } else if (parserDiceBtn) {
+                parserDiceBtn.classList.add('hidden');
+            }
         }
 
         actionPopup.classList.add('hidden'); verbInput.textContent = ''; activePopupType = null;
@@ -2930,7 +2998,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const scene = gameData.cenas[currentSceneId]; 
         const sceneObjects = getObjectsForScene(currentSceneId); 
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
-        let foundInteraction = scene.interactions.find(i => {
+        if (gameData.enableDiceRoll) {
+            const diceTriggerWords = ['rolar', 'dado', 'rolar dado', 'rolardado', 'd6', 'd20'];
+            if (diceTriggerWords.some(w => hasWord(w, inputLower))) {
+                triggerDiceRoll(scene);
+                return;
+            }
+        }
+
+        const sceneInteractions = (scene && scene.interactions) ? scene.interactions : [];
+
+        let foundInteraction = sceneInteractions.find(i => {
             if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
             if (i.requiresInInventory) {
                 const reqObj = inventory.find(o => o.id === i.requiresInInventory);
@@ -2948,7 +3026,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return !anyObjectMentioned;
         });
         if (!foundInteraction) {
-            foundInteraction = scene.interactions.find(i => {
+            foundInteraction = sceneInteractions.find(i => {
                 if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
                 if (i.requiresInInventory) {
                     const reqObj = inventory.find(o => o.id === i.requiresInInventory);
@@ -2971,7 +3049,125 @@ document.addEventListener('DOMContentLoaded', () => {
              if (obj) { printOutput(obj.examineDescription); return; }
              printOutput(scene.description); return;
         }
-        printOutput(scene.negativeFeedback || gameData.mensagem_falha_padrao || "Não aconteceu nada.");
+        printOutput((scene && scene.negativeFeedback) || gameData.mensagem_falha_padrao || "Não aconteceu nada.");
+    };
+
+    const matchDiceVerb = (verbStr, rollResult) => {
+        if (!verbStr) return false;
+        const v = verbStr.trim().toLowerCase();
+        if (!v.startsWith('dice:')) return false;
+        const valStr = v.substring(5).trim();
+        if (valStr.includes('-')) {
+            const parts = valStr.split('-');
+            const min = parseInt(parts[0], 10);
+            const max = parseInt(parts[1], 10);
+            if (!isNaN(min) && !isNaN(max)) {
+                return rollResult >= min && rollResult <= max;
+            }
+        }
+        if (valStr.includes('..')) {
+            const parts = valStr.split('..');
+            const min = parseInt(parts[0], 10);
+            const max = parseInt(parts[1], 10);
+            if (!isNaN(min) && !isNaN(max)) {
+                return rollResult >= min && rollResult <= max;
+            }
+        }
+        const exact = parseInt(valStr, 10);
+        if (!isNaN(exact)) {
+            return rollResult === exact;
+        }
+        return false;
+    };
+
+    const playDiceRollOverlayAnimation = (diceType, finalResult, callback) => {
+        const textPanel = document.querySelector('.text-panel') || document.body;
+        let overlay = document.getElementById('dice-roll-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'dice-roll-overlay';
+            overlay.className = 'dice-roll-overlay';
+            overlay.innerHTML = '<div class="dice-roll-box">' +
+                '<div class="dice-roll-icon">🎲</div>' +
+                '<div class="dice-roll-number" id="dice-roll-number">?</div>' +
+                '<div class="dice-roll-label" id="dice-roll-label">' + diceType.toUpperCase() + '</div>' +
+            '</div>';
+            textPanel.appendChild(overlay);
+        } else {
+            overlay.classList.remove('hidden');
+        }
+
+        const numberEl = overlay.querySelector('#dice-roll-number');
+        const labelEl = overlay.querySelector('#dice-roll-label');
+        if (labelEl) labelEl.textContent = diceType.toUpperCase();
+        if (numberEl) {
+            numberEl.classList.remove('roll-final');
+            numberEl.textContent = '?';
+        }
+
+        const maxVal = diceType === 'd6' ? 6 : 20;
+        let iterations = 0;
+        const maxIterations = 12;
+        const interval = setInterval(() => {
+            iterations++;
+            const randomVal = Math.floor(Math.random() * maxVal) + 1;
+            if (numberEl) numberEl.textContent = randomVal;
+
+            if (iterations >= maxIterations) {
+                clearInterval(interval);
+                if (numberEl) {
+                    numberEl.textContent = finalResult;
+                    numberEl.classList.add('roll-final');
+                }
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    if (callback) callback();
+                }, 600);
+            }
+        }, 60);
+    };
+
+    const triggerDiceRoll = (scene) => {
+        const diceType = gameData.diceType || 'd20';
+        const maxVal = diceType === 'd6' ? 6 : 20;
+        const rollResult = Math.floor(Math.random() * maxVal) + 1;
+        const prefix = gameData.diceRollTextPrefix || 'Você tirou';
+
+        playDiceRollOverlayAnimation(diceType, rollResult, () => {
+            const resultMsg = prefix + ' ' + rollResult;
+            printOutput(resultMsg);
+
+            const targetInteractions = (scene && scene.interactions) ? scene.interactions : [];
+
+            let targetVerb = null;
+            if (scene && scene.allowDiceRollInScene && scene.diceRollConfig) {
+                const config = scene.diceRollConfig;
+                const cutoff = config.cutoffValue || (diceType === 'd6' ? 4 : 10);
+                if (rollResult >= cutoff) {
+                    targetVerb = config.successVerb;
+                } else {
+                    targetVerb = config.failureVerb;
+                }
+            }
+
+            let matched = null;
+            if (targetVerb) {
+                const normalizedTarget = targetVerb.trim().toLowerCase();
+                matched = targetInteractions.find(i => {
+                    return (i.verbs || []).some(v => v.trim().toLowerCase() === normalizedTarget);
+                });
+            }
+
+            if (!matched) {
+                matched = targetInteractions.find(i => {
+                    return (i.verbs || []).some(v => matchDiceVerb(v, rollResult));
+                });
+            }
+
+            if (matched) {
+                executeInteraction(matched);
+            }
+        });
     };
 
     const executeInteraction = (interaction) => {
@@ -3166,7 +3362,21 @@ document.addEventListener('DOMContentLoaded', () => {
         else acquisitionModalImageContainer.classList.add('hidden');
         acquisitionModal.classList.remove('hidden');
     };
+
+    const toggleSystemMenu = () => {
+        if (!systemModal) return;
+        if (!systemModal.classList.contains('hidden')) {
+            systemModal.classList.add('hidden');
+        } else {
+            if (systemMenuMain) systemMenuMain.classList.remove('hidden');
+            if (systemSlotsContainer) systemSlotsContainer.classList.add('hidden');
+            if (systemModalTitle) systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
+            systemModal.classList.remove('hidden');
+        }
+    };
+
     const showDiary = (isConclusion = false) => {
+        if (!diaryModal || !diaryLog) return;
         diaryLog.innerHTML = ''; let currentInterContainer = null;
         
         const diaryTitle = document.getElementById('diary-modal-title');
@@ -3242,6 +3452,15 @@ document.addEventListener('DOMContentLoaded', () => {
             diaryLog.scrollTop = isConclusion ? 0 : diaryLog.scrollHeight; 
         }, 10);
     };
-    init();
+    try {
+        if (gameData.enableSystemMenu && !window.isSceneTest && document.getElementById('start-screen')) {
+            showStartScreen(true);
+        } else {
+            startGame();
+        }
+    } catch (e) {
+        console.error("Initialization error:", e);
+        try { startGame(); } catch (err) {}
+    }
 });
 `;

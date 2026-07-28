@@ -35,6 +35,7 @@ import {
 } from '../types';
 import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
+import { ErrorBoundary } from './ErrorBoundary';
 import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
 import SceneList from './SceneList';
@@ -1667,47 +1668,51 @@ const Editor: React.FC = () => {
                       </div>
                     ) : selectedScene ? (
                       <Suspense fallback={<LoadingOverlay message="Carregando Editor..." />}>
-                        <SceneEditor
-                          key={`side-editor-${selectedScene.id}`}
-                          scene={selectedScene}
-                          allScenes={scenesList}
-                          globalObjects={gameData.globalObjects}
-                          onUpdateScene={handleUpdateScene}
-                          onCopyScene={handleCopyScene}
-                          onCreateGlobalObject={handleCreateGlobalObject}
-                          onLinkObjectToScene={handleLinkObjectToScene}
-                          onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-                          onUpdateGlobalObject={handleUpdateGlobalObject}
-                          enableChances={
-                            (gameData.enableChances ?? detectedActiveSystems.chances) ||
-                            gameData.gameSystemEnabled === 'chances'
-                          }
-                          gameSystemEnabled={gameData.gameSystemEnabled}
-                          onPreviewScene={(scene) => {
-                            setPreviewSceneId(scene.id);
-                            setIsPreviewing(true);
-                          }}
-                          onSelectScene={handleSelectScene}
-                          isDirty={hasUnsavedTabChanges}
-                          onSetDirty={setHasUnsavedTabChanges}
-                          layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                          consequenceTrackers={consequenceTrackers}
-                          isStartScene={selectedScene.id === gameData.startScene}
-                          gameInteractionType={gameData.gameInteractionType || 'parser'}
-                          vignettes={gameData.vignettes || []}
-                          onViewMap={() => {}} // Redundant in three_panels
-                          globalSplashButtonText={gameData.gameSplashButtonText || ''}
-                          onUpdateGlobalSplashButtonText={(text) =>
-                            handleUpdateGameData('gameSplashButtonText', text)
-                          }
-                          isSidePanel={true}
-                          onClose={() => setSelectedSceneId(null)}
-                          onTabChange={setSidePanelTab}
-                          isNarrativeMenuOpen={isNarrativeMenuOpen}
-                          onToggleNarrative={() => {
-                            setIsNarrativeMenuOpen(true);
-                          }}
-                        />
+                        <ErrorBoundary fallbackTitle="Erro ao carregar o Editor de Ramificação">
+                          <SceneEditor
+                            key={`side-editor-${selectedScene.id}`}
+                            scene={selectedScene}
+                            allScenes={scenesList}
+                            globalObjects={gameData.globalObjects}
+                            onUpdateScene={handleUpdateScene}
+                            onCopyScene={handleCopyScene}
+                            onCreateGlobalObject={handleCreateGlobalObject}
+                            onLinkObjectToScene={handleLinkObjectToScene}
+                            onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                            onUpdateGlobalObject={handleUpdateGlobalObject}
+                            enableChances={
+                              (gameData.enableChances ?? detectedActiveSystems.chances) ||
+                              gameData.gameSystemEnabled === 'chances'
+                            }
+                            gameSystemEnabled={gameData.gameSystemEnabled}
+                            onPreviewScene={(scene) => {
+                              setPreviewSceneId(scene.id);
+                              setIsPreviewing(true);
+                            }}
+                            onSelectScene={handleSelectScene}
+                            isDirty={hasUnsavedTabChanges}
+                            onSetDirty={setHasUnsavedTabChanges}
+                            layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                            consequenceTrackers={consequenceTrackers}
+                            isStartScene={selectedScene.id === gameData.startScene}
+                            gameInteractionType={gameData.gameInteractionType || 'parser'}
+                            vignettes={gameData.vignettes || []}
+                            enableDiceRoll={gameData.enableDiceRoll ?? false}
+                            diceType={gameData.diceType || 'd20'}
+                            onViewMap={() => {}} // Redundant in three_panels
+                            globalSplashButtonText={gameData.gameSplashButtonText || ''}
+                            onUpdateGlobalSplashButtonText={(text) =>
+                              handleUpdateGameData('gameSplashButtonText', text)
+                            }
+                            isSidePanel={true}
+                            onClose={() => setSelectedSceneId(null)}
+                            onTabChange={setSidePanelTab}
+                            isNarrativeMenuOpen={isNarrativeMenuOpen}
+                            onToggleNarrative={() => {
+                              setIsNarrativeMenuOpen(true);
+                            }}
+                          />
+                        </ErrorBoundary>
                       </Suspense>
                     ) : null}
                   </div>

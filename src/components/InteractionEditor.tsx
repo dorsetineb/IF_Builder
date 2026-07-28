@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from './ConfirmationModal';
-import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
+import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette, DiceType, DiceOutcomeRange, DiceRollConfig } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Plus, Trash2, Upload, Search, MousePointer2, Box, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Sword, Key, Map as MapIcon, Eye, FlaskConical, X } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, MousePointer2, Box, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Sword, Key, Map as MapIcon, Eye, FlaskConical, X, Dices } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
@@ -46,6 +46,9 @@ interface InteractionEditorProps {
     consequenceTrackers: ConsequenceTracker[];
     vignettes: Vignette[];
     isSidePanel?: boolean;
+    enableDiceRoll?: boolean;
+    diceType?: DiceType;
+    diceRollConfig?: DiceRollConfig;
 }
 
 const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
@@ -55,22 +58,67 @@ const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
 };
 
 const InteractionEditor: React.FC<InteractionEditorProps> = ({
-    interactions,
+    interactions = [],
     onUpdateInteractions,
     allScenes,
     currentSceneId,
-    sceneObjects,
-    allTakableObjects,
-    consequenceTrackers,
+    sceneObjects = [],
+    allTakableObjects = [],
+    consequenceTrackers = [],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     vignettes,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isSidePanel
+    isSidePanel,
+    enableDiceRoll = false,
+    diceType = 'd20',
+    diceRollConfig,
 }) => {
-    const [selectedIndex, setSelectedIndex] = useState<number | null>(interactions.length > 0 ? 0 : null);
+    const [selectedIndex, setSelectedIndex] = useState<number | null>((interactions && interactions.length > 0) ? 0 : null);
     const [searchTerm, setSearchTerm] = useState('');
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; index: number | null }>({ isOpen: false, index: null });
     const { t } = useTranslation();
+
+    const safeDiceType = (diceType || 'd20').toLowerCase() as DiceType;
+    const diceMaxVal = safeDiceType === 'd6' ? 6 : 20;
+
+    const validateOutcomeRanges = (ranges: DiceOutcomeRange[] = []) => {
+        if (!ranges || !Array.isArray(ranges) || ranges.length === 0) {
+            return { isValid: false, message: `Nenhuma faixa cadastrada. O intervalo de 1 a ${diceMaxVal} precisa ser coberto.` };
+        }
+        const counts = new Array(diceMaxVal + 1).fill(0);
+        let hasInvalidRange = false;
+        for (const r of ranges) {
+            if (!r || r.min === undefined || r.max === undefined || r.min === null || r.max === null) {
+                hasInvalidRange = true;
+                continue;
+            }
+            const min = Number(r.min);
+            const max = Number(r.max);
+            if (isNaN(min) || isNaN(max) || min < 1 || max > diceMaxVal || min > max) {
+                hasInvalidRange = true;
+                continue;
+            }
+            for (let i = min; i <= max; i++) {
+                counts[i]++;
+            }
+        }
+        if (hasInvalidRange) {
+            return { isValid: false, message: `Existem faixas com valores fora do limite (1 a ${diceMaxVal}).` };
+        }
+        const missing: number[] = [];
+        const overlaps: number[] = [];
+        for (let i = 1; i <= diceMaxVal; i++) {
+            if (counts[i] === 0) missing.push(i);
+            if (counts[i] > 1) overlaps.push(i);
+        }
+        if (missing.length === 0 && overlaps.length === 0) {
+            return { isValid: true, message: `Excelente! Todo o intervalo de 1 a ${diceMaxVal} está coberto sem lacunas.` };
+        }
+        const parts: string[] = [];
+        if (missing.length > 0) parts.push(`Números ausentes: ${missing.join(', ')}`);
+        if (overlaps.length > 0) parts.push(`Números repetidos/sobrepostos: ${Array.from(new Set(overlaps)).join(', ')}`);
+        return { isValid: false, message: parts.join(' | ') };
+    };
 
     const handleAdd = () => {
         const newInteraction: Interaction = {
@@ -108,13 +156,13 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
     // Filter logic
     const filteredInteractions = useMemo(() => {
-        return interactions.map((inter, index) => ({ inter, index })).filter(({ inter }) => {
-            const searchLower = searchTerm.toLowerCase();
-            return (
-                (inter.title && inter.title.toLowerCase().includes(searchLower)) ||
-                inter.verbs.join(' ').toLowerCase().includes(searchLower) ||
-                (inter.target && sceneObjects.find(o => o.id === inter.target)?.name.toLowerCase().includes(searchLower))
-            );
+        return (interactions || []).map((inter, index) => ({ inter, index })).filter(({ inter }) => {
+            if (!inter) return false;
+            const searchLower = (searchTerm || '').toLowerCase();
+            const titleMatch = inter.title && inter.title.toLowerCase().includes(searchLower);
+            const verbsMatch = (inter.verbs || []).join(' ').toLowerCase().includes(searchLower);
+            const targetMatch = inter.target && sceneObjects.find(o => o?.id === inter.target)?.name?.toLowerCase().includes(searchLower);
+            return titleMatch || verbsMatch || targetMatch;
         });
     }, [interactions, searchTerm, sceneObjects]);
 
@@ -171,6 +219,36 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             handleInteractionChange('trackerEffects', (selectedInteraction.trackerEffects || []).filter((_, i) => i !== effectIndex));
         };
 
+        const handleAddDiceRange = () => {
+            if (selectedIndex === null || !selectedInteraction) return;
+            const currentRanges = selectedInteraction.diceOutcomeRanges || [];
+            const maxOccupied = currentRanges.reduce((acc, r) => Math.max(acc, r.max), 0);
+            const nextMin = Math.min(diceMaxVal, maxOccupied + 1);
+            const newRange: DiceOutcomeRange = {
+                id: `range_${Math.random().toString(36).substring(2, 7)}`,
+                min: nextMin,
+                max: diceMaxVal,
+                label: `Faixa ${currentRanges.length + 1}`,
+                successMessage: ''
+            };
+            handleInteractionChange('diceOutcomeRanges', [...currentRanges, newRange]);
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleUpdateDiceRange = (rangeIndex: number, field: keyof DiceOutcomeRange, value: any) => {
+            if (selectedIndex === null || !selectedInteraction) return;
+            const currentRanges = [...(selectedInteraction.diceOutcomeRanges || [])];
+            if (!currentRanges[rangeIndex]) return;
+            currentRanges[rangeIndex] = { ...currentRanges[rangeIndex], [field]: value };
+            handleInteractionChange('diceOutcomeRanges', currentRanges);
+        };
+
+        const handleRemoveDiceRange = (rangeIndex: number) => {
+            if (selectedIndex === null || !selectedInteraction) return;
+            const currentRanges = (selectedInteraction.diceOutcomeRanges || []).filter((_, i) => i !== rangeIndex);
+            handleInteractionChange('diceOutcomeRanges', currentRanges);
+        };
+
 
         return (
             <div className="flex flex-col h-full" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
@@ -183,25 +261,42 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <div className="space-y-1.5">
                             <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.verbsLabel', 'Verbos (separados por vírgula)')}</label>
                             <div className="min-h-[42px] w-full bg-input border border-input rounded-lg p-1.5 flex flex-wrap items-center gap-1.5 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
-                                {selectedInteraction.verbs.map((verb, idx) => (
-                                    <span
-                                        key={idx}
-                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/20 text-primary border border-primary/30 text-xs font-semibold select-none group/tag animate-in fade-in zoom-in-95 duration-100"
-                                    >
-                                        <span>{verb}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const newVerbs = selectedInteraction.verbs.filter((_, i) => i !== idx);
-                                                handleInteractionChange('verbs', newVerbs);
-                                            }}
-                                            className="text-primary/70 hover:text-red-400 p-0.5 rounded transition-colors"
-                                            title={t('common.delete', 'Remover')}
+                                {(selectedInteraction.verbs || []).map((verb, idx) => {
+                                    const sVerb = enableDiceRoll && diceRollConfig?.successVerb ? diceRollConfig.successVerb.trim().toLowerCase() : '';
+                                    const fVerb = enableDiceRoll && diceRollConfig?.failureVerb ? diceRollConfig.failureVerb.trim().toLowerCase() : '';
+                                    const normVerb = (verb || '').trim().toLowerCase();
+
+                                    const isSuccess = !!sVerb && normVerb === sVerb;
+                                    const isFailure = !!fVerb && normVerb === fVerb;
+
+                                    let tagStyle = "bg-primary/20 text-primary border-primary/30 font-semibold";
+                                    if (isSuccess) {
+                                        tagStyle = "bg-green-500/20 text-green-400 border-green-500/30 font-mono font-bold";
+                                    } else if (isFailure) {
+                                        tagStyle = "bg-red-500/20 text-red-400 border-red-500/30 font-mono font-bold";
+                                    }
+
+                                    return (
+                                        <span
+                                            key={idx}
+                                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md border text-xs select-none group/tag animate-in fade-in zoom-in-95 duration-100 ${tagStyle}`}
                                         >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </span>
-                                ))}
+                                            {(isSuccess || isFailure) && <Dices className="w-3.5 h-3.5 shrink-0" />}
+                                            <span>{verb}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newVerbs = (selectedInteraction.verbs || []).filter((_, i) => i !== idx);
+                                                    handleInteractionChange('verbs', newVerbs);
+                                                }}
+                                                className="text-muted-foreground hover:text-red-400 p-0.5 rounded transition-colors"
+                                                title={t('common.delete', 'Remover')}
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </span>
+                                    );
+                                })}
                                 <input
                                     type="text"
                                     value={verbsInput}
@@ -211,7 +306,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                             const parts = val.split(',');
                                             const added = parts.map(p => p.trim()).filter(Boolean);
                                             if (added.length > 0) {
-                                                const updatedVerbs = Array.from(new Set([...selectedInteraction.verbs, ...added]));
+                                                const updatedVerbs = Array.from(new Set([...(selectedInteraction.verbs || []), ...added]));
                                                 handleInteractionChange('verbs', updatedVerbs);
                                             }
                                             setVerbsInput(parts[parts.length - 1].trim());
@@ -224,12 +319,12 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                             e.preventDefault();
                                             const added = verbsInput.split(',').map(p => p.trim()).filter(Boolean);
                                             if (added.length > 0) {
-                                                const updatedVerbs = Array.from(new Set([...selectedInteraction.verbs, ...added]));
+                                                const updatedVerbs = Array.from(new Set([...(selectedInteraction.verbs || []), ...added]));
                                                 handleInteractionChange('verbs', updatedVerbs);
                                                 setVerbsInput('');
                                             }
-                                        } else if (e.key === 'Backspace' && verbsInput === '' && selectedInteraction.verbs.length > 0) {
-                                            const newVerbs = selectedInteraction.verbs.slice(0, -1);
+                                        } else if (e.key === 'Backspace' && verbsInput === '' && (selectedInteraction.verbs || []).length > 0) {
+                                            const newVerbs = (selectedInteraction.verbs || []).slice(0, -1);
                                             handleInteractionChange('verbs', newVerbs);
                                         }
                                     }}
@@ -237,17 +332,73 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                         if (verbsInput.trim()) {
                                             const added = verbsInput.split(',').map(p => p.trim()).filter(Boolean);
                                             if (added.length > 0) {
-                                                const updatedVerbs = Array.from(new Set([...selectedInteraction.verbs, ...added]));
+                                                const updatedVerbs = Array.from(new Set([...(selectedInteraction.verbs || []), ...added]));
                                                 handleInteractionChange('verbs', updatedVerbs);
                                             }
                                             setVerbsInput('');
                                         }
                                     }}
                                     className="flex-1 min-w-[120px] bg-transparent border-none p-1 text-xs text-foreground focus:outline-none focus:ring-0 placeholder:text-muted-foreground"
-                                    placeholder={selectedInteraction.verbs.length === 0 ? t('interactionEditor.verbsPlaceholder', 'Digite um verbo e pressione Enter ou vírgula...') : ''}
+                                    placeholder={(selectedInteraction.verbs || []).length === 0 ? t('interactionEditor.verbsPlaceholder', 'Digite um verbo e pressione Enter ou vírgula...') : ''}
                                 />
                             </div>
                             <p className="text-[10px] text-zinc-600">{t('interactionEditor.verbsDesc', 'O jogador deve digitar um destes para iniciar a ação.')}</p>
+
+                            {/* Dice Verbs Quick Chips */}
+                            {enableDiceRoll && diceRollConfig && (() => {
+                                const usedVerbsSet = new Set<string>();
+                                (interactions || []).forEach(inter => {
+                                    (inter?.verbs || []).forEach(v => {
+                                        if (v) usedVerbsSet.add(v.trim().toLowerCase());
+                                    });
+                                });
+
+                                const sVerb = diceRollConfig.successVerb ? diceRollConfig.successVerb.trim().toLowerCase() : '';
+                                const fVerb = diceRollConfig.failureVerb ? diceRollConfig.failureVerb.trim().toLowerCase() : '';
+
+                                const showSuccessChip = !!sVerb && !usedVerbsSet.has(sVerb);
+                                const showFailureChip = !!fVerb && !usedVerbsSet.has(fVerb);
+
+                                if (!showSuccessChip && !showFailureChip) return null;
+
+                                return (
+                                    <div className="flex items-center gap-2 pt-2 animate-in fade-in duration-200">
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            Verbos dos dados
+                                        </span>
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            {showSuccessChip && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (sVerb && !(selectedInteraction.verbs || []).includes(sVerb)) {
+                                                            handleInteractionChange('verbs', [...(selectedInteraction.verbs || []), sVerb]);
+                                                        }
+                                                    }}
+                                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-mono font-bold hover:bg-green-500/30 transition-all active:scale-95 cursor-pointer"
+                                                    title={`Adicionar verbo de sucesso (${diceRollConfig.successLabel || 'Sucesso'})`}
+                                                >
+                                                    <span>{diceRollConfig.successVerb}</span>
+                                                </button>
+                                            )}
+                                            {showFailureChip && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (fVerb && !(selectedInteraction.verbs || []).includes(fVerb)) {
+                                                            handleInteractionChange('verbs', [...(selectedInteraction.verbs || []), fVerb]);
+                                                        }
+                                                    }}
+                                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-mono font-bold hover:bg-red-500/30 transition-all active:scale-95 cursor-pointer"
+                                                    title={`Adicionar verbo de falha (${diceRollConfig.failureLabel || 'Falha'})`}
+                                                >
+                                                    <span>{diceRollConfig.failureVerb}</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Row 2: Icon & Title */}
@@ -305,12 +456,12 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 <div className="flex-1 space-y-1.5">
                                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Alvo da ação (opcional)')}</label>
                                     <select
-                                        value={selectedInteraction.target}
+                                        value={selectedInteraction.target || ''}
                                         onChange={e => handleInteractionChange('target', e.target.value)}
                                         className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
                                     >
                                         <option value="">{t('interactionEditor.noTarget', 'Nenhum (Ação no ambiente)')}</option>
-                                        {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                        {(sceneObjects || []).map(obj => obj && <option key={obj.id} value={obj.id}>{obj.name}</option>)}
                                     </select>
                                 </div>
 
@@ -369,7 +520,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
                                 >
                                     <option value="">{t('interactionEditor.noItemRequired', 'Não requer item')}</option>
-                                    {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                    {(allTakableObjects || []).map(obj => obj && <option key={obj.id} value={obj.id}>{obj.name}</option>)}
                                 </select>
                             </div>
 
@@ -395,7 +546,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.goToSceneLabel', 'Ir para Ramificação')}</label>
                                 <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground h-[42px]">
                                     <option value="">{t('interactionEditor.stayInScene', '(Permanecer na ramificação)')}</option>
-                                    {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
+                                    {(allScenes || []).filter(s => s && s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name || s.id} ({s.id})</option>)}
                                 </select>
                             </div>
                             <div className="w-1/3 space-y-1.5">
@@ -462,9 +613,9 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.trackersLabel', 'Rastreadores')}</label>
                                 <button 
                                     onClick={handleAddTrackerEffect} 
-                                    disabled={consequenceTrackers.length === 0}
+                                    disabled={(consequenceTrackers || []).length === 0}
                                     className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors ${
-                                        consequenceTrackers.length === 0
+                                        (consequenceTrackers || []).length === 0
                                             ? 'bg-zinc-500/10 text-zinc-500 cursor-not-allowed opacity-50'
                                             : 'bg-green-500/10 text-green-500 hover:bg-green-500/20 hover:text-green-400'
                                     }`}
@@ -474,19 +625,19 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             </div>
                             <div className="space-y-2">
                                 {(selectedInteraction.trackerEffects || []).map((effect, i) => {
-                                    const tracker = consequenceTrackers.find(t => t.id === effect.trackerId);
+                                    const tracker = (consequenceTrackers || []).find(t => t && t.id === effect.trackerId);
                                     const TrackerIcon = TRACKER_ICONS.find(icon => icon.name === tracker?.icon)?.component || Activity;
                                     
                                     return (
                                         <div key={i} className="flex items-center gap-2 bg-input p-2 rounded border border-input">
                                             <TrackerIcon className="w-3 h-3 text-muted-foreground" />
                                             <select 
-                                                value={effect.trackerId} 
+                                                value={effect.trackerId || ''} 
                                                 onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} 
                                                 className="flex-1 bg-transparent border-none text-xs text-foreground focus:ring-0 p-0"
                                             >
                                                 <option value="" className="bg-card text-foreground">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
-                                                {consequenceTrackers.map(tOption => (
+                                                {(consequenceTrackers || []).map(tOption => tOption && (
                                                     <option key={tOption.id} value={tOption.id} className="bg-card text-foreground">
                                                         {tOption.name}
                                                     </option>
@@ -507,6 +658,19 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 )}
                             </div>
                         </div>
+
+                        {/* Row 8: Dice Roll Verb Tip */}
+                        {enableDiceRoll && (
+                            <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-3 text-xs text-primary">
+                                <Dices className="w-5 h-5 shrink-0" />
+                                <div>
+                                    <p className="font-bold">🎲 Rolagem de Dados Habilitada ({safeDiceType.toUpperCase()})</p>
+                                    <p className="text-[11px] opacity-80">
+                                        O resultado do dado age como o verbo de disparo desta ação. Adicione verbos como <code className="bg-background/50 px-1 py-0.5 rounded font-mono font-bold">dice:20</code>, <code className="bg-background/50 px-1 py-0.5 rounded font-mono font-bold">dice:6</code> ou faixas como <code className="bg-background/50 px-1 py-0.5 rounded font-mono font-bold">dice:1-5</code> na lista de verbos acima.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -562,7 +726,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary-foreground' : 'text-foreground'}`}>
-                                        {inter.title && inter.title.trim() !== '' ? inter.title : (inter.verbs.length > 0 ? inter.verbs.join(', ') : t('interactionEditor.noVerbs', '(Sem verbos)'))}
+                                        {inter.title && inter.title.trim() !== '' ? inter.title : ((inter.verbs || []).length > 0 ? (inter.verbs || []).join(', ') : t('interactionEditor.noVerbs', '(Sem verbos)'))}
                                     </div>
                                     {inter.target && sceneObjects.find(o => o.id === inter.target)?.name && (
                                         <div className={`text-[10px] truncate ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>

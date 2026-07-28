@@ -2,67 +2,53 @@
 
 ## 📌 Contexto e Objetivos
 
-O sistema de **Rolagem de Dados** no IF Builder é uma funcionalidade adicional para interações em cenas. Ela permite adicionar mecânicas de sorte/azar (RPG) em situações onde o jogador não sabe exatamente como agir, ou deseja arriscar uma ação que pode levar a consequências variadas (falhas críticas, sucessos, desastres ou acertos críticos).
+O sistema de **Rolagem de Dados** no IF Builder é uma funcionalidade global que introduz mecânicas de sorte/azar (RPG). O resultado da rolagem de dados (D6 ou D20) é associado diretamente como um **verbo acionável** (ex: `dice:6`, `dice:20` ou faixas como `dice:1-5`).
+
+Desta forma, as interações do jogo continuam funcionando normalmente segundo a arquitetura padrão do IF Builder, sem necessidade de estruturas de dados complexas ou formulários aninhados adicionais.
 
 ---
 
 ## 🎯 Requisitos da Funcionalidade
 
-1. **Configuração por Interação**:
-   - Cada interação na cena pode ter o recurso de rolagem ativado via toggle (`enableDiceRoll`).
-   - O autor do jogo pode escolher o tipo de dado: **D4, D6, D8, D10, D12, D20 ou D100**.
+1. **Ativação e Configuração na Aba Mecânicas**:
+   - A funcionalidade é ativada globalmente no projeto através da aba **Mecânicas** (`UIEditor` -> Tab Sistemas/Mecânicas).
+   - O autor do jogo pode habilitar o recurso (`enableDiceRoll`) e selecionar o **Tipo de Dado** a ser utilizado em todo o jogo:
+     - **D6** (Dado de 6 lados, intervalo `1-6`)
+     - **D20** (Dado de 20 lados, intervalo `1-20`)
 
-2. **Faixas de Consequência (Outcome Ranges)**:
-   - Suporte a $N$ faixas de valores (ex: `1-3` = Desastre, `4-11` = Falha, `12-19` = Sucesso, `20` = Acerto Crítico).
-   - Validação no editor garantindo cobertura contínua dos valores de 1 até o máximo do dado (sem lacunas).
+2. **Texto Padrão Customizável (Aba Textos)**:
+   - Na aba **Textos** do editor, o autor pode customizar o prefixo da mensagem de resultado da rolagem (ex: `"Você tirou"`, gerando logs como `"Você tirou 6"`).
 
-3. **Consequências Configuráveis por Faixa**:
-   - Cada faixa de resultado suporta o mesmo conjunto de outcomes de uma interação padrão:
-     - Mensagem de atualização da cena (`successMessage`)
-     - Mudança de ramificação/cena (`goToScene`)
-     - Alteração em rastreadores (`trackerEffects`)
-     - Adição/remoção de itens do inventário (`addsToInventory`, `removesTargetFromScene`)
-     - Efeitos sonoros por faixa (`soundEffect`)
+3. **Verbos de Rolagem de Dados em Interações**:
+   - As interações utilizam o editor de interações padrão do IF Builder.
+   - Para vincular uma interação a um resultado de rolagem, basta adicionar verbos do tipo:
+     - `dice:20` (dispara quando o dado sorteia 20)
+     - `dice:6` (dispara quando o dado sorteia 6)
+     - `dice:1-5` ou `dice:1..5` (dispara para qualquer resultado entre 1 e 5)
+   - Todas as propriedades normais da interação funcionam como sempre: mudar de ramificação (`goToScene`), atualizar descrição (`successMessage`), efeitos em rastreadores (`trackerEffects`), inventário (`addsToInventory`, `removesTargetFromScene`), áudio (`soundEffect`), etc.
 
-4. **Experiência Visual no Runtime (Player UX)**:
-   - Modal/overlay com animação visual do dado girando.
-   - Destaque claro do número sorteado e da faixa alcançada.
-   - Suporte duplo:
-     - **Modo Escolha (Choice Mode)**: Exibe ícone/badge de dado no botão da escolha.
-     - **Modo Texto (Parser Mode)**: Abre o modal animado ao interpretar a palavra-chave/verbo do jogador.
+4. **Execução no Runtime (Player UX & Animação)**:
+   - **Disparo da Rolagem**: Ocorre quando o jogador digita um comando de rolagem (ex: `"rolar"`, `"dado"`, `"rolar dado"`), clica em uma opção de rolagem ou aciona o teste.
+   - **Animação em Overlay**: É exibida uma animação de rolagem de dados em overlay por cima da área de texto.
+   - **Log de Resultado**: Após revelar o número sorteado $R$, é impresso um log normal na história no formato `"{prefixo} {R}"` (ex: `"Você tirou 6"`).
+   - **Execução da Interação**: Imediatamente após o log, a engine localiza a interação na ramificação atual correspondente a `dice:{R}` e a executa normalmente.
+
+5. **Funcionamento Standalone e Offline**:
+   - 100% offline, executado no runtime nativo standalone (`gameJS.ts`).
+   - Zero dependências externas.
 
 ---
 
-## 🏗️ Alterações na Arquitetura e Estrutura de Arquivos
+## 🏗️ Alterações na Arquitetura
 
 ### 1. Tipos Globais (`src/types.ts`)
-- Adição dos tipos `DiceType` e `DiceOutcomeRange`.
-- Extensão da interface `Interaction`.
+- Configurações globais `enableDiceRoll`, `diceType` ('d6' | 'd20'), `diceRollTextPrefix`.
 
-### 2. Editor de Interações (`src/components/InteractionEditor.tsx`)
-- Seção expansível "🎲 Rolagem de Dados".
-- Form de inclusão/edição de faixas com validação visual de intervalos contínuos (1 a Max).
+### 2. Editor de Interface (`src/components/UIEditor.tsx`)
+- Configuração do toggle e tipo de dado na aba Mecânicas e do prefixo na aba Textos.
 
-### 3. Prepara Dados para a Engine (`src/components/game-engine.ts`)
-- Inclusão dos campos de dados na sanitização e empacotamento do `embeddedGameData`.
+### 3. Editor de Interações (`src/components/InteractionEditor.tsx`)
+- Mantém o formulário padrão e limpo de interações, apenas com dica informativa para verbos `dice:X`.
 
-### 4. Runtime / Game Engine (`src/components/gameJS.ts`)
-- Criação das funções de renderização do modal de dados (`renderDiceModal`, `rollDice`).
-- Atualização do dispatcher de comandos e escolhas (`processCommand`, `executeInteraction`, `choice click`).
-
-### 5. Estilização (`src/index.css`)
-- Estilos CSS para o modal de dados, animação de giro (keyframes/flip), badge nos botões do modo escolha e feedback de crítico.
-
----
-
-## 🔍 Plano de Verificação e Testes
-
-1. **Testes Unitários/Build**:
-   - `npm run build` para garantir ausência de erros de TypeScript e compilação limpa.
-2. **Verificação no Editor**:
-   - Criar uma nova cena com interação com D20.
-   - Adicionar 3 faixas (`1-5`, `6-14`, `15-20`).
-   - Verificar aviso de validação caso haja lacunas no intervalo.
-3. **Verificação no Runtime do Jogo**:
-   - Testar rolagem no Modo Texto e no Modo Escolha.
-   - Confirmar animação do dado e aplicação correta das consequências de cada faixa.
+### 4. Runtime (`src/components/gameJS.ts`)
+- Função `triggerDiceRoll()`: sorteia o número, toca a animação overlay, registra o log `"Você tirou X"` e executa a interação associada ao verbo `dice:X` ou `dice:min-max`.

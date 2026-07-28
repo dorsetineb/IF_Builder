@@ -6,6 +6,7 @@ import {
   GameObject,
   ConsequenceTracker,
   Choice,
+  DiceType,
 } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
@@ -15,6 +16,7 @@ import { MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
 import { useToast } from './ToastContext';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
+import { ErrorBoundary } from './ErrorBoundary';
 import BranchingPreview from './BranchingPreview';
 import {
   Upload,
@@ -41,6 +43,9 @@ import {
   SlidersHorizontal,
   Package,
   Hand,
+  Dices,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation, Trans } from 'react-i18next';
@@ -76,11 +81,13 @@ interface SceneEditorProps {
   onViewMap?: () => void;
   enableChances: boolean;
   gameSystemEnabled?: 'none' | 'chances' | 'trackers';
+  enableDiceRoll?: boolean;
+  diceType?: DiceType;
   globalSplashButtonText?: string;
   onUpdateGlobalSplashButtonText?: (text: string) => void;
   isSidePanel?: boolean;
   onClose?: () => void;
-  onTabChange?: (tab: 'properties' | 'objects' | 'interactions' | 'choices') => void;
+  onTabChange?: (tab: 'properties' | 'objects' | 'dice' | 'interactions' | 'choices') => void;
   isNarrativeMenuOpen?: boolean;
   onToggleNarrative?: () => void;
 }
@@ -91,6 +98,14 @@ const getCleanSceneState = (s: Scene): Scene => {
     isEndingScene: !!s.isEndingScene,
     removesChanceOnEntry: !!s.removesChanceOnEntry,
     restoresChanceOnEntry: !!s.restoresChanceOnEntry,
+    allowDiceRollInScene: !!s.allowDiceRollInScene,
+    diceRollConfig: s.diceRollConfig || {
+      cutoffValue: 10,
+      successVerb: 'sucesso_dado',
+      successLabel: 'Sucesso',
+      failureVerb: 'falha_dado',
+      failureLabel: 'Falha',
+    },
     objectIds: s.objectIds || [],
     interactions: s.interactions || [],
     choices: s.choices || [],
@@ -130,6 +145,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     onViewMap,
     enableChances,
     gameSystemEnabled,
+    enableDiceRoll = false,
+    diceType = 'd20',
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     globalSplashButtonText,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -150,7 +167,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
       [id: string]: Partial<GameObject>;
     }>({});
     const [activeTab, setActiveTab] = useState<
-      'properties' | 'objects' | 'interactions' | 'choices'
+      'properties' | 'objects' | 'dice' | 'interactions' | 'choices'
     >('properties');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
@@ -430,12 +447,18 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           choices: t('sceneEditor.tabs.choices'),
         };
       }
-      return {
+      const tabsObj: Record<string, string> = {
         properties: t('sceneEditor.tabs.properties'),
         objects: t('sceneEditor.tabs.objects'),
-        interactions: t('sceneEditor.tabs.interactions'),
       };
-    }, [gameInteractionType, t]);
+
+      if (enableDiceRoll && localScene.allowDiceRollInScene) {
+        tabsObj.dice = 'Dados';
+      }
+
+      tabsObj.interactions = t('sceneEditor.tabs.interactions');
+      return tabsObj;
+    }, [gameInteractionType, enableDiceRoll, localScene.allowDiceRollInScene, t]);
 
     const isAnyCheckboxChecked =
       !!localScene.isEndingScene ||
@@ -530,6 +553,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         return <SlidersHorizontal className="w-3.5 h-3.5" />;
                       case 'objects':
                         return <Package className="w-3.5 h-3.5" />;
+                      case 'dice':
+                        return <Dices className="w-3.5 h-3.5" />;
                       case 'interactions':
                         return <Hand className="w-3.5 h-3.5" />;
                       case 'choices':
@@ -741,6 +766,28 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                   'Isso não parece ter nenhum efeito.'
                                 )}
                               />
+                            </div>
+                          )}
+
+                          {enableDiceRoll && !isVignetteMode && (
+                            <div className="pt-4 mt-4 border-t border-border">
+                              <label className="flex items-center gap-3 cursor-pointer select-none group p-3 bg-muted/20 hover:bg-muted/40 border border-border rounded-lg transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={localScene.allowDiceRollInScene || false}
+                                  onChange={(e) => updateLocalScene('allowDiceRollInScene', e.target.checked)}
+                                  className="custom-checkbox shrink-0"
+                                />
+                                <div>
+                                  <span className="block text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                    <Dices className="w-3.5 h-3.5 text-primary" />
+                                    Permitir rolagem de dados nesta ramificação
+                                  </span>
+                                  <span className="block text-[9px] text-muted-foreground mt-0.5">
+                                    Habilita a aba "Dados" para definir nota de corte e verbos de resultado nesta cena.
+                                  </span>
+                                </div>
+                              </label>
                             </div>
                           )}
 
@@ -1343,21 +1390,157 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               </div>
             )}
 
+            {activeTab === 'dice' && (() => {
+              const maxDiceVal = diceType === 'd6' ? 6 : 20;
+              const currentCutoff = localScene.diceRollConfig?.cutoffValue || (diceType === 'd6' ? 4 : 10);
+              const cutoffPercent = ((currentCutoff - 1) / (maxDiceVal - 1)) * 100;
+
+              return (
+                <div key={localScene.id} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  {/* Texto descritivo limpo */}
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Configure os valores e verbos para a rolagem de dados.
+                  </p>
+
+                  {/* Seção 1: Corte dos resultados */}
+                  <div className="space-y-3">
+                    <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+                      <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                      CORTE DOS RESULTADOS
+                    </h3>
+
+                    <div className="pt-2 pb-6">
+                      <div className="relative flex items-center gap-3">
+                        <span className="text-xs font-bold text-foreground font-mono w-4 text-right shrink-0">1</span>
+                        <div className="relative flex-1 flex items-center">
+                          <input
+                            type="range"
+                            min={1}
+                            max={maxDiceVal}
+                            step={1}
+                            value={currentCutoff}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              updateLocalScene('diceRollConfig', {
+                                ...(localScene.diceRollConfig || {
+                                  cutoffValue: 10,
+                                  successVerb: 'sucesso_dado',
+                                  successLabel: 'Sucesso',
+                                  failureVerb: 'falha_dado',
+                                  failureLabel: 'Falha',
+                                }),
+                                cutoffValue: val,
+                              });
+                            }}
+                            style={{
+                              background: `linear-gradient(to right, var(--primary) ${cutoffPercent}%, rgba(255,255,255,0.1) ${cutoffPercent}%)`
+                            }}
+                            className="w-full h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md transition-all"
+                          />
+                          {/* Número do valor de corte posicionado logo abaixo do círculo do slider */}
+                          <div
+                            style={{
+                              left: `calc(${cutoffPercent}% + ${8 - cutoffPercent * 0.16}px)`,
+                              fontWeight: 900,
+                              fontSize: '1.25rem'
+                            }}
+                            className="absolute top-full -translate-x-1/2 pt-1 text-primary pointer-events-none tracking-tight"
+                          >
+                            {currentCutoff}
+                          </div>
+                        </div>
+                        <span className="text-xs font-bold text-foreground font-mono w-6 shrink-0">{maxDiceVal}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Seção 2: Resultado de Sucesso (Empilhado) */}
+                  <div className="space-y-3 pt-4 border-t border-border/50">
+                    <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      Sucesso (valores maiores que {currentCutoff - 1})
+                    </h3>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        VERBO ASSOCIADO
+                      </label>
+                      <input
+                        type="text"
+                        value={localScene.diceRollConfig?.successVerb || 'sucesso_dado'}
+                        onChange={(e) =>
+                          updateLocalScene('diceRollConfig', {
+                            ...(localScene.diceRollConfig || {
+                              cutoffValue: 10,
+                              successVerb: 'sucesso_dado',
+                              successLabel: 'Sucesso',
+                              failureVerb: 'falha_dado',
+                              failureLabel: 'Falha',
+                            }),
+                            successVerb: e.target.value.trim().toLowerCase(),
+                          })
+                        }
+                        placeholder="Ex: sucesso_dado"
+                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-mono font-bold focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Seção 3: Resultado de Falha (Empilhado) */}
+                  <div className="space-y-3 pt-4 border-t border-border/50">
+                    <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+                      <XCircle className="w-4 h-4 text-red-400" />
+                      Falha (valores menores que {currentCutoff})
+                    </h3>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        VERBO ASSOCIADO
+                      </label>
+                      <input
+                        type="text"
+                        value={localScene.diceRollConfig?.failureVerb || 'falha_dado'}
+                        onChange={(e) =>
+                          updateLocalScene('diceRollConfig', {
+                            ...(localScene.diceRollConfig || {
+                              cutoffValue: 10,
+                              successVerb: 'sucesso_dado',
+                              successLabel: 'Sucesso',
+                              failureVerb: 'falha_dado',
+                              failureLabel: 'Falha',
+                            }),
+                            failureVerb: e.target.value.trim().toLowerCase(),
+                          })
+                        }
+                        placeholder="Ex: falha_dado"
+                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-mono font-bold focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {activeTab === 'interactions' && (
-              <div key={localScene.id} className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <InteractionEditor
-                  interactions={localScene.interactions}
-                  onUpdateInteractions={(interactions) =>
-                    updateLocalScene('interactions', interactions)
-                  }
-                  allScenes={allScenes}
-                  currentSceneId={localScene.id}
-                  sceneObjects={currentSceneObjects}
-                  allTakableObjects={allAvailableInventoryObjects}
-                  consequenceTrackers={consequenceTrackers}
-                  vignettes={vignettes}
-                  isSidePanel={isSidePanel}
-                />
+              <div key={localScene?.id || 'interactions-panel'} className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <ErrorBoundary fallbackTitle="Erro ao carregar o Editor de Interações">
+                  <InteractionEditor
+                    interactions={localScene?.interactions || []}
+                    onUpdateInteractions={(interactions) =>
+                      updateLocalScene('interactions', interactions)
+                    }
+                    allScenes={allScenes || []}
+                    currentSceneId={localScene?.id || ''}
+                    sceneObjects={currentSceneObjects || []}
+                    allTakableObjects={allAvailableInventoryObjects || []}
+                    consequenceTrackers={consequenceTrackers || []}
+                    vignettes={vignettes || []}
+                    isSidePanel={isSidePanel}
+                    enableDiceRoll={enableDiceRoll}
+                    diceType={diceType}
+                    diceRollConfig={localScene.allowDiceRollInScene ? localScene.diceRollConfig : undefined}
+                  />
+                </ErrorBoundary>
               </div>
             )}
 

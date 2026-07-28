@@ -59,6 +59,9 @@ interface TextosTabProps {
     localLoadMenuTitle: string;
     setLocalLoadMenuTitle: (val: string) => void;
 
+    localDiceRollTextPrefix?: string;
+    setLocalDiceRollTextPrefix?: (val: string) => void;
+
     // Enable flags
     localEnableSuggestions: boolean;
     localEnableInventory: boolean;
@@ -162,6 +165,8 @@ export const TextosTab: React.FC<TextosTabProps> = ({
     setLocalSaveMenuTitle,
     localLoadMenuTitle,
     setLocalLoadMenuTitle,
+    localDiceRollTextPrefix = 'Você tirou',
+    setLocalDiceRollTextPrefix,
 
     localEnableSuggestions,
     localEnableInventory,
@@ -293,6 +298,10 @@ export const TextosTab: React.FC<TextosTabProps> = ({
                         <div className="space-y-2">
                             <label htmlFor="retrospectiveButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.retrospectiveButton')}</label>
                             <input type="text" id="retrospectiveButtonText" value={localRetrospectiveButtonText || ''} onChange={(e) => setLocalRetrospectiveButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder={t('UIEditor.textos.retrospectivePlaceholder')} />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="diceRollTextPrefix" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diceRollTextPrefix', 'Prefixo da Rolagem de Dados')}</label>
+                            <input type="text" id="diceRollTextPrefix" value={localDiceRollTextPrefix || ''} onChange={(e) => setLocalDiceRollTextPrefix?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Você tirou" />
                         </div>
                     </div>
                 </div>

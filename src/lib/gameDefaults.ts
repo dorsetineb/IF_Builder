@@ -439,20 +439,70 @@ body.with-spacing .main-wrapper { height: 100%; }
 .highlight-word { color: var(--accent-color); cursor: pointer; transition: color 0.2s; }
 .highlight-word:hover { filter: brightness(1.2); text-decoration: underline; }
 
-/* Desktop Action Bar with Popup Inside - Removido fundo cinza do popup */
+/* Desktop Action Bar with Popup Inside */
 .action-bar { border-top: none; padding-top: 15px; margin-top: auto; flex-shrink: 0; display: flex; flex-direction: column; }
-.action-popup { margin-bottom: 12px; background-color: transparent; border: none; padding: 0; }
+.action-popup { 
+    margin-bottom: 12px; 
+    background-color: rgba(0, 0, 0, 0.4); 
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2)); 
+    padding: 10px; 
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
 .action-popup.hidden { display: none !important; }
 .action-popup-container { display: flex; flex-direction: column; gap: 10px; }
 .action-popup-row { display: flex; flex-wrap: wrap; gap: 6px; }
-.action-popup-list button, .action-popup-row button, .action-popup-list p { display: inline-block; padding: 6px 10px; margin: 0; text-align: left; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--highlight-color); font-family: var(--font-family); font-size: 1em; font-weight: bold; }
-.action-popup-list button, .action-popup-row button { cursor: pointer; }
-.action-popup-list button:hover, .action-popup-row button:hover { background-color: var(--border-color); }
-.action-popup-list p { cursor: default; color: var(--text-dim-color); }
+.action-popup-list button, .action-popup-row button { 
+    display: inline-block; 
+    padding: 6px 12px; 
+    margin: 0; 
+    text-align: left; 
+    background-color: var(--action-button-bg, #ffffff); 
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2)); 
+    color: var(--action-button-text-color, #0d1117); 
+    font-family: var(--font-family); 
+    font-size: 0.9em; 
+    font-weight: bold; 
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+.action-popup-list p { 
+    display: block; 
+    padding: 8px; 
+    margin: 0; 
+    color: var(--text-dim-color, #8b949e); 
+    font-family: var(--font-family); 
+    font-size: 0.9em; 
+    font-weight: bold; 
+}
+.action-popup-list button:hover, .action-popup-row button:hover { 
+    background-color: var(--action-button-hover-bg, #f0f0f0); 
+    transform: translateY(-1px);
+}
 
-.action-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
+.action-buttons { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--system-button-border); background-color: var(--system-button-bg); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-size: 1em; }
 .action-buttons button:hover { background-color: var(--system-button-hover-bg); color: var(--system-button-hover-text, var(--system-button-text)); transform: translateY(-2px); }
+.dice-roll-btn-parser {
+    padding: 8px 16px;
+    border: 2px solid var(--primary, #58a6ff) !important;
+    background-color: var(--primary, #58a6ff) !important;
+    color: #ffffff !important;
+    font-family: var(--font-family);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-size: 1em;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dice-roll-btn-parser:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
 .input-area { display: flex; gap: 8px; }
 #verb-input { flex-grow: 1; padding: 12px 10px; border: 2px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-family: var(--font-family); font-size: 1em; }
 #verb-input:focus { outline: none; border-color: var(--action-button-bg); }
@@ -1919,6 +1969,67 @@ export const OVERLAY_CSS = `
 }
 .splash-screen.align-v-bottom .splash-content {
     justify-content: flex-end !important;
+}
+
+/* Dice Roll Overlay */
+.dice-roll-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInDice 0.2s ease-out;
+    border-radius: inherit;
+}
+
+@keyframes fadeInDice {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.dice-roll-box {
+    background: var(--card-bg, #18181b);
+    border: 2px solid var(--border-color, #3f3f46);
+    border-radius: 16px;
+    padding: 24px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.dice-roll-icon {
+    font-size: 2rem;
+    color: var(--primary-color, #3b82f6);
+}
+
+.dice-roll-number {
+    font-size: 3rem;
+    font-weight: 900;
+    font-family: monospace;
+    color: #ffffff;
+    min-width: 80px;
+    text-align: center;
+    letter-spacing: -1px;
+}
+
+.dice-roll-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a1a1aa;
+}
+
+.dice-roll-number.roll-final {
+    color: #4ade80;
+    transform: scale(1.15);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
 }
 `;
 

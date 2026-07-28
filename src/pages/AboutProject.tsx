@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp } from '../services/autoUpdater';
+import { isDesktopApp, safeTauriImport } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
 const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.6
@@ -32,9 +32,12 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         const url = 'https://www.ifbuildr.com';
         if (isDesktopApp()) {
             try {
-                const { openUrl } = await import('@tauri-apps/plugin-opener');
-                await openUrl(url);
-                return;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const openerPlugin = await safeTauriImport<any>('@tauri-apps/plugin-opener');
+                if (openerPlugin && openerPlugin.openUrl) {
+                    await openerPlugin.openUrl(url);
+                    return;
+                }
             } catch (e) {
                 console.error('[AboutProject] Failed to open URL via plugin-opener:', e);
             }

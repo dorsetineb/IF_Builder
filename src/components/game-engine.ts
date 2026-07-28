@@ -41,7 +41,9 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 suggestions: scene.suggestions || [],
                 negativeFeedback: scene.negativeFeedback,
                 creditsText: scene.creditsText,
-                creditsScrollEnabled: scene.creditsScrollEnabled
+                creditsScrollEnabled: scene.creditsScrollEnabled,
+                allowDiceRollInScene: scene.allowDiceRollInScene,
+                diceRollConfig: scene.diceRollConfig
             };
         }
     }
@@ -114,6 +116,10 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameMenuTransitionType: data.gameMenuTransitionType,
         gameMenuTransitionSpeed: data.gameMenuTransitionSpeed,
         gameMenuTransitionSound: data.gameMenuTransitionSound,
+        // Dice Rolling
+        enableDiceRoll: data.enableDiceRoll ?? false,
+        diceType: data.diceType || 'd20',
+        diceRollTextPrefix: data.diceRollTextPrefix || 'Você tirou',
         gameTranslations: data.gameTranslations || {
             view_diary_btn: "Ver Diário",
             stats_visited: "Você visitou",

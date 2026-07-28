@@ -37,6 +37,21 @@ export function isDesktopApp(): boolean {
 }
 
 /**
+ * Safely imports a Tauri plugin dynamically without triggering Vite's static AST import-analysis.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function safeTauriImport<T = any>(moduleName: string): Promise<T | null> {
+  if (!isDesktopApp()) return null;
+  try {
+    const dynamicImport = new Function('m', 'return import(m)');
+    return (await dynamicImport(moduleName)) as T;
+  } catch (e) {
+    console.warn(`[Tauri] Plugin ${moduleName} not available:`, e);
+    return null;
+  }
+}
+
+/**
  * Checks Releases for a newer version of IFBuilder.
  * Tries the Vercel API endpoint first (for private repos), then falls back to direct GitHub API.
  * Returns ReleaseInfo if a newer version is found, or null otherwise.
@@ -203,10 +218,16 @@ export async function performInAppUpdate(
 
   if (isDesktopApp()) {
     try {
-      const { check } = await import('@tauri-apps/plugin-updater');
-      const { relaunch } = await import('@tauri-apps/plugin-process');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updaterPlugin = await safeTauriImport<any>('@tauri-apps/plugin-updater');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const processPlugin = await safeTauriImport<any>('@tauri-apps/plugin-process');
 
-      const update = await check();
+      if (updaterPlugin && processPlugin) {
+        const { check } = updaterPlugin;
+        const { relaunch } = processPlugin;
+
+        const update = await check();
       if (update) {
         let downloaded = 0;
         let contentLength = 0;
@@ -236,10 +257,11 @@ export async function performInAppUpdate(
         await relaunch();
         return true;
       }
-    } catch (err) {
-      console.warn('[AutoUpdater] Tauri plugin updater error or fallback:', err);
     }
+  } catch (err) {
+    console.warn('[AutoUpdater] Tauri plugin updater error or fallback:', err);
   }
+}
 
   // Smooth fallback animation progress
   onProgress(15, 'Baixando atualização... 15%');

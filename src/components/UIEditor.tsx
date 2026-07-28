@@ -5,7 +5,7 @@ import { useToast } from './ToastContext';
 import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
 
 
-import { GameData, FixedVerb } from '../types';
+import { GameData, FixedVerb, DiceType } from '../types';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DitherShader } from '@/components/ui/dither-shader';
@@ -133,6 +133,9 @@ interface UIEditorProps {
     startScreenVerticalAlignment?: 'center' | 'bottom';
     gameMenuTransitionType?: 'fade' | 'slide' | 'none';
     gameMenuTransitionSpeed?: number;
+    enableDiceRoll?: boolean;
+    diceType?: DiceType;
+    diceRollTextPrefix?: string;
     gameMenuTransitionSound?: string;
     inventoryCapacity?: number;
     inventoryMaxWeight?: number;
@@ -431,6 +434,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localEnableImages, setLocalEnableImages] = useState(enableImages ?? true);
     const [localEnableTextControl, setLocalEnableTextControl] = useState(enableTextControl ?? true);
     const [localEnableRetrospective, setLocalEnableRetrospective] = useState(props.enableRetrospective ?? true);
+    const [localEnableDiceRoll, setLocalEnableDiceRoll] = useState(props.enableDiceRoll ?? false);
+    const [localDiceType, setLocalDiceType] = useState<DiceType>(props.diceType || 'd20');
+    const [localDiceRollTextPrefix, setLocalDiceRollTextPrefix] = useState(props.diceRollTextPrefix || 'Você tirou');
 
     const [localInventoryCapacity, setLocalInventoryCapacity] = useState(inventoryCapacity ?? 10);
     const [localInventoryMaxWeight, setLocalInventoryMaxWeight] = useState(inventoryMaxWeight ?? 0);
@@ -546,6 +552,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalEnableImages(enableImages ?? true); }, [enableImages]);
     useEffect(() => { setLocalEnableTextControl(enableTextControl ?? true); }, [enableTextControl]);
     useEffect(() => { setLocalEnableRetrospective(props.enableRetrospective ?? true); }, [props.enableRetrospective]);
+    useEffect(() => { setLocalEnableDiceRoll(props.enableDiceRoll ?? false); }, [props.enableDiceRoll]);
+    useEffect(() => { setLocalDiceType(props.diceType || 'd20'); }, [props.diceType]);
+    useEffect(() => { setLocalDiceRollTextPrefix(props.diceRollTextPrefix || 'Você tirou'); }, [props.diceRollTextPrefix]);
     useEffect(() => { setLocalMenuTransitionType(props.gameMenuTransitionType || 'fade'); }, [props.gameMenuTransitionType]);
     useEffect(() => { setLocalMenuTransitionSpeed(props.gameMenuTransitionSpeed || 500); }, [props.gameMenuTransitionSpeed]);
     useEffect(() => { setLocalStartScreenVerticalAlignment(startScreenVerticalAlignment || 'center'); }, [startScreenVerticalAlignment]);
@@ -591,7 +600,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localSuggestionsEmptyFeedback, localInventoryEmptyFeedback,
         // Main Menu / System Menu
         localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
-        localStartScreenTitle, localStartScreenButtonAlignment, localStartScreenVerticalAlignment, localMenuTransitionType, localMenuTransitionSpeed, localMenuTransitionSound
+        localStartScreenTitle, localStartScreenButtonAlignment, localStartScreenVerticalAlignment, localMenuTransitionType, localMenuTransitionSpeed, localMenuTransitionSound,
+        // Dice Rolling
+        localEnableDiceRoll, localDiceType, localDiceRollTextPrefix
     });
 
 
@@ -644,7 +655,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localSuggestionsEmptyFeedback, localInventoryEmptyFeedback,
         // Main Menu / System Menu
         localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
-        localStartScreenTitle, localStartScreenButtonAlignment, localStartScreenVerticalAlignment, localMenuTransitionType, localMenuTransitionSpeed
+        localStartScreenTitle, localStartScreenButtonAlignment, localStartScreenVerticalAlignment, localMenuTransitionType, localMenuTransitionSpeed,
+        // Dice Rolling
+        localEnableDiceRoll, localDiceType, localDiceRollTextPrefix
     ]);
 
 
@@ -754,6 +767,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
         if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
         if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
+        if (localEnableDiceRoll !== (props.enableDiceRoll ?? false)) onUpdate('enableDiceRoll', localEnableDiceRoll, true);
+        if (localDiceType !== (props.diceType || 'd20')) onUpdate('diceType', localDiceType, true);
+        if (localDiceRollTextPrefix !== (props.diceRollTextPrefix || 'Você tirou')) onUpdate('diceRollTextPrefix', localDiceRollTextPrefix, true);
         if (localDiaryAllowExport !== (diaryAllowExport ?? false)) onUpdate('diaryAllowExport', localDiaryAllowExport, true);
 
         if (localLanguage !== (i18n.language || 'pt')) {
@@ -1097,6 +1113,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalEnableTrackers={setLocalEnableTrackers}
                             localEnableRetrospective={localEnableRetrospective}
                             setLocalEnableRetrospective={setLocalEnableRetrospective}
+                            localEnableDiceRoll={localEnableDiceRoll}
+                            setLocalEnableDiceRoll={setLocalEnableDiceRoll}
+                            localDiceType={localDiceType}
+                            setLocalDiceType={setLocalDiceType}
                             localDiaryAllowExport={localDiaryAllowExport}
                             setLocalDiaryAllowExport={setLocalDiaryAllowExport}
                             localEnableSystemMenu={localEnableSystemMenu}
@@ -1288,6 +1308,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalSaveMenuTitle={setLocalSaveMenuTitle}
                                 localLoadMenuTitle={localLoadMenuTitle}
                                 setLocalLoadMenuTitle={setLocalLoadMenuTitle}
+                                localDiceRollTextPrefix={localDiceRollTextPrefix}
+                                setLocalDiceRollTextPrefix={setLocalDiceRollTextPrefix}
 
                                 localEnableSuggestions={localEnableSuggestions}
                                 localEnableInventory={localEnableInventory}

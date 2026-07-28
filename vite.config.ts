@@ -207,6 +207,10 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       host: '0.0.0.0',
     },
+    optimizeDeps: {
+      entries: ['index.html'],
+      exclude: ['@tauri-apps/plugin-opener', '@tauri-apps/plugin-updater', '@tauri-apps/plugin-process', '@tauri-apps/api'],
+    },
     plugins: [
       react(),
       minifyGameEnginePlugin(isProduction),
@@ -227,6 +231,9 @@ export default defineConfig(({ mode }) => {
     build: {
       chunkSizeWarningLimit: 2000,
       sourcemap: false,
+      rollupOptions: {
+        external: [/^@tauri-apps\/.*/]
+      }
     }
   };
 });
