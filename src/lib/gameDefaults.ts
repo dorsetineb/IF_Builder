@@ -431,7 +431,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .game-container.layout-horizontal.layout-image-last { flex-direction: column-reverse; }
 .game-container.layout-horizontal.layout-image-last .image-panel { border-left: none; border-bottom: none; border-top: 2px solid var(--border-color); }
 .game-container.layout-horizontal.layout-image-last .text-panel { padding: 0 0 30px 0; }
-.scene-description { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; padding-bottom: 20px; }
+.scene-description { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; padding-bottom: 20px; position: relative; }
 .scene-description.typewriting-active .highlight-word { cursor: default; }
 .scene-description.typewriting-active .highlight-word:hover { filter: none; text-decoration: none; }
 .verb-echo { color: var(--text-dim-color); font-style: italic; }
@@ -1977,15 +1977,14 @@ export const OVERLAY_CSS = `
 .dice-roll-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(4px);
-    z-index: 1000;
+    background: var(--bg-color, #000000);
+    z-index: 100;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     animation: fadeInDice 0.2s ease-out;
-    border-radius: inherit;
+    border-radius: 0px;
 }
 
 @keyframes fadeInDice {
@@ -1994,42 +1993,37 @@ export const OVERLAY_CSS = `
 }
 
 .dice-roll-box {
-    background: var(--card-bg, #18181b);
+    background: var(--panel-bg, #18181b);
     border: 2px solid var(--border-color, #3f3f46);
-    border-radius: 16px;
-    padding: 24px 36px;
+    border-radius: 0px;
+    padding: 24px 24px;
+    min-width: 130px;
+    min-height: 130px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 8px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
 .dice-roll-icon {
     font-size: 2rem;
-    color: var(--primary-color, #3b82f6);
+    color: var(--accent-color, #3b82f6);
 }
 
 .dice-roll-number {
     font-size: 3rem;
     font-weight: 900;
-    font-family: monospace;
-    color: #ffffff;
+    font-family: var(--font-family);
+    color: var(--text-color, #ffffff);
     min-width: 80px;
     text-align: center;
     letter-spacing: -1px;
 }
 
-.dice-roll-label {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #a1a1aa;
-}
-
 .dice-roll-number.roll-final {
-    color: #4ade80;
+    color: var(--accent-color, #4ade80);
     transform: scale(1.15);
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
 }

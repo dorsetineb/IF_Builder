@@ -2697,7 +2697,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
+        const setDiceButtonsDisabled = (disabled) => {
+            const parserDiceBtn = document.getElementById('parser-dice-roll-button');
+            if (parserDiceBtn) {
+                parserDiceBtn.disabled = disabled;
+                parserDiceBtn.style.opacity = disabled ? '0.5' : '1';
+                parserDiceBtn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            }
+            const choiceDiceBtns = document.querySelectorAll('.dice-roll-btn');
+            choiceDiceBtns.forEach(btn => {
+                btn.disabled = disabled;
+                btn.style.opacity = disabled ? '0.5' : '1';
+                btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            });
+        };
+
         isPrinting = true;
+        setDiceButtonsDisabled(true);
         sceneDescription.classList.add('typewriting-active');
         
         // Loop protection
@@ -2716,6 +2732,7 @@ document.addEventListener('DOMContentLoaded', () => {
             skipParagraph = false;
             if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
+                setDiceButtonsDisabled(false);
                 sceneDescription.classList.remove('typewriting-active');
                 if (chances <= 0) gameOver(); else if (scene.isEndingScene) activateEndingUI('win');
                 return; 
@@ -2787,6 +2804,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             } else { 
                 isPrinting = false;
+                setDiceButtonsDisabled(false);
                 window.removeEventListener('keydown', globalEnterSkip);
                 sceneDescription.classList.remove('typewriting-active');
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
@@ -3104,25 +3122,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const playDiceRollOverlayAnimation = (diceType, finalResult, callback) => {
-        const textPanel = document.querySelector('.text-panel') || document.body;
+        const descContainer = document.getElementById('scene-description') || document.body;
         let overlay = document.getElementById('dice-roll-overlay');
+        const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;width:28px;height:28px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
         if (!overlay) {
             overlay = document.createElement('div');
             overlay.id = 'dice-roll-overlay';
             overlay.className = 'dice-roll-overlay';
             overlay.innerHTML = '<div class="dice-roll-box">' +
-                '<div class="dice-roll-icon">🎲</div>' +
+                '<div class="dice-roll-icon">' + diceSvgIcon + '</div>' +
                 '<div class="dice-roll-number" id="dice-roll-number">?</div>' +
-                '<div class="dice-roll-label" id="dice-roll-label">' + diceType.toUpperCase() + '</div>' +
             '</div>';
-            textPanel.appendChild(overlay);
+            descContainer.appendChild(overlay);
         } else {
+            if (overlay.parentNode !== descContainer) {
+                descContainer.appendChild(overlay);
+            }
             overlay.classList.remove('hidden');
         }
 
         const numberEl = overlay.querySelector('#dice-roll-number');
-        const labelEl = overlay.querySelector('#dice-roll-label');
-        if (labelEl) labelEl.textContent = diceType.toUpperCase();
         if (numberEl) {
             numberEl.classList.remove('roll-final');
             numberEl.textContent = '?';
@@ -3151,14 +3170,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const triggerDiceRoll = (scene) => {
+        if (isPrinting) return;
         const diceType = gameData.diceType || 'd20';
         const maxVal = diceType === 'd6' ? 6 : 20;
         const rollResult = Math.floor(Math.random() * maxVal) + 1;
         const prefix = gameData.diceRollTextPrefix || 'Você tirou';
 
         playDiceRollOverlayAnimation(diceType, rollResult, () => {
-            const resultMsg = prefix + ' ' + rollResult;
-            printOutput(resultMsg);
+            const resultText = '> ' + prefix + ' ' + rollResult;
+            
+            // Output dice result as verb echo log entry below scene description
+            const echo = document.createElement('p');
+            echo.className = 'verb-echo';
+            echo.textContent = resultText;
+            sceneDescription.appendChild(echo);
+            sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            actionLog.push({ type: 'input', text: resultText });
 
             const targetInteractions = (scene && scene.interactions) ? scene.interactions : [];
 
