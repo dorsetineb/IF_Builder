@@ -353,7 +353,7 @@ export const gameHTML = `
 export const gameCSS = `
 body { padding: 0; }
 body.with-spacing { padding: 30px; }
-:root { --bg-color: __GAME_BACKGROUND_COLOR__; --text-color: __GAME_TEXT_COLOR__; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: __GAME_TITLE_COLOR__; --highlight-color: __GAME_FOCUS_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --action-button-hover-bg: __ACTION_BUTTON_HOVER_COLOR__; --system-button-bg: __SYSTEM_BUTTON_COLOR__; --system-button-text: __SYSTEM_BUTTON_TEXT_COLOR__; --system-button-border: __SYSTEM_BUTTON_BORDER_COLOR__; --system-button-hover-bg: __SYSTEM_BUTTON_HOVER_COLOR__; --system-button-hover-text: __SYSTEM_BUTTON_HOVER_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: var(--highlight-color); --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
+:root { --bg-color: __GAME_BACKGROUND_COLOR__; --text-color: __GAME_TEXT_COLOR__; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: __GAME_TITLE_COLOR__; --highlight-color: __GAME_FOCUS_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --action-button-hover-bg: __ACTION_BUTTON_HOVER_COLOR__; --dice-button-bg: __DICE_BUTTON_COLOR__; --dice-button-text-color: __DICE_BUTTON_TEXT_COLOR__; --dice-button-hover-bg: __DICE_BUTTON_HOVER_COLOR__; --system-button-bg: __SYSTEM_BUTTON_COLOR__; --system-button-text: __SYSTEM_BUTTON_TEXT_COLOR__; --system-button-border: __SYSTEM_BUTTON_BORDER_COLOR__; --system-button-hover-bg: __SYSTEM_BUTTON_HOVER_COLOR__; --system-button-hover-text: __SYSTEM_BUTTON_HOVER_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: var(--highlight-color); --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 body.is-demo { --scale-factor: 0.7; }
 body.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }
 body.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }
@@ -484,11 +484,11 @@ body.with-spacing .main-wrapper { height: 100%; }
 .action-buttons { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--system-button-border); background-color: var(--system-button-bg); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-size: 1em; }
 .action-buttons button:hover { background-color: var(--system-button-hover-bg); color: var(--system-button-hover-text, var(--system-button-text)); transform: translateY(-2px); }
-.dice-roll-btn-parser {
+.dice-roll-btn-parser, .dice-roll-btn {
     padding: 8px 16px;
-    border: 2px solid var(--primary, #58a6ff) !important;
-    background-color: var(--primary, #58a6ff) !important;
-    color: #ffffff !important;
+    border: 2px solid var(--dice-button-bg, #3b82f6) !important;
+    background-color: var(--dice-button-bg, #3b82f6) !important;
+    color: var(--dice-button-text-color, #ffffff) !important;
     font-family: var(--font-family);
     cursor: pointer;
     font-weight: bold;
@@ -498,9 +498,11 @@ body.with-spacing .main-wrapper { height: 100%; }
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
 }
-.dice-roll-btn-parser:hover {
-    filter: brightness(1.15);
+.dice-roll-btn-parser:hover, .dice-roll-btn:hover {
+    background-color: var(--dice-button-hover-bg, #2563eb) !important;
+    border-color: var(--dice-button-hover-bg, #2563eb) !important;
     transform: translateY(-1px);
 }
 .input-area { display: flex; gap: 8px; }

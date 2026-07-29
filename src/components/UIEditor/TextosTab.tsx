@@ -61,6 +61,8 @@ interface TextosTabProps {
 
     localDiceRollTextPrefix?: string;
     setLocalDiceRollTextPrefix?: (val: string) => void;
+    localDiceRollButtonText?: string;
+    setLocalDiceRollButtonText?: (val: string) => void;
 
     // Enable flags
     localEnableSuggestions: boolean;
@@ -167,6 +169,8 @@ export const TextosTab: React.FC<TextosTabProps> = ({
     setLocalLoadMenuTitle,
     localDiceRollTextPrefix = 'Você tirou',
     setLocalDiceRollTextPrefix,
+    localDiceRollButtonText = '',
+    setLocalDiceRollButtonText,
 
     localEnableSuggestions,
     localEnableInventory,
@@ -302,6 +306,10 @@ export const TextosTab: React.FC<TextosTabProps> = ({
                         <div className="space-y-2">
                             <label htmlFor="diceRollTextPrefix" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diceRollTextPrefix', 'Prefixo da Rolagem de Dados')}</label>
                             <input type="text" id="diceRollTextPrefix" value={localDiceRollTextPrefix || ''} onChange={(e) => setLocalDiceRollTextPrefix?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Você tirou" />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="diceRollButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diceRollButtonText', 'Texto do Botão de Rolagem de Dados')}</label>
+                            <input type="text" id="diceRollButtonText" value={localDiceRollButtonText || ''} onChange={(e) => setLocalDiceRollButtonText?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Rolar D6" />
                         </div>
                     </div>
                 </div>

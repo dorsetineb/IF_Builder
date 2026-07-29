@@ -136,6 +136,10 @@ interface UIEditorProps {
     enableDiceRoll?: boolean;
     diceType?: DiceType;
     diceRollTextPrefix?: string;
+    gameDiceRollButtonBg?: string;
+    gameDiceRollButtonTextColor?: string;
+    gameDiceRollButtonHoverColor?: string;
+    gameDiceRollButtonText?: string;
     gameMenuTransitionSound?: string;
     inventoryCapacity?: number;
     inventoryMaxWeight?: number;
@@ -437,6 +441,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localEnableDiceRoll, setLocalEnableDiceRoll] = useState(props.enableDiceRoll ?? false);
     const [localDiceType, setLocalDiceType] = useState<DiceType>(props.diceType || 'd20');
     const [localDiceRollTextPrefix, setLocalDiceRollTextPrefix] = useState(props.diceRollTextPrefix || 'Você tirou');
+    const [localGameDiceRollButtonBg, setLocalGameDiceRollButtonBg] = useState(props.gameDiceRollButtonBg || '#3b82f6');
+    const [localGameDiceRollButtonTextColor, setLocalGameDiceRollButtonTextColor] = useState(props.gameDiceRollButtonTextColor || '#ffffff');
+    const [localGameDiceRollButtonHoverColor, setLocalGameDiceRollButtonHoverColor] = useState(props.gameDiceRollButtonHoverColor || '#2563eb');
+    const [localGameDiceRollButtonText, setLocalGameDiceRollButtonText] = useState(props.gameDiceRollButtonText || '');
 
     const [localInventoryCapacity, setLocalInventoryCapacity] = useState(inventoryCapacity ?? 10);
     const [localInventoryMaxWeight, setLocalInventoryMaxWeight] = useState(inventoryMaxWeight ?? 0);
@@ -602,7 +610,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
         localStartScreenTitle, localStartScreenButtonAlignment, localStartScreenVerticalAlignment, localMenuTransitionType, localMenuTransitionSpeed, localMenuTransitionSound,
         // Dice Rolling
-        localEnableDiceRoll, localDiceType, localDiceRollTextPrefix
+        localEnableDiceRoll, localDiceType, localDiceRollTextPrefix,
+        localGameDiceRollButtonBg, localGameDiceRollButtonTextColor, localGameDiceRollButtonHoverColor, localGameDiceRollButtonText
     });
 
 
@@ -657,7 +666,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
         localStartScreenTitle, localStartScreenButtonAlignment, localStartScreenVerticalAlignment, localMenuTransitionType, localMenuTransitionSpeed,
         // Dice Rolling
-        localEnableDiceRoll, localDiceType, localDiceRollTextPrefix
+        localEnableDiceRoll, localDiceType, localDiceRollTextPrefix,
+        localGameDiceRollButtonBg, localGameDiceRollButtonTextColor, localGameDiceRollButtonHoverColor, localGameDiceRollButtonText
     ]);
 
 
@@ -770,6 +780,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableDiceRoll !== (props.enableDiceRoll ?? false)) onUpdate('enableDiceRoll', localEnableDiceRoll, true);
         if (localDiceType !== (props.diceType || 'd20')) onUpdate('diceType', localDiceType, true);
         if (localDiceRollTextPrefix !== (props.diceRollTextPrefix || 'Você tirou')) onUpdate('diceRollTextPrefix', localDiceRollTextPrefix, true);
+        if (localGameDiceRollButtonBg !== (props.gameDiceRollButtonBg || '#3b82f6')) onUpdate('gameDiceRollButtonBg', localGameDiceRollButtonBg, true);
+        if (localGameDiceRollButtonTextColor !== (props.gameDiceRollButtonTextColor || '#ffffff')) onUpdate('gameDiceRollButtonTextColor', localGameDiceRollButtonTextColor, true);
+        if (localGameDiceRollButtonHoverColor !== (props.gameDiceRollButtonHoverColor || '#2563eb')) onUpdate('gameDiceRollButtonHoverColor', localGameDiceRollButtonHoverColor, true);
+        if (localGameDiceRollButtonText !== (props.gameDiceRollButtonText || '')) onUpdate('gameDiceRollButtonText', localGameDiceRollButtonText, true);
         if (localDiaryAllowExport !== (diaryAllowExport ?? false)) onUpdate('diaryAllowExport', localDiaryAllowExport, true);
 
         if (localLanguage !== (i18n.language || 'pt')) {
@@ -1205,6 +1219,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalActionButtonTextColor={setLocalActionButtonTextColor}
                                 localActionButtonHoverColor={localActionButtonHoverColor}
                                 setLocalActionButtonHoverColor={setLocalActionButtonHoverColor}
+                                localDiceButtonColor={localGameDiceRollButtonBg}
+                                setLocalDiceButtonColor={setLocalGameDiceRollButtonBg}
+                                localDiceButtonTextColor={localGameDiceRollButtonTextColor}
+                                setLocalDiceButtonTextColor={setLocalGameDiceRollButtonTextColor}
+                                localDiceButtonHoverColor={localGameDiceRollButtonHoverColor}
+                                setLocalDiceButtonHoverColor={setLocalGameDiceRollButtonHoverColor}
                                 localSystemButtonColor={localSystemButtonColor}
                                 setLocalSystemButtonColor={setLocalSystemButtonColor}
                                 localSystemButtonTextColor={localSystemButtonTextColor}
@@ -1310,6 +1330,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalLoadMenuTitle={setLocalLoadMenuTitle}
                                 localDiceRollTextPrefix={localDiceRollTextPrefix}
                                 setLocalDiceRollTextPrefix={setLocalDiceRollTextPrefix}
+                                localDiceRollButtonText={localGameDiceRollButtonText}
+                                setLocalDiceRollButtonText={setLocalGameDiceRollButtonText}
 
                                 localEnableSuggestions={localEnableSuggestions}
                                 localEnableInventory={localEnableInventory}
@@ -1423,6 +1445,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         localChanceIconColor={localChanceIconColor}
                         localMaxChances={localMaxChances}
                         localGameInteractionType={localGameInteractionType}
+                        localEnableDiceRoll={localEnableDiceRoll}
+                        localDiceType={localDiceType}
+                        localDiceRollButtonText={localGameDiceRollButtonText}
+                        localDiceButtonColor={localGameDiceRollButtonBg}
+                        localDiceButtonTextColor={localGameDiceRollButtonTextColor}
+                        localDiceButtonHoverColor={localGameDiceRollButtonHoverColor}
                         localSuggestionsButtonText={localSuggestionsButtonText}
                         localInventoryButtonText={localInventoryButtonText}
                         localDiaryButtonText={localDiaryButtonText}

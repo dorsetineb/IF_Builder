@@ -231,6 +231,10 @@ export interface GameData {
   enableDiceRoll?: boolean;
   diceType?: DiceType;
   diceRollTextPrefix?: string;
+  gameDiceRollButtonBg?: string;
+  gameDiceRollButtonTextColor?: string;
+  gameDiceRollButtonHoverColor?: string;
+  gameDiceRollButtonText?: string;
 
   // Inventory Config
   inventoryCapacity?: number;

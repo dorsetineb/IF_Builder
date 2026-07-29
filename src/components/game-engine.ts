@@ -120,6 +120,10 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         enableDiceRoll: data.enableDiceRoll ?? false,
         diceType: data.diceType || 'd20',
         diceRollTextPrefix: data.diceRollTextPrefix || 'Você tirou',
+        gameDiceRollButtonBg: data.gameDiceRollButtonBg || '#3b82f6',
+        gameDiceRollButtonTextColor: data.gameDiceRollButtonTextColor || '#ffffff',
+        gameDiceRollButtonHoverColor: data.gameDiceRollButtonHoverColor || '#2563eb',
+        gameDiceRollButtonText: data.gameDiceRollButtonText || '',
         gameTranslations: data.gameTranslations || {
             view_diary_btn: "Ver Diário",
             stats_visited: "Você visitou",

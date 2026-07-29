@@ -1532,6 +1532,10 @@ const Editor: React.FC = () => {
                     gameMenuTransitionType={gameData.gameMenuTransitionType || 'fade'}
                     gameMenuTransitionSpeed={gameData.gameMenuTransitionSpeed || 0.5}
                     gameMenuTransitionSound={gameData.gameMenuTransitionSound || ''}
+                    gameDiceRollButtonBg={gameData.gameDiceRollButtonBg || '#3b82f6'}
+                    gameDiceRollButtonTextColor={gameData.gameDiceRollButtonTextColor || '#ffffff'}
+                    gameDiceRollButtonHoverColor={gameData.gameDiceRollButtonHoverColor || '#2563eb'}
+                    gameDiceRollButtonText={gameData.gameDiceRollButtonText || ''}
                     onNavigateToTrackers={() => handleSetView('trackers')}
                   />
                 </Suspense>

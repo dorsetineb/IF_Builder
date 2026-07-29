@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ChevronDown, Split, Heart, Circle, Square, Star } from 'lucide-react';
+import { ChevronDown, Split, Heart, Circle, Square, Star, Dices } from 'lucide-react';
 import { FONTS } from '../../constants';
 import { getFramePreviewStyles } from '../../utils/frameStyles';
 import { DitherShader } from '@/components/ui/dither-shader';
@@ -84,6 +84,14 @@ interface UIPreviewPanelProps {
     localGameInteractionType?: 'parser' | 'choice';
     localEnableSystemMenu?: boolean;
 
+    // Dice Rolling variables
+    localEnableDiceRoll?: boolean;
+    localDiceType?: string;
+    localDiceRollButtonText?: string;
+    localDiceButtonColor?: string;
+    localDiceButtonTextColor?: string;
+    localDiceButtonHoverColor?: string;
+
     // Custom Text variables
     localSuggestionsButtonText?: string;
     localInventoryButtonText?: string;
@@ -150,6 +158,12 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     localChanceIconColor = '#ff4d4d',
     localMaxChances = 3,
     localGameInteractionType = 'parser',
+    localEnableDiceRoll = false,
+    localDiceType = 'd20',
+    localDiceRollButtonText = '',
+    localDiceButtonColor = '#3b82f6',
+    localDiceButtonTextColor = '#ffffff',
+    localDiceButtonHoverColor = '#2563eb',
     localSuggestionsButtonText = '',
     localInventoryButtonText = '',
     localDiaryButtonText = '',
@@ -449,10 +463,25 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                                                 {localTrackersButtonText || t('UIEditor.textos.trackersPlaceholder', 'Rastreadores')}
                                             </button>
                                         )}
-                                    </div>
+                                     </div>
 
-                                    {localGameInteractionType === 'choice' ? (
+                                     {localGameInteractionType === 'choice' ? (
                                          <div className="flex flex-col gap-2 pt-1.5">
+                                             {localEnableDiceRoll && (
+                                                 <button 
+                                                     className="w-full text-center px-3 py-1.5 border rounded-md transition-all font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm"
+                                                     style={{ 
+                                                         fontSize: getScaledFontSize(0.9), 
+                                                         color: localDiceButtonTextColor || '#ffffff', 
+                                                         borderColor: localDiceButtonColor || '#3b82f6', 
+                                                         backgroundColor: localDiceButtonColor || '#3b82f6',
+                                                         fontFamily: localFontFamily
+                                                     }}
+                                                 >
+                                                     <Dices className="w-4 h-4 shrink-0" />
+                                                     <span>{localDiceRollButtonText || `Rolar ${(localDiceType || 'd20').toUpperCase()}`}</span>
+                                                 </button>
+                                             )}
                                              <button 
                                                  className="w-full text-left px-3 py-1.5 border rounded-md transition-all font-semibold"
                                                  style={{ 
@@ -513,6 +542,20 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                                              >
                                                  {localActionButtonText || t('UIEditor.aparencia.action', 'Ação')}
                                              </button>
+                                             {localEnableDiceRoll && (
+                                                 <button
+                                                     className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center gap-1.5 shrink-0 truncate"
+                                                     style={{ 
+                                                         fontSize: getScaledFontSize(0.9), 
+                                                         backgroundColor: localDiceButtonColor || '#3b82f6', 
+                                                         color: localDiceButtonTextColor || '#ffffff', 
+                                                         fontFamily: localFontFamily 
+                                                     }}
+                                                 >
+                                                     <Dices className="w-4 h-4 shrink-0" />
+                                                     <span>{localDiceRollButtonText || `Rolar ${(localDiceType || 'd20').toUpperCase()}`}</span>
+                                                 </button>
+                                             )}
                                          </div>
                                      )}
                                 </div>

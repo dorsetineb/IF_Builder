@@ -70,6 +70,13 @@ interface AppearanceTabProps {
     setLocalActionButtonTextColor: (val: string) => void;
     localActionButtonHoverColor: string;
     setLocalActionButtonHoverColor: (val: string) => void;
+
+    localDiceButtonColor?: string;
+    setLocalDiceButtonColor?: (val: string) => void;
+    localDiceButtonTextColor?: string;
+    setLocalDiceButtonTextColor?: (val: string) => void;
+    localDiceButtonHoverColor?: string;
+    setLocalDiceButtonHoverColor?: (val: string) => void;
     
     localSystemButtonColor: string;
     setLocalSystemButtonColor: (val: string) => void;
@@ -175,6 +182,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     setLocalActionButtonTextColor,
     localActionButtonHoverColor,
     setLocalActionButtonHoverColor,
+    localDiceButtonColor,
+    setLocalDiceButtonColor,
+    localDiceButtonTextColor,
+    setLocalDiceButtonTextColor,
+    localDiceButtonHoverColor,
+    setLocalDiceButtonHoverColor,
     localSystemButtonColor,
     setLocalSystemButtonColor,
     localSystemButtonTextColor,
@@ -573,6 +586,9 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                                 <ColorInput label={t('UIEditor.aparencia.actionButton', 'Fundo do Botão')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor', 'Texto do botão de Ação')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButtonHover', 'Hover do botão de Ação')} id="actionButtonHoverColor" value={localActionButtonHoverColor} onChange={setLocalActionButtonHoverColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.diceButtonBg', 'Fundo do Botão de Dados')} id="diceButtonBgColor" value={localDiceButtonColor || '#3B82F6'} onChange={val => setLocalDiceButtonColor?.(val)} placeholder="#3B82F6" />
+                                                <ColorInput label={t('UIEditor.aparencia.diceButtonTextColor', 'Texto do Botão de Dados')} id="diceButtonTextColor" value={localDiceButtonTextColor || '#FFFFFF'} onChange={val => setLocalDiceButtonTextColor?.(val)} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.diceButtonHover', 'Hover do Botão de Dados')} id="diceButtonHoverColor" value={localDiceButtonHoverColor || '#2563EB'} onChange={val => setLocalDiceButtonHoverColor?.(val)} placeholder="#2563EB" />
                                                 <ColorInput label={t('UIEditor.aparencia.systemButton', 'Botões de ferramentas')} id="systemButtonColor" value={localSystemButtonColor} onChange={setLocalSystemButtonColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.systemButtonTextColor', 'Texto dos botões de ferramentas')} id="systemButtonTextColor" value={localSystemButtonTextColor} onChange={setLocalSystemButtonTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.systemButtonBorder', 'Contorno dos botões e input')} id="systemButtonBorderColor" value={localSystemButtonBorderColor} onChange={setLocalSystemButtonBorderColor} placeholder="#FFFFFF" />

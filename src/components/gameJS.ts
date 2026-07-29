@@ -1221,8 +1221,16 @@ document.addEventListener('DOMContentLoaded', () => {
                  negativeEndingScreen.classList.remove('fade-out');
              }, 1000);
         }));
-        submitVerb.addEventListener('click', handleInput);
-        verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
+        if (submitVerb) {
+            submitVerb.addEventListener('mousedown', (e) => { e.preventDefault(); });
+            submitVerb.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleInput();
+            });
+        }
+        if (verbInput) {
+            verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
+        }
         if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
         if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
         if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
@@ -1700,13 +1708,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
-    };
-
-    const toggleSystemMenu = () => {
-        if (systemModal.classList.contains('hidden')) {
-            systemModal.classList.remove('hidden'); systemMenuMain.classList.remove('hidden'); systemSlotsContainer.classList.add('hidden');
-            systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
-        } else systemModal.classList.add('hidden');
     };
 
     const renderSlots = (mode) => {
@@ -2359,6 +2360,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        gameContainer.classList.remove('hidden');
+        gameContainer.classList.remove('fade-out');
+        
         let effectiveTransition = gameData.gameImageTransitionType || 'fade';
         if (effectiveTransition === 'none') transition = false;
         let speed = 0.5;
@@ -2839,15 +2843,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parserDiceBtn) parserDiceBtn.remove();
 
             const isDiceAllowed = gameData.enableDiceRoll && scene.allowDiceRollInScene !== false;
+            const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;margin-right:6px;width:18px;height:18px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
+            const getDiceBtnText = () => gameData.gameDiceRollButtonText || ('Rolar ' + (gameData.diceType || 'd20').toUpperCase());
+
             if (isDiceAllowed) {
                 const diceBtn = document.createElement('button');
-                diceBtn.textContent = '🎲 Rolar ' + (gameData.diceType || 'd20').toUpperCase();
+                diceBtn.innerHTML = diceSvgIcon + '<span>' + getDiceBtnText() + '</span>';
                 diceBtn.className = 'choice-button dice-roll-btn';
                 diceBtn.style.padding = '12px 16px';
                 diceBtn.style.textAlign = 'center';
-                diceBtn.style.backgroundColor = 'var(--primary, #58a6ff)';
-                diceBtn.style.color = '#ffffff';
-                diceBtn.style.border = '2px solid var(--primary, #58a6ff)';
+                diceBtn.style.backgroundColor = 'var(--dice-button-bg, #3b82f6)';
+                diceBtn.style.color = 'var(--dice-button-text-color, #ffffff)';
+                diceBtn.style.border = '2px solid var(--dice-button-bg, #3b82f6)';
                 diceBtn.style.borderRadius = '0px';
                 diceBtn.style.fontFamily = 'var(--font-family)';
                 diceBtn.style.fontSize = '1em';
@@ -2856,6 +2863,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 diceBtn.style.transition = 'all 0.2s';
                 diceBtn.style.width = '100%';
                 diceBtn.style.textTransform = 'uppercase';
+                diceBtn.style.display = 'flex';
+                diceBtn.style.alignItems = 'center';
+                diceBtn.style.justifyContent = 'center';
 
                 diceBtn.onclick = () => {
                     diceBtn.disabled = true;
@@ -2925,6 +2935,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // PARSER MODE DICE ROLL BUTTON INJECTION (To the RIGHT of Action button)
             let parserDiceBtn = document.getElementById('parser-dice-roll-button');
             const isDiceAllowed = gameData.enableDiceRoll && scene.allowDiceRollInScene !== false;
+            const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;margin-right:6px;width:18px;height:18px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
+            const getDiceBtnText = () => gameData.gameDiceRollButtonText || ('Rolar ' + (gameData.diceType || 'd20').toUpperCase());
+
             if (isDiceAllowed) {
                 if (!parserDiceBtn && inputArea) {
                     parserDiceBtn = document.createElement('button');
@@ -2933,7 +2946,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     inputArea.appendChild(parserDiceBtn);
                 }
                 if (parserDiceBtn) {
-                    parserDiceBtn.textContent = '🎲 Rolar ' + (gameData.diceType || 'd20').toUpperCase();
+                    parserDiceBtn.innerHTML = diceSvgIcon + '<span>' + getDiceBtnText() + '</span>';
                     parserDiceBtn.classList.remove('hidden');
                     parserDiceBtn.onclick = () => {
                         triggerDiceRoll(scene);
@@ -2967,7 +2980,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOver = () => { 
         activateEndingUI('lose'); 
     };
-    const handleInput = () => { if (isPrinting) return; const input = verbInput.textContent.trim(); if (input) { processCommand(input); verbInput.textContent = ''; } };
+    const handleInput = () => {
+        if (isPrinting) return;
+        const input = (verbInput ? (verbInput.innerText || verbInput.textContent || '') : '').trim();
+        if (input) {
+            processCommand(input);
+            if (verbInput) {
+                verbInput.textContent = '';
+                verbInput.innerText = '';
+            }
+        }
+    };
     
     // Prevent Enter from creating new lines in contenteditable and trigger handleInput instead
     verbInput.addEventListener('keydown', (e) => {
@@ -3453,6 +3476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10);
     };
     try {
+        init();
         if (gameData.enableSystemMenu && !window.isSceneTest && document.getElementById('start-screen')) {
             showStartScreen(true);
         } else {
@@ -3460,7 +3484,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     } catch (e) {
         console.error("Initialization error:", e);
-        try { startGame(); } catch (err) {}
+        try { init(); startGame(); } catch (err) {}
     }
 });
 `;
