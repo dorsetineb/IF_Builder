@@ -6,7 +6,7 @@ import { APP_VERSION } from '../version';
 import { isDesktopApp, safeTauriImport } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.7
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.0
 
 • Sistema de Rolagem de Dados (D6/D20): Suporte completo a testes de habilidade por cena com nota de corte, verbos de sucesso/falha e bloqueio durante a digitação da cena.
 • Customização Visual e Textos Padrão: Personalização da cor do botão de dados, cor da fonte, rótulo do botão ("Rolar D6"/"Rolar D20") e mensagens customizadas de Sucesso/Falha no Editor de Cena.
