@@ -6,10 +6,13 @@ import { APP_VERSION } from '../version';
 import { isDesktopApp, safeTauriImport } from '../services/autoUpdater';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.6
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.8.7
 
-• Navegação Externa no Desktop: Integração com o plugin @tauri-apps/plugin-opener permitindo abrir o navegador padrão do sistema ao clicar no link www.ifbuildr.com.
-• Ajuste de Formatação de Texto: Remoção da quebra de linha no texto explicativo do card da versão desktop, mantendo a frase em uma única linha.`;
+• Sistema de Rolagem de Dados (D6/D20): Suporte completo a testes de habilidade por cena com nota de corte, verbos de sucesso/falha e bloqueio durante a digitação da cena.
+• Customização Visual e Textos Padrão: Personalização da cor do botão de dados, cor da fonte, rótulo do botão ("Rolar D6"/"Rolar D20") e mensagens customizadas de Sucesso/Falha no Editor de Cena.
+• Overlay e Exibição de Dados: Interface de rolagem com formato quadrado, fonte nativa do jogo, ícone ampliado, overlay restrito ao painel de texto e exibição do resultado estendida.
+• Integração Narrativa e Diário: Registro do valor rolado na cena de origem e inserção do comando de sucesso/falha no topo da cena de destino, mantendo ordenação idêntica no Diário.
+• Transição Sincronizada de Overlays: Cross-fade suave e simultâneo entre imagens e efeitos visuais (granulado, glitch, tv, etc.), evitando vazamentos de overlay na troca de ramificação.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();

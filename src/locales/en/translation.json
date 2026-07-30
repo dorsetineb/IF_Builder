@@ -142,7 +142,7 @@
       "desktopAppDesc": "This is version v{{version}} of the app. To download the latest version, look for the link on the About Project page.",
       "changelogTitle": "Development Log",
       "latestTag": "Latest Version",
-      "devlogContent": "🚀 Version v0.8.6 Updates and Improvements\n\n• Desktop External Browser Launch: Integrated @tauri-apps/plugin-opener to trigger the system's default browser when clicking www.ifbuildr.com.\n• Single-line Layout Fix: Removed line breaks in the desktop app version text to display the sentence cleanly on a single line.",
+      "devlogContent": "🚀 Version v0.8.7 Updates and Improvements\n\n• Dice Rolling System (D6/D20): Full support for skill checks per scene with custom cutoff values, success/failure verbs, and action lock during text typewriting.\n• Visual Customization & Default Texts: Customize dice button color, font color, button label (\"Roll D6\"/\"Roll D20\"), and custom Success/Failure messages in the Scene Editor.\n• Overlay & Dice Reveal Card: Square dice modal layout with native game typography, enlarged icon, text-restricted overlay backdrop, and extended result display time.\n• Narrative Log & Journal Sync: Roll results logged in origin scene, with success/failure command echoes inserted at the top of destination scenes and aligned in the Journal.\n• Synchronized Scene Overlay Transition: Seamless simultaneous cross-fade between background images and visual overlays (grain, glitch, TV), eliminating overlay bleed between scenes.",
       "newsTitle": "✨ What's New",
       "newsItem1": "Automatic desktop update system with support for GitHub repositories.",
       "newsItem2": "Notification with release notes summary and explicit confirmation to authorize download and installation.",
