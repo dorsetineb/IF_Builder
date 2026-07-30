@@ -578,7 +578,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </div>
                                                 <div>
                                                     <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableDiary ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('UIEditor.sistemas.diary', 'Diário de Bordo')}</h4>
-                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.diaryDesc', 'Registro automático de eventos')}</p>
+                                                    <p className="text-[11px] text-zinc-500 leading-tight">{t('UIEditor.sistemas.diaryDesc', 'Registro automático dos eventos da narrativa')}</p>
                                                 </div>
                                             </div>
                                         </div>

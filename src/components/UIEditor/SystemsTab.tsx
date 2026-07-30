@@ -790,7 +790,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     </label>
                                     <div>
                                         <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableDiceRoll ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diceRollTitle', 'Rolagem de Dados')}</h4>
-                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diceRollDesc', 'Habilita testes de sorte/habilidade utilizando dados em interações.')}</p>
+                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diceRollDesc', 'Habilita testes de sorte utilizando dados para resolver interações.')}</p>
                                     </div>
                                 </div>
                                 {localEnableDiceRoll && (
