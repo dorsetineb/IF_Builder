@@ -2306,7 +2306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
+    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
         if (!sceneId || !gameData.cenas || !gameData.cenas[sceneId]) {
             const keys = Object.keys((gameData && gameData.cenas) || {});
             if (keys.length > 0) sceneId = keys[0];
@@ -2391,10 +2391,22 @@ document.addEventListener('DOMContentLoaded', () => {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
+                 if (sceneOverlay) {
+                     sceneOverlay.style.transition = 'opacity ' + defaultDuration + ' ease-in-out';
+                     sceneOverlay.style.opacity = '0';
+                 }
                  const durationMs = speed * 1000;
-                 setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
-             } else renderScene(scene, successPrefix);
-        } else { renderScene(scene, successPrefix); }
+                 setTimeout(() => { 
+                     renderScene(scene, successPrefix, inputEchoText); 
+                     sceneImage.classList.remove(animClass); 
+                     sceneImageBack.src = ''; 
+                     sceneImageBack.classList.add('hidden'); 
+                     if (sceneOverlay) {
+                         sceneOverlay.style.opacity = '1';
+                     }
+                 }, durationMs + 50);
+             } else renderScene(scene, successPrefix, inputEchoText);
+        } else { renderScene(scene, successPrefix, inputEchoText); }
         autoSaveGame();
     };
 
@@ -2547,7 +2559,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderScene = (scene, successPrefix = null) => {
+    const renderScene = (scene, successPrefix = null, inputEchoText = null) => {
         const isImagesEnabled = gameData.enableImages !== false;
         if (scene.image && isImagesEnabled) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
@@ -2556,6 +2568,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle Overlay Effect
         if (sceneOverlay) {
             sceneOverlay.className = 'scene-overlay'; // Reset
+            sceneOverlay.style.opacity = '1';
             // Clear previous effect DOM
             const existingBlur = sceneOverlay.querySelector('.blur-overlay-container');
             if (existingBlur) existingBlur.remove();
@@ -2689,6 +2702,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         sceneDescription.innerHTML = '';
+        
+        if (inputEchoText) {
+            const formattedInput = inputEchoText.trim().startsWith('>') ? inputEchoText.trim() : ('> ' + inputEchoText.trim());
+            const echo = document.createElement('p');
+            echo.className = 'verb-echo';
+            echo.textContent = formattedInput;
+            sceneDescription.appendChild(echo);
+            actionLog.push({ type: 'input', text: formattedInput, isLeadInput: true });
+        }
         
         let fullDescription = scene.description || '';
         if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
@@ -3121,10 +3143,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     };
 
-    const playDiceRollOverlayAnimation = (diceType, finalResult, callback) => {
+    const playDiceRollOverlayAnimation = (diceType, finalResult, isSuccess, statusText, callback) => {
         const descContainer = document.getElementById('scene-description') || document.body;
         let overlay = document.getElementById('dice-roll-overlay');
-        const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;width:28px;height:28px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
+        const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;width:48px;height:48px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
         if (!overlay) {
             overlay = document.createElement('div');
             overlay.id = 'dice-roll-overlay';
@@ -3132,6 +3154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.innerHTML = '<div class="dice-roll-box">' +
                 '<div class="dice-roll-icon">' + diceSvgIcon + '</div>' +
                 '<div class="dice-roll-number" id="dice-roll-number">?</div>' +
+                '<div class="dice-roll-status" id="dice-roll-status"></div>' +
             '</div>';
             descContainer.appendChild(overlay);
         } else {
@@ -3142,9 +3165,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const numberEl = overlay.querySelector('#dice-roll-number');
+        const statusEl = overlay.querySelector('#dice-roll-status');
         if (numberEl) {
             numberEl.classList.remove('roll-final');
             numberEl.textContent = '?';
+        }
+        if (statusEl) {
+            statusEl.classList.remove('roll-final', 'status-success', 'status-failure');
+            statusEl.textContent = '';
         }
 
         const maxVal = diceType === 'd6' ? 6 : 20;
@@ -3161,10 +3189,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     numberEl.textContent = finalResult;
                     numberEl.classList.add('roll-final');
                 }
+                if (statusEl && statusText) {
+                    statusEl.textContent = statusText;
+                    statusEl.className = 'dice-roll-status roll-final ' + (isSuccess ? 'status-success' : 'status-failure');
+                }
                 setTimeout(() => {
                     overlay.classList.add('hidden');
                     if (callback) callback();
-                }, 600);
+                }, 1600);
             }
         }, 60);
     };
@@ -3176,10 +3208,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const rollResult = Math.floor(Math.random() * maxVal) + 1;
         const prefix = gameData.diceRollTextPrefix || 'Você tirou';
 
-        playDiceRollOverlayAnimation(diceType, rollResult, () => {
+        const config = (scene && scene.allowDiceRollInScene && scene.diceRollConfig) ? scene.diceRollConfig : null;
+        const cutoff = config ? (config.cutoffValue || (diceType === 'd6' ? 4 : 10)) : (diceType === 'd6' ? 4 : 10);
+        const isSuccess = rollResult >= cutoff;
+        const statusText = isSuccess ? ((config && config.successText) || 'Sucesso!') : ((config && config.failureText) || 'Falha!');
+        const inputEchoText = '> ' + statusText;
+
+        playDiceRollOverlayAnimation(diceType, rollResult, isSuccess, statusText, () => {
             const resultText = '> ' + prefix + ' ' + rollResult;
             
-            // Output dice result as verb echo log entry below scene description
+            // Output dice result (> Você tirou X) in origin scene description and actionLog
             const echo = document.createElement('p');
             echo.className = 'verb-echo';
             echo.textContent = resultText;
@@ -3190,10 +3228,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetInteractions = (scene && scene.interactions) ? scene.interactions : [];
 
             let targetVerb = null;
-            if (scene && scene.allowDiceRollInScene && scene.diceRollConfig) {
-                const config = scene.diceRollConfig;
-                const cutoff = config.cutoffValue || (diceType === 'd6' ? 4 : 10);
-                if (rollResult >= cutoff) {
+            if (config) {
+                if (isSuccess) {
                     targetVerb = config.successVerb;
                 } else {
                     targetVerb = config.failureVerb;
@@ -3215,12 +3251,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (matched) {
-                executeInteraction(matched);
+                executeInteraction(matched, inputEchoText);
+            } else {
+                const statusEcho = document.createElement('p');
+                statusEcho.className = 'verb-echo';
+                statusEcho.textContent = inputEchoText;
+                sceneDescription.appendChild(statusEcho);
+                sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                actionLog.push({ type: 'input', text: inputEchoText });
             }
         });
     };
 
-    const executeInteraction = (interaction) => {
+    const executeInteraction = (interaction, inputEchoText = null) => {
         if (interaction.consumesItem && interaction.requiresInInventory) { removeFromInventory(interaction.requiresInInventory); }
         if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
         if (interaction.addsToInventory && interaction.target) {
@@ -3235,14 +3278,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
-        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
+        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage, inputEchoText);
         else {
             const scene = gameData.cenas[currentSceneId];
             if (interaction.newSceneDescription) { 
                 if (interaction.successMessage) scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
                 else scene.description = interaction.newSceneDescription;
-                renderScene(scene); 
-            } else if (interaction.successMessage) printOutput(interaction.successMessage);
+                renderScene(scene, null, inputEchoText); 
+            } else if (interaction.successMessage) {
+                if (inputEchoText) {
+                    const formattedInput = inputEchoText.trim().startsWith('>') ? inputEchoText.trim() : ('> ' + inputEchoText.trim());
+                    const echo = document.createElement('p');
+                    echo.className = 'verb-echo';
+                    echo.textContent = formattedInput;
+                    sceneDescription.appendChild(echo);
+                    actionLog.push({ type: 'input', text: formattedInput });
+                }
+                printOutput(interaction.successMessage);
+            } else if (inputEchoText) {
+                const formattedInput = inputEchoText.trim().startsWith('>') ? inputEchoText.trim() : ('> ' + inputEchoText.trim());
+                const echo = document.createElement('p');
+                echo.className = 'verb-echo';
+                echo.textContent = formattedInput;
+                sceneDescription.appendChild(echo);
+                actionLog.push({ type: 'input', text: formattedInput });
+            }
         }
     };
 
@@ -3480,12 +3540,30 @@ document.addEventListener('DOMContentLoaded', () => {
             diaryLog.appendChild(statsContainer);
         }
 
-        actionLog.forEach(entry => {
+        for (let i = 0; i < actionLog.length; i++) {
+            const entry = actionLog[i];
             if (entry.type === 'scene') {
                 const div = document.createElement('div'); div.className = 'diary-entry';
                 if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
                 const txt = document.createElement('div'); txt.className = 'text-container'; 
-                txt.innerHTML = window.safeHTML('<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>', { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'scene-name';
+                nameSpan.textContent = entry.name || '';
+                txt.appendChild(nameSpan);
+
+                if (i + 1 < actionLog.length && actionLog[i + 1].type === 'input' && actionLog[i + 1].isLeadInput) {
+                    const leadInputP = document.createElement('p');
+                    leadInputP.className = 'diary-input';
+                    leadInputP.textContent = actionLog[i + 1].text;
+                    txt.appendChild(leadInputP);
+                    i++;
+                }
+
+                const descP = document.createElement('p');
+                descP.innerHTML = window.safeHTML(formatText(entry.description || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                txt.appendChild(descP);
+
                 div.appendChild(txt); diaryLog.appendChild(div);
                 setupHighlights(txt);
                 currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
@@ -3496,7 +3574,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentInterContainer.appendChild(p);
                 }
             }
-        });
+        }
         diaryModal.classList.remove('hidden'); 
         setTimeout(() => { 
             diaryLog.scrollTop = isConclusion ? 0 : diaryLog.scrollHeight; 

@@ -111,8 +111,10 @@ export interface DiceRollConfig {
   cutoffValue: number;
   successVerb: string;
   successLabel?: string;
+  successText?: string;
   failureVerb: string;
   failureLabel?: string;
+  failureText?: string;
 }
 
 export interface FixedVerb {

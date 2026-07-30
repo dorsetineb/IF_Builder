@@ -1996,36 +1996,64 @@ export const OVERLAY_CSS = `
     background: var(--panel-bg, #18181b);
     border: 2px solid var(--border-color, #3f3f46);
     border-radius: 0px;
-    padding: 24px 24px;
-    min-width: 130px;
-    min-height: 130px;
+    padding: 28px 32px;
+    min-width: 160px;
+    min-height: 160px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
 .dice-roll-icon {
-    font-size: 2rem;
+    font-size: 3.5rem;
     color: var(--accent-color, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .dice-roll-number {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: 900;
     font-family: var(--font-family);
     color: var(--text-color, #ffffff);
-    min-width: 80px;
+    min-width: 90px;
     text-align: center;
     letter-spacing: -1px;
+    line-height: 1;
 }
 
 .dice-roll-number.roll-final {
     color: var(--accent-color, #4ade80);
     transform: scale(1.15);
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+}
+
+.dice-roll-status {
+    font-size: 0.95rem;
+    font-weight: 800;
+    font-family: var(--font-family);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    text-align: center;
+}
+
+.dice-roll-status.roll-final {
+    opacity: 1;
+}
+
+.dice-roll-status.status-success {
+    color: #4ade80;
+}
+
+.dice-roll-status.status-failure {
+    color: #f87171;
 }
 `;
 

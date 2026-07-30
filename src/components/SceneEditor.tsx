@@ -1484,6 +1484,30 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-mono font-bold focus:ring-1 focus:ring-primary"
                       />
                     </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        TEXTO DE SUCESSO
+                      </label>
+                      <input
+                        type="text"
+                        value={localScene.diceRollConfig?.successText ?? 'Sucesso!'}
+                        onChange={(e) =>
+                          updateLocalScene('diceRollConfig', {
+                            ...(localScene.diceRollConfig || {
+                              cutoffValue: 10,
+                              successVerb: 'sucesso_dado',
+                              successLabel: 'Sucesso',
+                              failureVerb: 'falha_dado',
+                              failureLabel: 'Falha',
+                            }),
+                            successText: e.target.value,
+                          })
+                        }
+                        placeholder="Ex: Sucesso!"
+                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
                   </div>
 
                   {/* Seção 3: Resultado de Falha (Empilhado) */}
@@ -1514,6 +1538,30 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         }
                         placeholder="Ex: falha_dado"
                         className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-mono font-bold focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        TEXTO DE FALHA
+                      </label>
+                      <input
+                        type="text"
+                        value={localScene.diceRollConfig?.failureText ?? 'Falha!'}
+                        onChange={(e) =>
+                          updateLocalScene('diceRollConfig', {
+                            ...(localScene.diceRollConfig || {
+                              cutoffValue: 10,
+                              successVerb: 'sucesso_dado',
+                              successLabel: 'Sucesso',
+                              failureVerb: 'falha_dado',
+                              failureLabel: 'Falha',
+                            }),
+                            failureText: e.target.value,
+                          })
+                        }
+                        placeholder="Ex: Falha!"
+                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold focus:ring-1 focus:ring-primary"
                       />
                     </div>
                   </div>
