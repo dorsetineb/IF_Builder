@@ -36,7 +36,26 @@ if (fs.existsSync(aboutProjectPath) && releaseNotesContent) {
   fs.writeFileSync(aboutProjectPath, aboutContent);
 }
 
-// 5. Atualiza o arquivo public/releases/latest.json
+// 5. Atualiza a chave devlogContent nos arquivos de tradução i18n (pt/en/es)
+const localePaths = [
+  path.resolve('./src/locales/pt/translation.json'),
+  path.resolve('./src/locales/en/translation.json'),
+  path.resolve('./src/locales/es/translation.json')
+];
+
+if (releaseNotesContent) {
+  for (const localePath of localePaths) {
+    if (fs.existsSync(localePath)) {
+      const localeJson = JSON.parse(fs.readFileSync(localePath, 'utf-8'));
+      if (localeJson.about && localeJson.about.versions) {
+        localeJson.about.versions.devlogContent = releaseNotesContent;
+        fs.writeFileSync(localePath, JSON.stringify(localeJson, null, 2) + '\n');
+      }
+    }
+  }
+}
+
+// 6. Atualiza o arquivo public/releases/latest.json
 const latestJsonPath = path.resolve('./public/releases/latest.json');
 if (fs.existsSync(latestJsonPath)) {
   const latestJson = JSON.parse(fs.readFileSync(latestJsonPath, 'utf-8'));
@@ -57,3 +76,4 @@ console.log(`   - tauri.conf.json`);
 console.log(`   - src/version.ts`);
 console.log(`   - public/releases/latest.json`);
 console.log(`   - src/pages/AboutProject.tsx (Devlog)`);
+console.log(`   - src/locales/ (pt/en/es translation.json)`);
