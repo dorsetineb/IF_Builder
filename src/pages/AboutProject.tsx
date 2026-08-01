@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
 import { isDesktopApp } from '../utils/platform';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
-import { openUrl } from '@tauri-apps/plugin-opener';
 
 const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.1
 
@@ -35,8 +34,11 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         const url = (typeof targetUrl === 'string' && targetUrl) ? targetUrl : 'https://www.ifbuildr.com';
         if (isDesktopApp()) {
             try {
-                await openUrl(url);
-                return;
+                const opener = await import('@tauri-apps/plugin-opener');
+                if (opener && opener.openUrl) {
+                    await opener.openUrl(url);
+                    return;
+                }
             } catch (e) {
                 console.error('[AboutProject] Failed to open URL via plugin-opener:', e);
             }
