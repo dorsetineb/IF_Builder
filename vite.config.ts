@@ -209,7 +209,7 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       entries: ['index.html'],
-      exclude: ['@tauri-apps/plugin-opener', '@tauri-apps/plugin-updater', '@tauri-apps/plugin-process', '@tauri-apps/api'],
+      exclude: ['@tauri-apps/plugin-opener', '@tauri-apps/plugin-process', '@tauri-apps/api'],
     },
     plugins: [
       react(),

@@ -1,68 +1,46 @@
 ---
 name: release-versioning
-description: Automatiza a geração de Release Notes, tradução multilíngue do DevLog (pt/en/es), sincronização do public/releases/latest.json, commit das alterações e incremento de versão via scripts npm (release, release:minor, release:major). Use quando o usuário solicitar atualização de versão ou devlog.
+description: Automatiza a geração de Release Notes, tradução multilíngue do DevLog (pt/en/es), sincronização do public/releases/latest.json, atualização do modal de devlog no app e commit/tag de release via scripts npm. Use quando o usuário solicitar lançamento de nova versão ou atualização do devlog.
 ---
 
 # 🚀 Release Versioning & Devlog Manager Skill
 
-> **Objetivo:** Automatizar o processo completo de atualização de versão da aplicação (IF Builder), incluindo a geração de Release Notes traduzidas (em Português, Inglês e Espanhol), atualização do modal de DevLog da interface, atualização do arquivo `public/releases/latest.json`, criação do commit de release e execução dos scripts de versionamento (`npm run release`, `release:minor`, `release:major`).
+> **Objetivo:** Automatizar o processo completo de atualização de versão da aplicação (IF Builder), garantindo que as notas de versão, `public/releases/latest.json`, a constante do Devlog e as traduções i18n sejam sincronizadas **ANTES** de compilar e publicar a tag no GitHub.
 
 ---
 
-## 🎯 Quando esta Skill é Ativada
+## 📋 Fluxo Unificado de Lançamento de Versão
 
-Esta skill é acionada sempre que o usuário solicitar uma atualização de versão ou atualização do devlog/release notes (ex: *"atualize para a versão v0.8.1"*, *"faça a release v0.7.0"*, *"update de versão e devlog"*).
+Sempre que o usuário solicitar o lançamento de uma nova versão (ex: *"lance a versão v0.9.1"*, *"release patch"*, *"faça o release v1.0.0"*):
 
----
+### 1. 📝 Preparar as Notas de Versão (Release Notes)
+1. **Analisar Alterações:** Consultar todo o histórico de alterações desde o último release usando `git log <ultima-tag>..HEAD` (ex: `git log v0.9.0..HEAD` ou `git log -n 20`) e conferir os arquivos modificados para consolidar **todas** as novidades, refatorações, melhorias visuais e correções de bugs feitas desde a versão anterior.
+2. **Atualizar `public/RELEASE_NOTES.md`:** Escrever/atualizar o arquivo `public/RELEASE_NOTES.md` com as notas detalhadas e organizadas por tópicos com emojis.
+3. **Atualizar Traduções i18n:** Se necessário, atualizar a chave `about.versions.devlogContent` em `src/locales/pt/translation.json`, `en/translation.json`, `es/translation.json`.
 
-## 📋 Protocolo de Execução Passo a Passo
+### 2. 🚀 Executar o Comando de Versionamento (NPM Release)
+Executar o comando de versão correspondente:
 
-Sempre que a skill for ativada com uma versão de destino (ex: `v0.8.1`), o assistente DEVE seguir rigorosamente esta sequência de 4 etapas:
-
-### 1. 📝 Gerar Release Notes, Traduzir i18n e Atualizar Devlog & `latest.json`
-
-1. **Analisar Alterações:** Consultar `git log` recente (ou `git status`/`git diff`) para identificar todas as novidades, correções e melhorias introduzidas desde o último release.
-2. **Formatar as Notas de Versão:** Criar uma estrutura limpa e bem organizada com emojis e tópicos claros.
-3. **Atualizar `public/RELEASE_NOTES.md`:** Sobrescrever/atualizar o arquivo `public/RELEASE_NOTES.md` com as novas notas formatadas.
-4. **Atualizar `DEVLOG_RELEASE_NOTES` no Modal (`src/pages/AboutProject.tsx`):** Atualizar a constante de fallback `DEVLOG_RELEASE_NOTES` no arquivo `src/pages/AboutProject.tsx`.
-5. **Atualizar Traduções i18n (`src/locales/pt/translation.json`, `en/translation.json`, `es/translation.json`):** Atualizar a chave `about.versions.devlogContent` nos três arquivos de tradução (Português, Inglês e Espanhol) para garantir que ao trocar o idioma na interface o modal do Devlog seja dinamicamente traduzido.
-6. **Atualizar `public/releases/latest.json`:** Atualizar o arquivo `public/releases/latest.json` com a nova versão (`version`, `releaseName`, `releaseNotes`, e caminhos dos instaladores em `downloads`).
-
----
-
-### 2. 📌 Fazer Commit das Alterações do Devlog, Traduções e `latest.json`
-
-Antes de rodar o comando de versionamento do `npm`, execute o staging e commit das alterações da documentação, devlog, i18n e `latest.json`:
-
-```bash
-git add public/RELEASE_NOTES.md src/pages/AboutProject.tsx src/locales/ public/releases/latest.json scripts/update-tauri-version.js .agent/skills/release-versioning/SKILL.md
-git commit -m "chore(release): atualiza release notes, i18n, latest.json e modal de devlog para vX.X.X"
-```
-
----
-
-### 3. 🚀 Executar o Script de Versionamento (NPM Release)
-
-Identificar a diferença entre a versão atual no `package.json` e a nova versão solicitada pelo usuário para selecionar o comando adequado:
-
-| Tipo de Mudança | Exemplo de Transição | Comando NPM |
+| Tipo de Mudança | Exemplo | Comando NPM |
 | :--- | :--- | :--- |
-| **Patch** (correções/ajustes menores) | `v0.8.0` ➔ `v0.8.1` | `npm run release` |
-| **Minor** (novas funcionalidades) | `v0.7.0` ➔ `v0.8.0` | `npm run release:minor` |
-| **Major** (mudança estrutural/quebra) | `v0.8.0` ➔ `v1.0.0` | `npm run release:major` |
-| **Versão Específica** | Ex: `v0.8.5` | `npm version 0.8.5` |
-
-> ℹ️ **Nota:** O script `scripts/update-tauri-version.js` preserva o campo `releaseNotes` previamente preenchido no `latest.json`.
-> A execução dos comandos `npm run release*` dispara automaticamente os scripts em cadeia definidos no `package.json`:
-> 1. Atualização do `package.json`
-> 2. `node scripts/update-tauri-version.js` (atualiza `tauri.conf.json` e `src/version.ts`)
-> 3. Git add e commit automático de versão (`git push && git push --tags` se postversion for acionado)
+| **Patch** (correções/ajustes) | `v0.9.0` ➔ `v0.9.1` | `npm run release` |
+| **Minor** (novas funcionalidades) | `v0.9.0` ➔ `v0.10.0` | `npm run release:minor` |
+| **Major** (grandes mudanças) | `v0.9.0` ➔ `v1.0.0` | `npm run release:major` |
+| **Versão Específica** | Ex: `v0.9.5` | `npm version 0.9.5` |
 
 ---
 
-### 4. ✅ Confirmação e Relatório
+## ⚙️ O que Acontece Automaticamente ao Rodar `npm run release*`
 
-Apresentar ao usuário um resumo executivo claro com:
-1. A nova versão configurada (`vX.X.X`).
-2. O Release Note aplicado no modal, arquivos i18n (`pt/en/es`), `latest.json` e no arquivo de release.
-3. O status dos commits e das tags git geradas.
+Ao executar o `npm version` / `npm run release*`, o lifecycle script `"version"` do `package.json` aciona automaticamente o `node scripts/update-tauri-version.js`:
+
+1. **`package.json`**: Atualiza a versão.
+2. **`scripts/update-tauri-version.js`**:
+   * Atualiza a versão em `src-tauri/tauri.conf.json`.
+   * Atualiza a versão em `src/version.ts`.
+   * Atualiza `public/releases/latest.json` com a nova versão, novo `releaseNotes` (lido do `RELEASE_NOTES.md`) e novos links em `downloads`.
+   * Atualiza a constante `DEVLOG_RELEASE_NOTES` em `src/pages/AboutProject.tsx` com as novas notas de versão.
+3. **`git add`**: Inclui **todos** os arquivos modificados (`package.json`, `tauri.conf.json`, `src/version.ts`, `latest.json`, `RELEASE_NOTES.md`, `AboutProject.tsx`, `src/locales/`) no **mesmo commit de release**.
+4. **Git Commit & Tag**: Cria o commit e a tag de versão `vX.X.X`.
+5. **`postversion`**: Executa `git push && git push --tags` para publicar no GitHub.
+6. **GitHub Actions**: O GitHub Actions detecta a tag publicada, compila a release oficial no Windows/Linux e publica o conteúdo exato do `public/RELEASE_NOTES.md` na página de Releases do GitHub via `gh release edit --notes-file`, eliminando o texto genérico do "Full Changelog".

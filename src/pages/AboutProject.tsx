@@ -3,16 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp, safeTauriImport } from '../services/autoUpdater';
+import { isDesktopApp } from '../utils/platform';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
+import { openUrl } from '@tauri-apps/plugin-opener';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.0
+const DEVLOG_RELEASE_NOTES = `# IF Builder v0.9.0
 
-• Sistema de Rolagem de Dados (D6/D20): Suporte completo a testes de habilidade por cena com nota de corte, verbos de sucesso/falha e bloqueio durante a digitação da cena.
-• Customização Visual e Textos Padrão: Personalização da cor do botão de dados, cor da fonte, rótulo do botão ("Rolar D6"/"Rolar D20") e mensagens customizadas de Sucesso/Falha no Editor de Cena.
-• Overlay e Exibição de Dados: Interface de rolagem com formato quadrado, fonte nativa do jogo, ícone ampliado, overlay restrito ao painel de texto e exibição do resultado estendida.
-• Integração Narrativa e Diário: Registro do valor rolado na cena de origem e inserção do comando de sucesso/falha no topo da cena de destino, mantendo ordenação idêntica no Diário.
-• Transição Sincronizada de Overlays: Cross-fade suave e simultâneo entre imagens e efeitos visuais (granulado, glitch, tv, etc.), evitando vazamentos de overlay na troca de ramificação.`;
+🚀 Atualizações e Melhorias da Versão v0.9.0
+
+- **Sistema de Rolagem de Dados (D6/D20)**: Suporte completo a testes de habilidade por cena com nota de corte, verbos de sucesso/falha e bloqueio durante a digitação da cena.
+- **Customização Visual e Textos Padrão**: Personalização da cor do botão de dados, cor da fonte, rótulo do botão ("Rolar D6"/"Rolar D20") e mensagens customizadas de Sucesso/Falha no Editor de Cena.
+- **Overlay e Exibição de Dados**: Interface de rolagem com formato quadrado, fonte nativa do jogo, ícone ampliado, overlay restrito ao painel de texto e exibição do resultado estendida.
+- **Integração Narrativa e Diário**: Registro do valor rolado na cena de origem e inserção do comando de sucesso/falha no topo da cena de destino, mantendo ordenação idêntica no Diário.
+- **Transição Sincronizada de Overlays**: Cross-fade suave e simultâneo entre imagens e efeitos visuais (granulado, glitch, tv, etc.), evitando vazamentos de overlay na troca de ramificação.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
@@ -31,16 +34,12 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
     };
 
-    const handleOpenWebsite = async () => {
-        const url = 'https://www.ifbuildr.com';
+    const handleOpenWebsite = async (targetUrl?: string) => {
+        const url = (typeof targetUrl === 'string' && targetUrl) ? targetUrl : 'https://www.ifbuildr.com';
         if (isDesktopApp()) {
             try {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const openerPlugin = await safeTauriImport<any>('@tauri-apps/plugin-opener');
-                if (openerPlugin && openerPlugin.openUrl) {
-                    await openerPlugin.openUrl(url);
-                    return;
-                }
+                await openUrl(url);
+                return;
             } catch (e) {
                 console.error('[AboutProject] Failed to open URL via plugin-opener:', e);
             }
@@ -51,7 +50,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const DonationButton = ({ onClick, href, icon: Icon, label, variant = 'primary' }: { onClick?: () => void, href?: string, icon?: any, label: string, variant?: 'primary' | 'secondary' }) => {
         const handleClick = () => {
-            if (href) handleOpenWebsite();
+            if (href) handleOpenWebsite(href);
             if (onClick) onClick();
         };
 
@@ -185,7 +184,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                                             <div className="pt-2 flex items-center flex-wrap gap-4">
                                                 <button
-                                                    onClick={handleOpenWebsite}
+                                                    onClick={() => handleOpenWebsite('https://www.ifbuildr.com')}
                                                     className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
                                                 >
                                                     <span>www.ifbuildr.com</span>
@@ -245,7 +244,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             <p>{t('about.dev.p2', 'Tive a sorte de trabalhar com desenho e com computadores, e adoro histórias que são contadas de um jeito diferente.')}</p>
                                             <p>
                                                 {t('about.dev.p3', 'Escrevo com alguma regularidade no ')}
-                                                <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>
+                                                <a href="https://substack.com/@dorsetineb" onClick={(e) => { e.preventDefault(); handleOpenWebsite('https://substack.com/@dorsetineb'); }} target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>
                                                 {t('about.dev.p4', ', e seria muito legal conversar com você por lá também!')}
                                             </p>
                                         </div>
@@ -312,6 +311,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                                     <a
                                         href="https://ko-fi.com/ifbuildr"
+                                        onClick={(e) => { e.preventDefault(); handleOpenWebsite('https://ko-fi.com/ifbuildr'); }}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="w-full py-2 bg-[#29abe0] hover:bg-[#228cb8] text-white font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#29abe0]/20 hover:-translate-y-0.5"
