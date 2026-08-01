@@ -34,16 +34,18 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "nsis": {
-      "displayLanguageSelector": true,
-      "languages": [
-        "Portuguese",
-        "English",
-        "Spanish"
-      ],
-      "headerImage": "nsis/header.bmp",
-      "installerIcon": "icons/icon.ico",
-      "uninstallerIcon": "icons/icon.ico"
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": true,
+        "languages": [
+          "Portuguese",
+          "English",
+          "Spanish"
+        ],
+        "headerImage": "nsis/header.bmp",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico"
+      }
     },
     "android": {
       "debugApplicationIdSuffix": ".debug"
