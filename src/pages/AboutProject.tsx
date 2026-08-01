@@ -7,15 +7,12 @@ import { isDesktopApp } from '../utils/platform';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
-const DEVLOG_RELEASE_NOTES = `# IF Builder v0.9.0
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.1
 
-🚀 Atualizações e Melhorias da Versão v0.9.0
-
-- **Sistema de Rolagem de Dados (D6/D20)**: Suporte completo a testes de habilidade por cena com nota de corte, verbos de sucesso/falha e bloqueio durante a digitação da cena.
-- **Customização Visual e Textos Padrão**: Personalização da cor do botão de dados, cor da fonte, rótulo do botão ("Rolar D6"/"Rolar D20") e mensagens customizadas de Sucesso/Falha no Editor de Cena.
-- **Overlay e Exibição de Dados**: Interface de rolagem com formato quadrado, fonte nativa do jogo, ícone ampliado, overlay restrito ao painel de texto e exibição do resultado estendida.
-- **Integração Narrativa e Diário**: Registro do valor rolado na cena de origem e inserção do comando de sucesso/falha no topo da cena de destino, mantendo ordenação idêntica no Diário.
-- **Transição Sincronizada de Overlays**: Cross-fade suave e simultâneo entre imagens e efeitos visuais (granulado, glitch, tv, etc.), evitando vazamentos de overlay na troca de ramificação.`;
+• Otimização do Instalador Windows (NSIS): Adicionado seletor inicial de idioma (Português, Inglês e Espanhol), ícones personalizados do IF Builder para o instalador/desinstalador e banner de cabeçalho personalizado.
+• Correção de Links no App Desktop: Solucionado o problema de clique nos links da tela "Sobre o Projeto" (incluindo o botão para www.ifbuildr.com, Substack e Ko-fi), que agora abrem diretamente no navegador padrão do sistema.
+• Automação Completa de Releases: Sincronização automática do arquivo \`latest.json\`, notas de versão e modal de DevLog em um único commit, com publicação automática do Release Note formatado no GitHub Releases.
+• Remoção do Auto-Updater Legado: Remoção completa de dependências e código legado de auto-update (@tauri-apps/plugin-updater), deixando o aplicativo mais leve e limpo.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
