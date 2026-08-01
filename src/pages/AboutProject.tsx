@@ -6,12 +6,11 @@ import { APP_VERSION } from '../version';
 import { isDesktopApp } from '../utils/platform';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.2
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.3
 
-• Estabilidade na Versão Web: Corrigido problema de tela preta ao iniciar o programa no navegador de internet (ifbuildr.com), convertendo plugins de integração desktop para carregamento dinâmico sob demanda.
-• Compatibilidade e Validação do Tauri 2.0: Ajustado o esquema de configuração do instalador Windows (NSIS) sob \`bundle.windows.nsis\` para total compatibilidade com o Tauri v2.
-• Sincronização Multilíngue do DevLog (i18n): Automação completa do script de release para sincronizar instantaneamente as notas de versão nos arquivos de tradução (Português, Inglês e Espanhol).
-• Correção na Esteira de Integração Contínua (CI): Ajustada a sintaxe do GitHub Actions para a verificação do SignPath Foundation e publicação automatizada no GitHub Releases.`;
+• Correção Definitiva de Links no Desktop: Adicionada permissão explícita \`opener:allow-open-url\` no Tauri v2 e utilitário com fallbacks robustos para garantir que os links para www.ifbuildr.com, Substack e Ko-fi abram corretamente no navegador padrão do sistema no Windows e Linux.
+• Botão de Log de Desenvolvimento no App Desktop: Adicionado o botão "Log de Desenvolvimento" no banner da tela Sobre o Projeto dentro do aplicativo desktop instalado (Windows/Linux), alinhando a interface com a versão Web.
+• Estabilidade e Conectividade: Garantida abertura confiável de links sem interrupções em todas as plataformas.`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
@@ -32,18 +31,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
     const handleOpenWebsite = async (targetUrl?: string) => {
         const url = (typeof targetUrl === 'string' && targetUrl) ? targetUrl : 'https://www.ifbuildr.com';
-        if (isDesktopApp()) {
-            try {
-                const opener = await import('@tauri-apps/plugin-opener');
-                if (opener && opener.openUrl) {
-                    await opener.openUrl(url);
-                    return;
-                }
-            } catch (e) {
-                console.error('[AboutProject] Failed to open URL via plugin-opener:', e);
-            }
-        }
-        window.open(url, '_blank', 'noopener,noreferrer');
+        await openExternalUrl(url);
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
@@ -188,6 +176,14 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                 >
                                                     <span>www.ifbuildr.com</span>
                                                     <ExternalLink className="w-4 h-4" />
+                                                </button>
+
+                                                <button
+                                                    onClick={() => setIsDevLogModalOpen(true)}
+                                                    className="px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white/90 font-medium text-xs flex items-center gap-2 border border-zinc-700 transition-colors cursor-pointer"
+                                                >
+                                                    <FileText className="w-4 h-4 text-primary" />
+                                                    <span>{t('about.versions.changelogTitle', 'Log de Desenvolvimento')}</span>
                                                 </button>
                                             </div>
                                         </div>
