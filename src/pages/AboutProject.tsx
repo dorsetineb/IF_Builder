@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, Workflow, Crop, Key, Download, Sparkles, Monitor, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../version';
-import { isDesktopApp } from '../utils/platform';
+import { isDesktopApp, openExternalUrl } from '../utils/platform';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
 const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.9.3
@@ -17,7 +17,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [showPixModal, setShowPixModal] = useState(false);
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
     const [isDevLogModalOpen, setIsDevLogModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
     const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
 
     // Automatically update the default selected tab if the user switches languages
@@ -73,180 +72,82 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
                     {/* Main Content */}
                     <div className="space-y-6 lg:col-span-7 xl:col-span-8 transition-all duration-300">
-                        {/* Tabs Navigation */}
-                        <div className="flex border-b border-muted-foreground/50 mb-6">
-                            <div className="flex space-x-6">
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
+                            <div>
+                                <div className="space-y-6 text-white leading-relaxed font-light text-sm mb-8">
+                                    <p>{t('about.project.p1', 'O IF Builder é um editor de ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
+                                    <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
+                                    <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
+                                </div>
 
-                                <button
-                                    onClick={() => setActiveTab('about_project')}
-                                    className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'about_project'
-                                        ? 'text-primary border-b-4 border-primary'
-                                        : 'text-white/70 hover:text-white'
-                                        }`}
-                                >
-                                    {t('about.tabs.aboutProject', 'Sobre o Projeto')}
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('dev')}
-                                    className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'dev'
-                                        ? 'text-primary border-b-4 border-primary'
-                                        : 'text-white/70 hover:text-white'
-                                        }`}
-                                >
-                                    {t('about.tabs.developer', 'Sobre o Desenvolvedor')}
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('support')}
-                                    className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'support'
-                                        ? 'text-primary border-b-4 border-primary'
-                                        : 'text-white/70 hover:text-white'
-                                        }`}
-                                >
-                                    {t('about.tabs.support', 'Apoie o IF Builder')}
-                                </button>
+                                {/* Desktop Installer Banner (Web vs Desktop App) */}
+                                {!isDesktopApp() ? (
+                                    <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+                                        <div className="flex items-start justify-between">
+                                            <div className="space-y-2">
+                                                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                    <Monitor className="w-5 h-5 text-primary" />
+                                                    {t('about.versions.desktopBannerTitle', 'Baixe o IFBuilder para Desktop')}
+                                                </h3>
+                                                <div className="text-xs text-white/70 leading-relaxed max-w-xl">
+                                                    <p>{t('about.versions.desktopBannerDesc', 'Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2 flex items-center flex-wrap gap-4">
+                                            <button
+                                                onClick={() => setIsDownloadModalOpen(true)}
+                                                className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                                <span>{t('about.versions.downloadBtn', 'Baixar Aplicativo Desktop (v{{version}})', { version: APP_VERSION })}</span>
+                                            </button>
+
+                                            <button
+                                                onClick={() => setIsDevLogModalOpen(true)}
+                                                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
+                                            >
+                                                <FileText className="w-4 h-4" />
+                                                <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+                                        <div className="flex items-start justify-between">
+                                            <div className="space-y-2">
+                                                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                    <Globe className="w-5 h-5 text-primary" />
+                                                    {t('about.versions.desktopAppTitle', 'Acesse o IFBuilder na web')}
+                                                </h3>
+                                                <div className="text-xs text-white/70 leading-relaxed max-w-none">
+                                                    <p className="whitespace-normal xl:whitespace-nowrap">{t('about.versions.desktopAppDesc', 'Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.', { version: APP_VERSION })}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2 flex items-center flex-wrap gap-4">
+                                            <button
+                                                onClick={() => handleOpenWebsite('https://www.ifbuildr.com')}
+                                                className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
+                                            >
+                                                <span>www.ifbuildr.com</span>
+                                                <ExternalLink className="w-4 h-4" />
+                                            </button>
+
+                                            <button
+                                                onClick={() => setIsDevLogModalOpen(true)}
+                                                className="px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white/90 font-medium text-xs flex items-center gap-2 border border-zinc-700 transition-colors cursor-pointer"
+                                            >
+                                                <FileText className="w-4 h-4 text-primary" />
+                                                <span>{t('about.versions.changelogTitle', 'Log de Desenvolvimento')}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-
-                        {/* TAB: SOBRE O PROJETO */}
-                        {activeTab === 'about_project' && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <h2 className="text-lg font-bold text-white">
-                                            {t('about.title', 'Sobre o IF Builder')}
-                                        </h2>
-                                    </div>
-                                    <div className="space-y-6 text-white leading-relaxed font-light text-sm mb-8">
-                                        <p>{t('about.project.p1', 'O IF Builder é um editor que desenvolvi para criar ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
-                                        <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
-                                        <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
-                                    </div>
-
-                                    {/* Desktop Installer Banner (Web vs Desktop App) */}
-                                    {!isDesktopApp() ? (
-                                        <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
-                                            <div className="flex items-start justify-between">
-                                                <div className="space-y-2">
-                                                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                                                        <Monitor className="w-5 h-5 text-primary" />
-                                                        {t('about.versions.desktopBannerTitle', 'Baixe o IFBuilder para Desktop')}
-                                                    </h3>
-                                                    <div className="text-xs text-white/70 leading-relaxed max-w-xl">
-                                                        <p>{t('about.versions.desktopBannerDesc', 'Use o editor sem precisar de conexão com a internet. Disponível para Windows e Linux.')}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="pt-2 flex items-center flex-wrap gap-4">
-                                                <button
-                                                    onClick={() => setIsDownloadModalOpen(true)}
-                                                    className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
-                                                >
-                                                    <Download className="w-4 h-4" />
-                                                    <span>{t('about.versions.downloadBtn', 'Baixar Aplicativo Desktop (v{{version}})', { version: APP_VERSION })}</span>
-                                                </button>
-
-                                                <button
-                                                    onClick={() => setIsDevLogModalOpen(true)}
-                                                    className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5 cursor-pointer py-1"
-                                                >
-                                                    <FileText className="w-4 h-4" />
-                                                    <span>{t('about.versions.viewLogLink', 'ver log de desenvolvimento')}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-zinc-900 border-2 border-primary/40 rounded-xl p-6 space-y-4 shadow-xl relative overflow-hidden">
-                                            <div className="flex items-start justify-between">
-                                                <div className="space-y-2">
-                                                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                                                        <Globe className="w-5 h-5 text-primary" />
-                                                        {t('about.versions.desktopAppTitle', 'Acesse o IFBuilder na web')}
-                                                    </h3>
-                                                    <div className="text-xs text-white/70 leading-relaxed max-w-none">
-                                                        <p className="whitespace-normal xl:whitespace-nowrap">{t('about.versions.desktopAppDesc', 'Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.', { version: APP_VERSION })}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="pt-2 flex items-center flex-wrap gap-4">
-                                                <button
-                                                    onClick={() => handleOpenWebsite('https://www.ifbuildr.com')}
-                                                    className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs flex items-center gap-2 shadow-lg cursor-pointer transition-all hover:-translate-y-0.5"
-                                                >
-                                                    <span>www.ifbuildr.com</span>
-                                                    <ExternalLink className="w-4 h-4" />
-                                                </button>
-
-                                                <button
-                                                    onClick={() => setIsDevLogModalOpen(true)}
-                                                    className="px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white/90 font-medium text-xs flex items-center gap-2 border border-zinc-700 transition-colors cursor-pointer"
-                                                >
-                                                    <FileText className="w-4 h-4 text-primary" />
-                                                    <span>{t('about.versions.changelogTitle', 'Log de Desenvolvimento')}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* TAB: APOIAR (ANTIGO SOBRE O PROJETO) */}
-                        {activeTab === 'support' && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
-                                <div className="">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <h2 className="text-lg font-bold text-white">
-                                            {t('about.support.title', 'Por que apoiar?')}
-                                        </h2>
-                                    </div>
-
-                                    <div className="space-y-6 text-white leading-relaxed font-light text-sm">
-                                        <p>{t('about.support.p1', 'IF Builder é um projeto gratuito, sem fins lucrativos, e seu funcionamento é custeado pelo desenvolvedor.')}</p>
-                                        <p>{t('about.support.p2', 'Se esta ferramenta é útil para você, considere fazer uma doação de qualquer valor. Todo o recurso arrecadado é destinado exclusivamente ao pagamento dos custos de infraestrutura do site, incluindo a manutenção e as futuras melhorias.')}</p>
-                                        <p>
-                                            {t('about.support.p3', 'Se tiver sugestões, críticas ou quiser compartilhar suas histórias, mande um e-mail para: ')}
-                                            <strong><a className="text-primary hover:underline hover:text-primary/80" href="mailto:ola@ifbuildr.com">ola@ifbuildr.com</a></strong>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-
-                        {/* TAB: SOBRE O DESENVOLVEDOR (Renamed & Reordered) */}
-                        {activeTab === 'dev' && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
-                                <div className="">
-                                    <div className="flex flex-col md:flex-row gap-8">
-                                        {/* Avatar Refined */}
-                                        <div className="flex-shrink-0 flex flex-col items-center">
-                                            <div className="w-32 h-32 rounded-full border-4 border-muted-foreground/50 overflow-hidden flex items-center justify-center">
-                                                <img
-                                                    src="/rodrigo-profile.png"
-                                                    alt="Rodrigo Benites"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                            <div className="mt-4 text-center">
-                                                <h3 className="text-lg font-bold text-white">@dorsetineb</h3>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex-1 space-y-6 text-white leading-relaxed font-light text-sm text-left">
-                                            <p>{t('about.dev.p1', 'Sou bacharel em Artes Visuais, pós-graduado em Gestão da Inovação, e atuo há mais de uma década em projetos que envolvem design, educação e tecnologia.')}</p>
-                                            <p>{t('about.dev.p2', 'Tive a sorte de trabalhar com desenho e com computadores, e adoro histórias que são contadas de um jeito diferente.')}</p>
-                                            <p>
-                                                {t('about.dev.p3', 'Escrevo com alguma regularidade no ')}
-                                                <a href="https://substack.com/@dorsetineb" onClick={(e) => { e.preventDefault(); handleOpenWebsite('https://substack.com/@dorsetineb'); }} target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>
-                                                {t('about.dev.p4', ', e seria muito legal conversar com você por lá também!')}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
 
                     {/* Sidebar - Fixa/Sticky */}
@@ -257,9 +158,10 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <h3 className="font-bold text-sm text-white">{t('about.support.sidebar.title', 'Apoie o Projeto')}</h3>
                             </div>
 
-                            <p className="text-[12px] text-white/80 leading-relaxed mb-4">
-                                {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX! ou um Ko-fi!')}
-                            </p>
+                            <div className="text-[12px] text-white/80 leading-relaxed mb-4 space-y-3">
+                                <p>{t('about.support.p1', 'IF Builder é um projeto gratuito, sem fins lucrativos, e seu funcionamento é custeado pelo desenvolvedor.')}</p>
+                                <p>{t('about.support.p2', 'Se esta ferramenta é útil para você, considere fazer uma doação de qualquer valor. Todo o recurso arrecadado é destinado exclusivamente ao pagamento dos custos de infraestrutura do site, incluindo a manutenção e as futuras melhorias.')}</p>
+                            </div>
 
                             <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-muted-foreground/50">
                                 <button

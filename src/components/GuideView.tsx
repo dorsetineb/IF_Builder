@@ -26,22 +26,24 @@ export const GuideView: React.FC = () => {
                         <select
                             className="w-full bg-background border border-muted-foreground/50 rounded-md px-3 py-2 text-sm appearance-none focus:ring-1 focus:ring-primary outline-none text-white cursor-pointer shadow-sm"
                             onChange={(e) => {
-                                scrollToSection(e.target.value);
-                                e.target.value = ""; // Reset selection nicely
+                                if (e.target.value) {
+                                    scrollToSection(e.target.value);
+                                    e.target.value = ""; // Reset selection nicely
+                                }
                             }}
                             defaultValue=""
                         >
-                            <option value="" disabled>{t('guide.tocSelect', 'Selecione um capítulo para navegar...')}</option>
-                            <option value="section-scenes">{t('guide.sections.scenes.title', '1. Editor de Ramificações')}</option>
-                            <option value="section-objects">{t('guide.sections.objects.title', '2. Biblioteca de Objetos')}</option>
-                            <option value="section-interactions">{t('guide.sections.interactions.title', '3. Interações')}</option>
-                            <option value="section-globals">{t('guide.sections.globals.title', '4. Verbos Globais')}</option>
-                            <option value="section-vignettes">{t('guide.sections.vignettes.title', '5. Capítulos')}</option>
-                            <option value="section-trackers">{t('guide.sections.trackers.title', '6. Rastreadores de Consequência')}</option>
-                            <option value="section-map">{t('guide.sections.map.title', '7. Mapa de Conexões')}</option>
-                            <option value="section-settings">{t('guide.sections.settings.title', '8. Configurações do Jogo')}</option>
-                            <option value="section-preview">{t('guide.sections.preview.title', '9. Pré-visualização e Teste')}</option>
-                            <option value="section-export">{t('guide.sections.export.title', '10. Finalização e Exportação')}</option>
+                            <option value="" className="bg-zinc-900 text-white">{t('guide.tocSelect', 'Selecione um capítulo...')}</option>
+                            <option value="section-scenes" className="bg-zinc-900 text-white">{t('guide.sections.scenes.title', '1. Editor de Ramificações')}</option>
+                            <option value="section-objects" className="bg-zinc-900 text-white">{t('guide.sections.objects.title', '2. Biblioteca de Objetos')}</option>
+                            <option value="section-interactions" className="bg-zinc-900 text-white">{t('guide.sections.interactions.title', '3. Interações')}</option>
+                            <option value="section-globals" className="bg-zinc-900 text-white">{t('guide.sections.globals.title', '4. Verbos Globais')}</option>
+                            <option value="section-vignettes" className="bg-zinc-900 text-white">{t('guide.sections.vignettes.title', '5. Capítulos')}</option>
+                            <option value="section-trackers" className="bg-zinc-900 text-white">{t('guide.sections.trackers.title', '6. Rastreadores de Consequência')}</option>
+                            <option value="section-map" className="bg-zinc-900 text-white">{t('guide.sections.map.title', '7. Mapa de Conexões')}</option>
+                            <option value="section-settings" className="bg-zinc-900 text-white">{t('guide.sections.settings.title', '8. Configurações do Jogo')}</option>
+                            <option value="section-preview" className="bg-zinc-900 text-white">{t('guide.sections.preview.title', '9. Pré-visualização e Teste')}</option>
+                            <option value="section-export" className="bg-zinc-900 text-white">{t('guide.sections.export.title', '10. Finalização e Exportação')}</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>

@@ -129,7 +129,7 @@
       "support": "Support IF Builder"
     },
     "project": {
-      "p1": "IF Builder is an editor I developed to create interactive fiction - textual narratives where the player decides what happens next.",
+      "p1": "IF Builder is an interactive fiction editor - textual narratives where the player decides what happens next.",
       "p2": "Here, interactive fictions are written in branches. It's easy to visualize where each choice takes the player and how paths cross. If you want something to happen only if the player has a specific item or made a previous choice, the editor easily handles that.",
       "p3": "When finished, the editor exports a .zip file that works in any browser. Your story leaves the editor and goes straight to whoever wants to play. And if that person uses IF Builder, they can import the .zip file into the editor and see how you created your story. Maybe even make a remix?"
     },
@@ -207,7 +207,7 @@
     "title": "Quick Guide",
     "intro": "IF Builder allows you to create interactive fictions, text-based narratives where the player interacts with the story through choices or verbs. The fiction is composed of <strong>Branches</strong>, where the user reads descriptions, observes images, and makes decisions to interact with <strong>objects</strong> and <strong>navigate the world</strong>.",
     "toc": "Guide Index",
-    "tocSelect": "Select a chapter to navigate...",
+    "tocSelect": "Select a chapter...",
     "sections": {
       "scenes": {
         "title": "1. Branch Editor",

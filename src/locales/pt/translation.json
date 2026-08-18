@@ -151,7 +151,7 @@
       "support": "Apoie o IF Builder"
     },
     "project": {
-      "p1": "O IF Builder é um editor que desenvolvi para criar ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.",
+      "p1": "O IF Builder é um editor de ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.",
       "p2": "Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o usuário e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o usuário tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.",
       "p3": "Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?"
     },
@@ -524,7 +524,7 @@
     "title": "Guia Rápido",
     "intro": "O IF Builder permite criar ficções interativas, narrativas textuais onde o usuário interage com a história por meio de escolhas ou verbos. A ficção é composta por <strong>Ramificações</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.",
     "toc": "Índice do Guia",
-    "tocSelect": "Selecione um capítulo para navegar...",
+    "tocSelect": "Selecione um capítulo...",
     "sections": {
       "scenes": {
         "title": "1. Editor de Ramificações",
