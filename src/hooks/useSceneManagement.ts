@@ -30,7 +30,7 @@ export const useSceneManagement = ({
 }: UseSceneManagementProps) => {
     const { t } = useTranslation();
 
-    const handleAddScene = useCallback((type: 'scene' | 'vignette' = 'scene') => {
+    const handleAddScene = useCallback((type: 'scene' | 'vignette' | 'hypercard_stack' = 'scene') => {
         const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
 
         // Calculate position to the right of existing scenes
@@ -42,9 +42,11 @@ export const useSceneManagement = ({
         const sceneValues = Object.values(gameData.scenes);
         const hasOpeningVignette = sceneValues.some(s => s.vignetteType === 'opening');
         const isVignette = type === 'vignette' || !hasOpeningVignette;
+        const isStack = type === 'hypercard_stack' && hasOpeningVignette;
 
         const vignetteCount = sceneValues.filter(s => s.vignetteType && s.vignetteType !== 'none').length + 1;
-        const sceneCount = sceneValues.filter(s => !s.vignetteType || s.vignetteType === 'none').length + 1;
+        const sceneCount = sceneValues.filter(s => (!s.vignetteType || s.vignetteType === 'none') && s.sceneType !== 'hypercard_stack').length + 1;
+        const stackCount = sceneValues.filter(s => s.sceneType === 'hypercard_stack').length + 1;
 
         let defaultName = '';
         if (isVignette) {
@@ -53,18 +55,37 @@ export const useSceneManagement = ({
             } else {
                 defaultName = `${t('editor.newVignetteNamePrefix', 'Cena #')}${vignetteCount}`;
             }
+        } else if (isStack) {
+            defaultName = `${t('editor.newStackNamePrefix', 'Cenário #')}${stackCount}`;
         } else {
             defaultName = `${t('editor.newSceneNamePrefix', 'Ramificação #')}${sceneCount}`;
         }
+
+        const firstCardId = generateUniqueId('crd', []);
+        const initialCard = isStack ? {
+            id: firstCardId,
+            name: t('editor.defaultCardName', 'Slide 1'),
+            image: '',
+            description: '',
+            hotspots: [],
+            transition: 'dissolve' as const,
+            transitionSpeed: 300
+        } : undefined;
 
         const newScene: Scene = {
             id: newId,
             name: defaultName,
             image: '',
-            description: isVignette ? t('editor.newVignetteDescription', 'Descrição da nova cena.') : t('editor.newSceneDescription', 'Descrição da nova ramificação.'),
+            description: isStack
+                ? t('editor.newStackDescription', 'Pilha de cartões interativos com hotspots.')
+                : (isVignette ? t('editor.newVignetteDescription', 'Descrição da nova cena.') : t('editor.newSceneDescription', 'Descrição da nova ramificação.')),
             objectIds: [],
             interactions: [],
             vignetteType: !hasOpeningVignette ? 'opening' : (type === 'vignette' ? 'transition' : 'none'),
+            sceneType: isStack ? 'hypercard_stack' : (isVignette ? 'vignette' : 'branch'),
+            stackCards: initialCard ? [initialCard] : undefined,
+            startCardId: initialCard ? firstCardId : undefined,
+            enableRevealZonesButton: isStack ? true : undefined,
             mapX: initialMapX,
             mapY: 0
         };
@@ -99,7 +120,7 @@ export const useSceneManagement = ({
         setCurrentView('three_panels');
         setSelectedSceneId(newId);
         setIsDirty(true);
-    }, [gameData.scenes, gameData.sceneOrder, setGameData, setCurrentView, setSelectedSceneId, setIsDirty]);
+    }, [gameData.scenes, gameData.sceneOrder, setGameData, setCurrentView, setSelectedSceneId, setIsDirty, t]);
 
     const handleDeleteScene = useCallback((sceneId: string) => {
         if (sceneId === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
@@ -135,6 +156,18 @@ export const useSceneManagement = ({
                     // Clean up dangling vignette links
                     if (scene.vignetteNextSceneId === sceneId) {
                         scene.vignetteNextSceneId = '';
+                    }
+                    // Clean up dangling stack hotspot links
+                    if (scene.stackCards) {
+                        scene.stackCards.forEach(card => {
+                            if (card.hotspots) {
+                                card.hotspots.forEach(h => {
+                                    if (h.targetSceneId === sceneId) {
+                                        h.targetSceneId = '';
+                                    }
+                                });
+                            }
+                        });
                     }
                 });
 

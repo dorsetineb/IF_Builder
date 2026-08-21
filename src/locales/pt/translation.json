@@ -217,6 +217,9 @@
       "scene": {
         "title": "Criar Ramificação",
         "lockedDesc": "Crie um capítulo de abertura para habilitar ramificações."
+      },
+      "hypercard": {
+        "title": "Criar Cenário"
       }
     }
   },
@@ -229,6 +232,7 @@
     "noTitle": "(Sem Título)",
     "opening": "Abertura",
     "conclusion": "Conclusão",
+    "scenario": "Cenário (Slides)",
     "ending": "Final",
     "action": "Ação",
     "reorganize": "Reorganizar",
@@ -1362,5 +1366,86 @@
       "sizeLarge": "Grande",
       "description": "Ajuste o tamanho geral e selecione a fonte principal da interface."
     }
+  },
+  "hypercard": {
+    "badge": "PILHA DE CARTÕES",
+    "stackSubtitle": "Cena interativa com imagens e hiperlinks navegáveis",
+    "cardsListTitle": "Cartões da Pilha",
+    "addCardBtn": "Novo Cartão",
+    "defaultCardName": "Cartão 1",
+    "cardPrefix": "Cartão",
+    "zonesCount": "zonas",
+    "startCard": "INÍCIO",
+    "setAsStart": "Tornar Inicial",
+    "cardTransition": "Transição",
+    "tools": {
+      "select": "Mover",
+      "rect": "Retângulo",
+      "circle": "Círculo",
+      "polygon": "Polígono"
+    },
+    "editMode": "Modo Edição",
+    "testMode": "Testar Hotspots",
+    "hideZones": "Ocultar Zonas",
+    "revealZones": "Revelar Zonas (Espaço)",
+    "emptyImageTitle": "Adicione a Imagem deste Cartão",
+    "emptyImageDesc": "Faça upload do cenário visual ou ilustração para desenhar as áreas clicáveis e criar a cena interativa.",
+    "uploadImageBtn": "Escolher Imagem",
+    "noHotspotSelected": "Nenhuma Área Selecionada",
+    "selectHotspotHint": "Clique em uma área na imagem ou desenhe uma nova para configurar suas ações e propriedades.",
+    "hotspotDefault": "Área Interativa",
+    "examineTitleDefault": "Examinar",
+    "examineTextDefault": "Você observa atentamente este detalhe.",
+    "tabs": {
+      "visual": "Visual",
+      "action": "Ação",
+      "conditions": "Condições"
+    },
+    "fields": {
+      "title": "Rótulo / Tooltip",
+      "highlightStyle": "Estilo de Realce",
+      "cursor": "Ponteiro do Mouse (Cursor)",
+      "soundEffect": "Efeito Sonoro ao Clicar",
+      "actionType": "Tipo de Ação",
+      "targetCard": "Cartão de Destino",
+      "targetScene": "Ramificação / Capítulo de Destino",
+      "examineTitle": "Título do Diálogo",
+      "examineText": "Texto da Mensagem",
+      "collectItem": "Item a Coletar",
+      "requiresInInventory": "Requer Item no Inventário",
+      "consumesItem": "Consumir/remover item ao usar",
+      "lockedMessage": "Mensagem de Bloqueio",
+      "trackers": "Efeito em Contadores"
+    },
+    "styles": {
+      "hoverGlow": "Brilho ao passar o mouse",
+      "hidden": "Invisível (Pixel hunt clássico)",
+      "subtleBorder": "Borda sutil permanente",
+      "alwaysVisible": "Realce visível permanente",
+      "pulsingPin": "Marcador pulsante (Pin)"
+    },
+    "cursors": {
+      "pointer": "Mãozinha / Clique padrão",
+      "magnify": "Lupa (Examinar)",
+      "hand": "Mão aberta (Interagir)",
+      "eye": "Olho (Observar)",
+      "door": "Porta (Entrar / Sair)",
+      "arrowUp": "Seta para Cima (Avançar)",
+      "arrowDown": "Seta para Baixo (Recuar)",
+      "arrowLeft": "Seta para Esquerda",
+      "arrowRight": "Seta para Direita"
+    },
+    "actions": {
+      "examine": "Examinar (Diálogo flutuante)",
+      "navigateCard": "Navegar para outro Cartão da Pilha",
+      "navigateScene": "Sair para outra Cena/Ramificação do Mapa",
+      "collectItem": "Coletar Item para Inventário",
+      "toggleTracker": "Alterar Contador / Tracker"
+    },
+    "selectCardPlaceholder": "-- Selecione o Cartão --",
+    "selectScenePlaceholder": "-- Selecione a Cena no Mapa --",
+    "selectItemPlaceholder": "-- Selecione o Item --",
+    "noRequirement": "Nenhum requisito",
+    "uploadSound": "Adicionar Som (.mp3, .wav)"
   }
 }

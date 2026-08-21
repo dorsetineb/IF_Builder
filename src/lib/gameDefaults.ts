@@ -418,6 +418,54 @@ body.with-spacing .main-wrapper { height: 100%; }
 .image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; padding: 0; }
 .image-container { width: 100%; height: 100%; position: relative; overflow: hidden; background-size: cover; background-position: center; transition: border 0.3s ease-in-out, outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
 .scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* HyperCard Scenario Fullscreen Mode */
+.game-container.hypercard-fullscreen {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10 !important;
+    display: block !important;
+}
+.game-container.hypercard-fullscreen .image-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    flex: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-color: #000 !important;
+    display: block !important;
+}
+.game-container.hypercard-fullscreen .image-container {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #000 !important;
+}
+.game-container.hypercard-fullscreen .text-panel {
+    display: none !important;
+}
+.game-container.hypercard-fullscreen .action-bar {
+    display: none !important;
+}
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
 .scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; }

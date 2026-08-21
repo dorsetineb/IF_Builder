@@ -308,6 +308,9 @@
       "scene": {
         "title": "Crear Ramificación",
         "lockedDesc": "Crea un capítulo de apertura para habilitar ramificaciones."
+      },
+      "hypercard": {
+        "title": "Crear Escenario"
       }
     }
   },
@@ -320,6 +323,7 @@
     "noTitle": "(Sin Título)",
     "opening": "Apertura",
     "conclusion": "Conclusión",
+    "scenario": "Escenario (Slides)",
     "ending": "Final",
     "action": "Acción",
     "reorganize": "Reorganizar",
@@ -1336,5 +1340,86 @@
       "sizeLarge": "Grande",
       "description": "Ajuste el tamaño general y seleccione la fuente principal de toda la interfaz del editor para que se adapte a su visión."
     }
+  },
+  "hypercard": {
+    "badge": "PILA DE TARJETAS",
+    "stackSubtitle": "Escena interactiva con imágenes e hipervínculos navegables",
+    "cardsListTitle": "Tarjetas de la Pila",
+    "addCardBtn": "Nueva Tarjeta",
+    "defaultCardName": "Tarjeta 1",
+    "cardPrefix": "Tarjeta",
+    "zonesCount": "zonas",
+    "startCard": "INICIO",
+    "setAsStart": "Establecer como Inicio",
+    "cardTransition": "Transición",
+    "tools": {
+      "select": "Mover",
+      "rect": "Rectángulo",
+      "circle": "Círculo",
+      "polygon": "Polígono"
+    },
+    "editMode": "Modo Edición",
+    "testMode": "Probar Hotspots",
+    "hideZones": "Ocultar Zonas",
+    "revealZones": "Revelar Zonas (Espacio)",
+    "emptyImageTitle": "Añadir Imagen de Fondo de Tarjeta",
+    "emptyImageDesc": "Sube un fondo visual o ilustración para dibujar áreas cliqueables y crear una escena point-and-click interactiva.",
+    "uploadImageBtn": "Elegir Imagen",
+    "noHotspotSelected": "Ninguna Área Seleccionada",
+    "selectHotspotHint": "Haz clic en un área de la imagen o dibuja una nueva para configurar sus acciones y propiedades.",
+    "hotspotDefault": "Área Interactiva",
+    "examineTitleDefault": "Examinar",
+    "examineTextDefault": "Observas atentamente este detalle.",
+    "tabs": {
+      "visual": "Visual",
+      "action": "Acción",
+      "conditions": "Condiciones"
+    },
+    "fields": {
+      "title": "Etiqueta / Tooltip",
+      "highlightStyle": "Estilo de Resalte",
+      "cursor": "Cursor del Ratón",
+      "soundEffect": "Efecto de Sonido al Clic",
+      "actionType": "Tipo de Acción",
+      "targetCard": "Tarjeta de Destino",
+      "targetScene": "Ramificación / Capítulo de Destino",
+      "examineTitle": "Título del Diálogo",
+      "examineText": "Texto del Mensaje",
+      "collectItem": "Objeto a Recoger",
+      "requiresInInventory": "Requiere Objeto en Inventario",
+      "consumesItem": "Consumir/eliminar objeto al usar",
+      "lockedMessage": "Mensaje de Bloqueo",
+      "trackers": "Efecto en Contadores"
+    },
+    "styles": {
+      "hoverGlow": "Brillo al pasar el ratón",
+      "hidden": "Invisible (Pixel hunt clásico)",
+      "subtleBorder": "Borde sutil permanente",
+      "alwaysVisible": "Resalte visible permanente",
+      "pulsingPin": "Marcador pulsante (Pin)"
+    },
+    "cursors": {
+      "pointer": "Puntero predeterminado",
+      "magnify": "Lupa (Examinar)",
+      "hand": "Mano abierta (Interactuar)",
+      "eye": "Ojo (Observar)",
+      "door": "Puerta (Entrar / Salir)",
+      "arrowUp": "Flecha Arriba (Avanzar)",
+      "arrowDown": "Flecha Abajo (Retroceder)",
+      "arrowLeft": "Flecha Izquierda",
+      "arrowRight": "Flecha Derecha"
+    },
+    "actions": {
+      "examine": "Examinar (Diálogo flotante)",
+      "navigateCard": "Navegar a otra Tarjeta de la Pila",
+      "navigateScene": "Salir a otra Escena del Mapa",
+      "collectItem": "Recoger Objeto al Inventario",
+      "toggleTracker": "Modificar Contador / Rastreador"
+    },
+    "selectCardPlaceholder": "-- Seleccionar Tarjeta --",
+    "selectScenePlaceholder": "-- Seleccionar Escena en el Mapa --",
+    "selectItemPlaceholder": "-- Seleccionar Objeto --",
+    "noRequirement": "Sin requisitos",
+    "uploadSound": "Añadir Sonido (.mp3, .wav)"
   }
 }

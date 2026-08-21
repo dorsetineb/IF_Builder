@@ -105,6 +105,93 @@ export interface Scene {
   creditsScrollEnabled?: boolean;
   allowDiceRollInScene?: boolean;
   diceRollConfig?: DiceRollConfig;
+  // HyperCard Stacks & Hotspots
+  sceneType?: 'branch' | 'vignette' | 'hypercard_stack';
+  stackCards?: HyperCard[];
+  startCardId?: string;
+  enableRevealZonesButton?: boolean;
+}
+
+export type HotspotShape = 'rect' | 'circle' | 'polygon';
+
+export type HotspotHighlightStyle =
+  | 'icons-visible'
+  | 'icons-hover'
+  | 'hidden'
+  | 'hover-glow'
+  | 'subtle-border'
+  | 'always-visible'
+  | 'pulsing-pin';
+
+export type HotspotCursor =
+  | 'pointer'
+  | 'magnify'
+  | 'hand'
+  | 'eye'
+  | 'arrow-up'
+  | 'arrow-down'
+  | 'arrow-left'
+  | 'arrow-right'
+  | 'door';
+
+export type HotspotActionType =
+  | 'navigate_card'
+  | 'navigate_scene'
+  | 'examine'
+  | 'collect_item'
+  | 'toggle_tracker';
+
+export interface HotspotPolygonPoint {
+  x: number; // percentage 0-100
+  y: number; // percentage 0-100
+}
+
+export interface CardHotspot {
+  id: string;
+  title: string;
+  shape: HotspotShape;
+  // Bounding box in percentage 0-100%
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  points?: HotspotPolygonPoint[];
+  // Appearance & Feedback
+  highlightStyle: HotspotHighlightStyle;
+  cursor?: HotspotCursor;
+  icon?: string;
+  iconColor?: string;
+  iconBgColor?: string;
+  iconBorderColor?: string;
+  hideIconBg?: boolean;
+  soundEffect?: string;
+  soundEffectName?: string;
+  // Actions & Outcomes
+  actionType: HotspotActionType;
+  targetCardId?: string;
+  targetSceneId?: string;
+  // In-place Examine / Floating Dialogue
+  examineTitle?: string;
+  examineText?: string;
+  examineImage?: string;
+  // Inventory & Game State
+  requiresInInventory?: string;
+  consumesItem?: boolean;
+  addsToInventory?: string;
+  trackerEffects?: TrackerEffect[];
+  lockedMessage?: string;
+}
+
+export interface HyperCard {
+  id: string;
+  name: string;
+  image: string; // Base64 or URL
+  description?: string;
+  hotspots: CardHotspot[];
+  backgroundMusic?: string;
+  backgroundMusicName?: string;
+  transition?: 'cut' | 'dissolve' | 'wipe-left' | 'wipe-right' | 'iris' | 'zoom';
+  transitionSpeed?: number;
 }
 
 export interface DiceRollConfig {

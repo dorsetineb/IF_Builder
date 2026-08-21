@@ -2440,17 +2440,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const textPanel = document.querySelector('.text-panel');
         const chancesContainer = document.getElementById('chances-container');
         
-        const isImagesEnabled = gameData.enableImages !== false;
-        
         if (sceneNameOverlay) {
             sceneNameOverlay.style.whiteSpace = 'nowrap';
+        }
+
+        const gameContainer = document.getElementById('game-container');
+
+        if (scene.sceneType === 'hypercard_stack') {
+            if (gameContainer) gameContainer.classList.add('hypercard-fullscreen');
+            return;
+        } else {
+            if (gameContainer) gameContainer.classList.remove('hypercard-fullscreen');
         }
         
         if (!isImagesEnabled) {
             // Completely hide image panel and container
-            if (imagePanel) imagePanel.style.display = 'none';
+            if (imagePanel) {
+                imagePanel.style.display = 'none';
+                imagePanel.style.flex = '';
+                imagePanel.style.width = '';
+                imagePanel.style.height = '';
+                imagePanel.style.maxWidth = '';
+            }
             if (imageContainer) imageContainer.style.display = 'none';
-            if (textPanel) textPanel.style.padding = '0';
+            if (textPanel) {
+                textPanel.style.display = '';
+                textPanel.style.padding = '0';
+            }
+            if (standardActionBar) standardActionBar.classList.remove('hidden');
             
             // Create text-scene-header if not present
             let textSceneHeader = document.getElementById('text-scene-header');
@@ -2509,9 +2526,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             // Restore default panels visibility
-            if (imagePanel) imagePanel.style.display = '';
-            if (imageContainer) imageContainer.style.display = '';
-            if (textPanel) textPanel.style.padding = '';
+            if (imagePanel) {
+                imagePanel.style.display = '';
+                imagePanel.style.alignItems = '';
+                imagePanel.style.justifyContent = '';
+                imagePanel.style.flex = '';
+                imagePanel.style.width = '';
+                imagePanel.style.height = '';
+                imagePanel.style.maxWidth = '';
+                imagePanel.style.backgroundColor = '';
+            }
+            if (imageContainer) {
+                imageContainer.style.display = '';
+                imageContainer.style.alignItems = '';
+                imageContainer.style.justifyContent = '';
+                imageContainer.style.width = '';
+                imageContainer.style.height = '';
+                imageContainer.style.overflow = '';
+                imageContainer.style.backgroundColor = '';
+                imageContainer.style.position = '';
+            }
+            if (sceneImage) {
+                sceneImage.style.objectFit = '';
+                sceneImage.style.maxWidth = '';
+                sceneImage.style.maxHeight = '';
+                sceneImage.style.width = '';
+                sceneImage.style.height = '';
+                sceneImage.style.position = '';
+                sceneImage.style.display = '';
+                sceneImage.style.margin = '';
+                sceneImage.style.borderRadius = '';
+            }
+            if (textPanel) {
+                textPanel.style.display = '';
+                textPanel.style.padding = '';
+            }
+            if (standardActionBar) standardActionBar.classList.remove('hidden');
             
             // Remove text-scene-header if present
             const textSceneHeader = document.getElementById('text-scene-header');
@@ -2559,11 +2609,356 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    let currentStackCardId = null;
+
+    const showFloatingDialogue = (title, text, image) => {
+        let modal = document.getElementById('hypercard-floating-dialogue');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'hypercard-floating-dialogue';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:3000;padding:20px;box-sizing:border-box;';
+            modal.innerHTML = '<div class="modal-content" style="background-color:var(--panel-bg, #0d1117);padding:25px;border:2px solid var(--border-color, #30363d);position:relative;max-width:540px;width:100%;border-radius:0;box-shadow:none;box-sizing:border-box;display:flex;flex-direction:column;font-family:var(--font-family);">' +
+                '<button class="modal-close-button" id="hypercard-dialogue-close" style="position:absolute;top:10px;right:15px;background:none;border:none;color:var(--text-dim-color, #8b949e);font-size:2em;cursor:pointer;line-height:1;font-family:var(--font-family);">&times;</button>' +
+                '<h2 id="hypercard-dialogue-title" style="margin-top:0;margin-bottom:16px;font-size:1.3em;color:var(--accent-color, var(--title-color, #58a6ff));font-family:var(--font-family);font-weight:bold;"></h2>' +
+                '<div id="hypercard-dialogue-img-container" style="max-height:240px;overflow:hidden;border:2px solid var(--border-color, #30363d);margin-bottom:16px;display:none;">' +
+                '<img id="hypercard-dialogue-img" src="" alt="" style="width:100%;height:auto;max-height:240px;object-fit:cover;display:block;" />' +
+                '</div>' +
+                '<p id="hypercard-dialogue-text" style="margin:0 0 20px 0;font-size:1em;line-height:1.6;color:var(--text-color, #c9d1d9);font-family:var(--font-family);white-space:pre-wrap;"></p>' +
+                '<div style="display:flex;justify-content:flex-end;">' +
+                '<button id="hypercard-dialogue-ok-btn" style="padding:8px 16px;border:2px solid var(--border-color, #30363d);background-color:var(--action-button-bg, #ffffff);color:var(--action-button-text-color, #0d1117);font-family:var(--font-family);cursor:pointer;font-weight:bold;font-size:1em;transition:all 0.2s;border-radius:0;">Continuar</button>' +
+                '</div>' +
+                '</div>';
+            document.body.appendChild(modal);
+
+            const closeDialogue = () => {
+                modal.style.display = 'none';
+            };
+            modal.querySelector('#hypercard-dialogue-close').addEventListener('click', closeDialogue);
+            const okBtn = modal.querySelector('#hypercard-dialogue-ok-btn');
+            okBtn.addEventListener('click', closeDialogue);
+            okBtn.addEventListener('mouseenter', () => {
+                okBtn.style.backgroundColor = 'var(--action-button-hover-bg, #f0f0f0)';
+            });
+            okBtn.addEventListener('mouseleave', () => {
+                okBtn.style.backgroundColor = 'var(--action-button-bg, #ffffff)';
+            });
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeDialogue();
+            });
+        }
+
+        const titleEl = modal.querySelector('#hypercard-dialogue-title');
+        const textEl = modal.querySelector('#hypercard-dialogue-text');
+        const imgContainer = modal.querySelector('#hypercard-dialogue-img-container');
+        const imgEl = modal.querySelector('#hypercard-dialogue-img');
+
+        if (titleEl) titleEl.textContent = title || "Examinar";
+        if (textEl) textEl.textContent = text || "";
+        if (imgContainer && imgEl) {
+            if (image) {
+                imgEl.src = image;
+                imgContainer.style.display = 'block';
+            } else {
+                imgContainer.style.display = 'none';
+            }
+        }
+        modal.style.display = 'flex';
+    };
+
+    const renderHyperCardStack = (scene, targetCardId = null) => {
+        const cards = scene.stackCards && scene.stackCards.length > 0 ? scene.stackCards : [];
+        if (cards.length === 0) return;
+
+        const card = cards.find(c => c.id === (targetCardId || currentStackCardId || scene.startCardId)) || cards[0];
+        currentStackCardId = card.id;
+
+        // Clean up previous overlay and stage
+        const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        const existingRevealBtn = document.getElementById('hypercard-reveal-btn');
+        if (existingRevealBtn) existingRevealBtn.remove();
+
+        if (sceneNameOverlay) {
+            sceneNameOverlay.textContent = scene.name + (card.name ? ' · ' + card.name : '');
+            sceneNameOverlay.style.opacity = '1';
+        }
+
+        if (imageContainer && sceneImage) {
+            let stage = document.getElementById('hypercard-stage');
+            if (!stage) {
+                stage = document.createElement('div');
+                stage.id = 'hypercard-stage';
+                imageContainer.appendChild(stage);
+            }
+            if (sceneImage.parentElement !== stage) {
+                stage.appendChild(sceneImage);
+            }
+
+            // Update image
+            sceneImage.src = card.image || '';
+            sceneImage.classList.toggle('hidden', !card.image);
+            if (imageContainer) imageContainer.classList.toggle('no-image', !card.image);
+
+            const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            overlay.id = 'hypercard-hotspot-overlay';
+            overlay.setAttribute('viewBox', '0 0 1000 1000');
+            overlay.setAttribute('preserveAspectRatio', 'none');
+            overlay.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;z-index:25;pointer-events:auto;');
+            stage.appendChild(overlay);
+
+            const updateStageDimensions = () => {
+                const nw = sceneImage.naturalWidth || 1920;
+                const nh = sceneImage.naturalHeight || 1080;
+                const viewportW = window.innerWidth;
+                const viewportH = window.innerHeight;
+
+                // Scale to cover full screen maintaining 100% natural aspect ratio (0% distortion)
+                const scale = Math.max(viewportW / nw, viewportH / nh);
+                const stageW = Math.round(nw * scale);
+                const stageH = Math.round(nh * scale);
+
+                stage.style.cssText = 'position:relative;display:block;width:' + stageW + 'px;height:' + stageH + 'px;flex-shrink:0;overflow:visible;line-height:0;margin:0;';
+                sceneImage.style.cssText = 'display:block;width:100%;height:100%;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;';
+            };
+
+            if (sceneImage.complete && sceneImage.naturalWidth > 0) {
+                updateStageDimensions();
+            } else {
+                sceneImage.addEventListener('load', updateStageDimensions, { once: true });
+            }
+            window.addEventListener('resize', updateStageDimensions);
+
+            const HOTSPOT_ICONS_SVG = {
+                eye: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+                mouse: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="m13 13 6 6"/></svg>',
+                hand: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>',
+                search: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+                box: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+                key: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
+                sword: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg>',
+                flask: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.12 19a2 2 0 0 0 1.66 3h12.44a2 2 0 0 0 1.66-3L14 9.31V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>',
+                book: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 2v20"/></svg>',
+                map: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>',
+                crown: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.203a4 4 0 0 1-3.86 2.928H8.713a4 4 0 0 1-3.86-2.928L2.018 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/></svg>',
+                star: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+                heart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+                zap: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+                shield: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+                coins: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>',
+                clock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+                skull: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/></svg>',
+                user: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+                trophy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.45.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+                alert: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>',
+                flame: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+                droplet: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>',
+                sun: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+                moon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+                activity: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+            };
+
+            let isRevealingZones = false;
+
+            (card.hotspots || []).forEach(hotspot => {
+                const hx = hotspot.x * 10;
+                const hy = hotspot.y * 10;
+                const hw = hotspot.width * 10;
+                const hh = hotspot.height * 10;
+
+                let elem;
+                if (hotspot.shape === 'circle') {
+                    elem = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    elem.setAttribute('cx', String(hx + hw / 2));
+                    elem.setAttribute('cy', String(hy + hh / 2));
+                    elem.setAttribute('rx', String(hw / 2));
+                    elem.setAttribute('ry', String(hh / 2));
+                } else if (hotspot.shape === 'polygon' && hotspot.points && hotspot.points.length > 0) {
+                    elem = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    elem.setAttribute('points', hotspot.points.map(p => (p.x * 10) + ',' + (p.y * 10)).join(' '));
+                } else {
+                    elem = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    elem.setAttribute('x', String(hx));
+                    elem.setAttribute('y', String(hy));
+                    elem.setAttribute('width', String(hw));
+                    elem.setAttribute('height', String(hh));
+                    elem.setAttribute('rx', '4');
+                }
+
+                elem.setAttribute('vector-effect', 'non-scaling-stroke');
+                // The clickable area itself is always transparent
+                elem.setAttribute('fill', 'transparent');
+                elem.setAttribute('stroke', 'transparent');
+                elem.setAttribute('stroke-width', '2');
+                elem.setAttribute('class', 'hypercard-hotspot-zone');
+                elem.style.cursor = 'pointer';
+
+                // Centered Icon Badge in the middle of the hotspot (Square, customizable)
+                const iconName = hotspot.icon || 'eye';
+                const iconSvg = HOTSPOT_ICONS_SVG[iconName] || HOTSPOT_ICONS_SVG['eye'];
+                const centerX = hotspot.x + hotspot.width / 2;
+                const centerY = hotspot.y + hotspot.height / 2;
+
+                const hideBg = !!hotspot.hideIconBg;
+                const iconColor = hotspot.iconColor || '#10b981';
+                const bgColor = hideBg ? 'transparent' : (hotspot.iconBgColor || 'rgba(0,0,0,0.75)');
+                const borderColor = hideBg ? 'transparent' : (hotspot.iconBorderColor || 'rgba(255,255,255,0.3)');
+                const borderCss = hideBg ? 'border:none;' : 'border:1.5px solid ' + borderColor + ';';
+                const shadowCss = hideBg ? 'box-shadow:none;' : 'box-shadow:0 4px 14px rgba(0,0,0,0.5);';
+
+                const iconEl = document.createElement('div');
+                iconEl.className = 'hypercard-hotspot-icon-badge';
+                iconEl.style.cssText = 'position:absolute;left:' + centerX + '%;top:' + centerY + '%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:0;background:' + bgColor + ';' + borderCss + 'display:flex;align-items:center;justify-content:center;color:' + iconColor + ';' + shadowCss + 'pointer-events:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:28;';
+                iconEl.innerHTML = iconSvg;
+
+                const isAlwaysVisible = hotspot.highlightStyle === 'icons-visible' || hotspot.highlightStyle === 'always-visible' || hotspot.highlightStyle === 'pulsing-pin';
+                const isHidden = hotspot.highlightStyle === 'hidden';
+
+                if (isAlwaysVisible) {
+                    iconEl.style.opacity = '1';
+                    iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
+                } else if (isHidden) {
+                    iconEl.style.display = 'none';
+                    iconEl.style.opacity = '0';
+                } else {
+                    // icons-hover
+                    iconEl.style.opacity = '0';
+                    iconEl.style.transform = 'translate(-50%, -50%) scale(0.85)';
+                }
+                stage.appendChild(iconEl);
+
+                // Hover interaction
+                elem.addEventListener('mouseenter', () => {
+                    if (!isAlwaysVisible && !isHidden) {
+                        iconEl.style.display = 'flex';
+                        iconEl.style.opacity = '1';
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.12)';
+                        if (!hideBg) {
+                            iconEl.style.borderColor = iconColor;
+                            iconEl.style.boxShadow = '0 0 16px ' + iconColor;
+                        }
+                    } else if (isAlwaysVisible) {
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.15)';
+                        if (!hideBg) {
+                            iconEl.style.borderColor = iconColor;
+                            iconEl.style.boxShadow = '0 0 16px ' + iconColor;
+                        }
+                    }
+                });
+
+                elem.addEventListener('mouseleave', () => {
+                    if (!isAlwaysVisible && !isHidden) {
+                        iconEl.style.opacity = isRevealingZones ? '1' : '0';
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
+                        if (!hideBg) {
+                            iconEl.style.borderColor = borderColor;
+                            iconEl.style.boxShadow = '0 4px 14px rgba(0,0,0,0.5)';
+                        }
+                    } else if (isAlwaysVisible) {
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
+                        if (!hideBg) {
+                            iconEl.style.borderColor = borderColor;
+                            iconEl.style.boxShadow = '0 4px 14px rgba(0,0,0,0.5)';
+                        }
+                    }
+                });
+
+                if (hotspot.title) {
+                    const titleTag = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                    titleTag.textContent = hotspot.title;
+                    elem.appendChild(titleTag);
+                }
+
+                elem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
+                    if (hotspot.soundEffect) {
+                        try {
+                            const snd = new Audio(hotspot.soundEffect);
+                            snd.play().catch(() => {});
+                        } catch (err) {}
+                    }
+
+                    if (hotspot.requiresInInventory) {
+                        const hasRequired = inventory.some(i => i.id === hotspot.requiresInInventory);
+                        if (!hasRequired) {
+                            showFloatingDialogue("Bloqueado", hotspot.lockedMessage || "Você não possui o item necessário para interagir aqui.");
+                            return;
+                        }
+                        if (hotspot.consumesItem) {
+                            removeFromInventory(hotspot.requiresInInventory);
+                        }
+                    }
+
+                    if (hotspot.actionType === 'collect_item' && hotspot.addsToInventory) {
+                        const itemObj = gameData.globalObjects ? gameData.globalObjects[hotspot.addsToInventory] : null;
+                        if (itemObj) {
+                            addToInventory(itemObj);
+                            showFloatingDialogue("Item Coletado", "Você obteve: " + itemObj.name);
+                        }
+                    }
+
+                    if (hotspot.trackerEffects && hotspot.trackerEffects.length > 0) {
+                        hotspot.trackerEffects.forEach(eff => {
+                            updateTracker(eff.trackerId, eff.valueChange);
+                        });
+                    }
+
+                    if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId) {
+                        renderHyperCardStack(scene, hotspot.targetCardId);
+                    } else if (hotspot.actionType === 'navigate_scene' && hotspot.targetSceneId) {
+                        loadScene(hotspot.targetSceneId);
+                    } else if (hotspot.actionType === 'examine') {
+                        showFloatingDialogue(hotspot.examineTitle || "Examinar", hotspot.examineText || "", hotspot.examineImage);
+                    }
+                });
+
+                overlay.appendChild(elem);
+            });
+
+            // Floating Reveal Zones Button
+            const revealBtn = document.createElement('button');
+            revealBtn.id = 'hypercard-reveal-btn';
+            revealBtn.setAttribute('style', 'position:absolute;bottom:16px;right:16px;z-index:30;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:bold;cursor:pointer;transition:all 0.2s;');
+            revealBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Zonas</span>';
+            revealBtn.title = "Revelar Áreas Interativas (Espaço)";
+
+            let isRevealed = false;
+            const toggleReveal = (e) => {
+                if (e) e.stopPropagation();
+                isRevealed = !isRevealed;
+                overlay.querySelectorAll('.hypercard-hotspot-zone').forEach(z => {
+                    if (isRevealed) {
+                        z.setAttribute('fill', 'rgba(16, 185, 129, 0.3)');
+                        z.setAttribute('stroke', '#10b981');
+                    } else {
+                        z.setAttribute('fill', 'transparent');
+                        z.setAttribute('stroke', 'transparent');
+                    }
+                });
+                revealBtn.style.background = isRevealed ? '#10b981' : 'rgba(0,0,0,0.6)';
+            };
+
+            revealBtn.addEventListener('click', toggleReveal);
+            imageContainer.appendChild(revealBtn);
+        }
+    };
+
     const renderScene = (scene, successPrefix = null, inputEchoText = null) => {
+        // Clear any previous HyperCard overlay if entering standard scene
+        const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
+        if (existingOverlay && scene.sceneType !== 'hypercard_stack') existingOverlay.remove();
+        const existingRevealBtn = document.getElementById('hypercard-reveal-btn');
+        if (existingRevealBtn && scene.sceneType !== 'hypercard_stack') existingRevealBtn.remove();
+
+        if (scene.sceneType === 'hypercard_stack') {
+            renderHyperCardStack(scene);
+        }
+
         const isImagesEnabled = gameData.enableImages !== false;
-        if (scene.image && isImagesEnabled) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
-        else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
-        if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
+        if (scene.image && isImagesEnabled && scene.sceneType !== 'hypercard_stack') { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        else if (scene.sceneType !== 'hypercard_stack') { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
+        if (sceneNameOverlay && scene.sceneType !== 'hypercard_stack') { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         
         // Handle Overlay Effect
         if (sceneOverlay) {

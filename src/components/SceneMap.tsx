@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3, Trash2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3, Trash2, ZoomIn, ZoomOut, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditorStatsModal from './EditorStatsModal';
 import { useTheme } from './ThemeProvider';
@@ -16,7 +16,7 @@ interface SceneMapProps {
   onUpdateVignettePosition: (vignetteId: string, x: number, y: number) => void;
   onReorganizeScenes: () => void;
   gameInteractionType?: 'parser' | 'choice';
-  onAddNode?: (type: 'scene' | 'vignette') => void;
+  onAddNode?: (type: 'scene' | 'vignette' | 'hypercard_stack') => void;
   hasOpeningVignette?: boolean;
   gameTitle?: string;
   isSidebarOpen?: boolean;
@@ -216,6 +216,23 @@ const SceneMap: React.FC<SceneMapProps> = ({
           });
         }
 
+        // 4. HyperCard Stack External Links
+        if (scene.sceneType === 'hypercard_stack' && scene.stackCards) {
+          scene.stackCards.forEach((card) => {
+            card.hotspots?.forEach((h) => {
+              if (h.targetSceneId && h.targetSceneId !== scene.id) {
+                items.push({
+                  id: `link-hotspot-${card.id}-${h.id}`,
+                  targetId: h.targetSceneId,
+                  label: `${card.name}: ${h.title || t('sceneMap.hotspotExit', 'Saída')}`,
+                  type: 'scene',
+                  original: h,
+                });
+              }
+            });
+          });
+        }
+
         return items;
       } else {
         // Vignette
@@ -254,11 +271,13 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
     // Add Scenes
     Object.values(allScenesMap).forEach((scene: Scene) => {
+      const isStack = scene.sceneType === 'hypercard_stack';
+      const thumbnailImage = (isStack && scene.stackCards?.[0]?.image) ? scene.stackCards[0].image : scene.image;
       allNodesMap.set(scene.id, {
         id: scene.id,
         type: 'scene',
         name: scene.name,
-        image: scene.image,
+        image: thumbnailImage,
         data: scene,
         isStart: scene.id === startSceneId,
         isEnding: scene.isEndingScene,
@@ -280,6 +299,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
     // 2. Calculate Heights
     const nodeHeights = new Map<string, number>();
     allNodesMap.forEach((node) => {
+      const isStack = node.type === 'scene' && (node.data as Scene).sceneType === 'hypercard_stack';
+      const headerH = isStack ? 86 : NODE_HEADER_HEIGHT;
       const linkingItems = getLinkingItems(node);
       const interactionsHeight =
         linkingItems.length > 0
@@ -289,7 +310,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             PADDING_TOP
           : 0;
       const imagePadding = node.image ? THUMBNAIL_HEIGHT : 0;
-      nodeHeights.set(node.id, NODE_HEADER_HEIGHT + imagePadding + interactionsHeight);
+      nodeHeights.set(node.id, headerH + imagePadding + interactionsHeight);
     });
 
     // 3. Right-Bifurcation Layout Algorithm
@@ -778,6 +799,22 @@ const SceneMap: React.FC<SceneMapProps> = ({
             <Split className="w-4 h-4 mr-2 rotate-90" />
             {t('sceneList.nodeSelection.scene.title', 'Criar Ramificação')}
           </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (hasOpeningVignette) onAddNode?.('hypercard_stack');
+            }}
+            disabled={!hasOpeningVignette}
+            className={`w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent whitespace-nowrap shadow-sm ${
+              !hasOpeningVignette 
+                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
+                : `bg-white text-zinc-950 hover:bg-zinc-200 hover:text-zinc-950`
+            }`}
+            title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie um capítulo de abertura para habilitar cenários.') : ''}
+          >
+            <Layers className="w-4 h-4 mr-2" />
+            {t('sceneList.nodeSelection.hypercard.title', 'Criar Cenário')}
+          </button>
         </div>
 
         <div
@@ -1021,28 +1058,33 @@ const SceneMap: React.FC<SceneMapProps> = ({
             // --- STANDARD SCENE NODE STYLE ---
             const scene = node.data as Scene;
 
-            // Color Rules: Opening = Blue, Transition = Blue, Conclusion = Green, Ending = Green, Normal = Amber
+            // Color Rules: Opening = Blue, Transition = Blue, Conclusion = Green, Ending = Green, Stack = Emerald, Normal = Amber
             const isVignetteOpening = scene.vignetteType === 'opening';
             const isVignetteTransition = scene.vignetteType === 'transition';
             const isVignetteConclusion = scene.vignetteType === 'conclusion';
+            const isStack = scene.sceneType === 'hypercard_stack';
             const isEnding = scene.isEndingScene;
             const isOrphan = highlightOrphans && orphanIds.has(node.id);
 
             // Determine color base
             let colorBase = 'amber';
             if (isOrphan) colorBase = 'red';
+            else if (isStack) colorBase = 'emerald';
+            else if (isEnding) colorBase = 'white';
             else if (isVignetteOpening || isVignetteTransition) colorBase = 'blue';
-            else if (isVignetteConclusion || isEnding) colorBase = 'green';
+            else if (isVignetteConclusion) colorBase = 'green';
 
             const borderColorClass = isOrphan
               ? 'border-red-500 animate-pulse'
-              : isVignetteOpening
-                ? 'border-blue-500 border-4'
-                : isVignetteConclusion
-                  ? 'border-green-500 border-4'
-                  : isEnding
-                    ? 'border-green-500 border-4'
-                    : `border-${colorBase}-500 border-4`;
+              : isStack
+                ? 'border-emerald-500 border-4'
+                : isEnding
+                  ? 'border-white border-4'
+                  : isVignetteOpening
+                    ? 'border-blue-500 border-4'
+                    : isVignetteConclusion
+                      ? 'border-green-500 border-4'
+                      : `border-${colorBase}-500 border-4`;
 
             const isSelected = selectedSceneId === node.id;
             
@@ -1097,8 +1139,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   }}
                 >
                 <div
-                  className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50"
-                  style={{ height: NODE_HEADER_HEIGHT }}
+                  className="p-2.5 relative flex-shrink-0 text-center bg-zinc-900/50 flex flex-col justify-center items-center"
+                  style={{ height: isStack ? 86 : NODE_HEADER_HEIGHT }}
                 >
                   {/* Anchor Points Visualization */}
                   {!node.isStart && (
@@ -1108,12 +1150,20 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   )}
                   {/* Although anchors are strictly computed, we show right anchor visually if there are inputs from right? No, inputs always Left. Outputs always Right. */}
 
-                  <h3 className="font-bold text-zinc-100 truncate text-sm">{node.name}</h3>
+                  <div className="flex items-center justify-center gap-1.5 px-1 max-w-full">
+                    {isStack && <Layers className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
+                    <h3 className="font-bold text-zinc-100 truncate text-sm">{node.name}</h3>
+                  </div>
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
                     (ID: {node.id})
                   </p>
+                  {isStack && (
+                    <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded mt-1 inline-block shadow-sm">
+                      {scene.stackCards?.length || 0} {t('sceneMap.cards', 'Cartões')}
+                    </span>
+                  )}
                   {isEnding && (
-                    <p className="text-[10px] font-bold text-green-400 mt-1 uppercase tracking-widest">
+                    <p className="text-[10px] font-bold text-white mt-1 uppercase tracking-widest">
                       {t('sceneMap.ending', 'Final')}
                     </p>
                   )}
@@ -1200,19 +1250,25 @@ const SceneMap: React.FC<SceneMapProps> = ({
           </h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full border-2 border-blue-500 bg-blue-500/20"></div>
+              <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-blue-500 bg-blue-500/20 shrink-0"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
                 {t('sceneMap.opening', 'Abertura')}
               </span>
             </li>
             <li className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full border-2 border-amber-500 bg-amber-500/20"></div>
+              <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-amber-500 bg-amber-500/20 shrink-0"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
                 {t('sceneMap.sceneVignette', 'Ramificação / Capítulo')}
               </span>
             </li>
             <li className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div>
+              <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-emerald-500 bg-emerald-500/20 shrink-0"></div>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
+                {t('sceneMap.scenario', 'Cenário (Slides)')}
+              </span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-white bg-white/20 shrink-0"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
                 {t('sceneMap.ending', 'Final')}
               </span>

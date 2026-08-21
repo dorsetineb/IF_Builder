@@ -43,7 +43,11 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 creditsText: scene.creditsText,
                 creditsScrollEnabled: scene.creditsScrollEnabled,
                 allowDiceRollInScene: scene.allowDiceRollInScene,
-                diceRollConfig: scene.diceRollConfig
+                diceRollConfig: scene.diceRollConfig,
+                sceneType: scene.sceneType,
+                stackCards: scene.stackCards,
+                startCardId: scene.startCardId,
+                enableRevealZonesButton: scene.enableRevealZonesButton
             };
         }
     }

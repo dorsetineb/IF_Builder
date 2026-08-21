@@ -534,6 +534,9 @@
       "scene": {
         "title": "Create Branch",
         "lockedDesc": "Create an opening chapter to enable branches."
+      },
+      "hypercard": {
+        "title": "Create Scenario"
       }
     }
   },
@@ -546,6 +549,7 @@
     "noTitle": "(No Title)",
     "opening": "Opening",
     "conclusion": "Conclusion",
+    "scenario": "Scenario (Slides)",
     "ending": "Final",
     "action": "Action",
     "reorganize": "Reorganize",
@@ -1377,5 +1381,86 @@
       "sizeLarge": "Large",
       "description": "Adjust the overall size and select the primary font of the entire editor interface to suit your vision."
     }
+  },
+  "hypercard": {
+    "badge": "CARD STACK",
+    "stackSubtitle": "Interactive scene with images and navigable hyperlinks",
+    "cardsListTitle": "Stack Cards",
+    "addCardBtn": "New Card",
+    "defaultCardName": "Card 1",
+    "cardPrefix": "Card",
+    "zonesCount": "zones",
+    "startCard": "START",
+    "setAsStart": "Set as Start",
+    "cardTransition": "Transition",
+    "tools": {
+      "select": "Move",
+      "rect": "Rectangle",
+      "circle": "Circle",
+      "polygon": "Polygon"
+    },
+    "editMode": "Edit Mode",
+    "testMode": "Test Hotspots",
+    "hideZones": "Hide Zones",
+    "revealZones": "Reveal Zones (Space)",
+    "emptyImageTitle": "Add Card Background Image",
+    "emptyImageDesc": "Upload a visual background or artwork to draw clickable zones and create an interactive point-and-click scene.",
+    "uploadImageBtn": "Choose Image",
+    "noHotspotSelected": "No Area Selected",
+    "selectHotspotHint": "Click an area on the image or draw a new one to configure its actions and properties.",
+    "hotspotDefault": "Interactive Area",
+    "examineTitleDefault": "Examine",
+    "examineTextDefault": "You inspect this area closely.",
+    "tabs": {
+      "visual": "Visual",
+      "action": "Action",
+      "conditions": "Conditions"
+    },
+    "fields": {
+      "title": "Label / Tooltip",
+      "highlightStyle": "Highlight Style",
+      "cursor": "Mouse Cursor",
+      "soundEffect": "Click Sound Effect",
+      "actionType": "Action Type",
+      "targetCard": "Target Card",
+      "targetScene": "Target Branch / Chapter",
+      "examineTitle": "Dialogue Title",
+      "examineText": "Message Text",
+      "collectItem": "Item to Collect",
+      "requiresInInventory": "Requires Item in Inventory",
+      "consumesItem": "Consume/remove item upon use",
+      "lockedMessage": "Locked Message",
+      "trackers": "Tracker Effects"
+    },
+    "styles": {
+      "hoverGlow": "Glow on hover",
+      "hidden": "Hidden (Classic pixel hunt)",
+      "subtleBorder": "Permanent subtle border",
+      "alwaysVisible": "Permanent visible highlight",
+      "pulsingPin": "Pulsing pin marker"
+    },
+    "cursors": {
+      "pointer": "Default Pointer",
+      "magnify": "Magnifying Glass (Examine)",
+      "hand": "Open Hand (Interact)",
+      "eye": "Eye (Look)",
+      "door": "Door (Enter / Exit)",
+      "arrowUp": "Up Arrow (Forward)",
+      "arrowDown": "Down Arrow (Backward)",
+      "arrowLeft": "Left Arrow",
+      "arrowRight": "Right Arrow"
+    },
+    "actions": {
+      "examine": "Examine (Floating dialogue)",
+      "navigateCard": "Navigate to another Stack Card",
+      "navigateScene": "Exit to another Scene/Branch on Map",
+      "collectItem": "Collect Item to Inventory",
+      "toggleTracker": "Modify Tracker"
+    },
+    "selectCardPlaceholder": "-- Select Card --",
+    "selectScenePlaceholder": "-- Select Scene on Map --",
+    "selectItemPlaceholder": "-- Select Item --",
+    "noRequirement": "No requirement",
+    "uploadSound": "Add Sound (.mp3, .wav)"
   }
 }

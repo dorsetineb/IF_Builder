@@ -2,7 +2,7 @@
 import React, { useRef, CSSProperties, useState, useMemo, useCallback } from 'react';
 import { Scene, View } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Trash2, Menu, ArrowRight, ArrowDown, Search, Split, Map, Columns3 } from 'lucide-react';
+import { Trash2, Menu, ArrowRight, ArrowDown, Search, Split, Map, Columns3, Layers } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ interface SceneListProps {
   selectedSceneId: string | null;
   onSelectScene: (id: string) => void;
   onAddScene: () => void;
-  onAddNode?: (type: 'scene' | 'vignette') => void;
+  onAddNode?: (type: 'scene' | 'vignette' | 'hypercard_stack') => void;
   hasOpeningVignette?: boolean;
   onViewMap?: () => void;
   onDeleteScene: (id: string) => void;
@@ -56,6 +56,15 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
   const isDraggable = !searchTerm && scene.id !== startSceneId;
 
   const getVignetteLabel = (scene: Scene) => {
+    if (scene.sceneType === 'hypercard_stack') {
+      return (
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md border bg-emerald-500/20 text-emerald-400 border-emerald-500/40 flex items-center gap-1">
+          <Layers className="w-3 h-3" />
+          <span>{scene.stackCards?.length || 0}</span>
+        </span>
+      );
+    }
+
     if (!scene.vignetteType || scene.vignetteType === 'none' || scene.vignetteType === 'opening') return null;
     
     const isTransition = scene.vignetteType === 'transition';

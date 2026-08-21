@@ -36,7 +36,7 @@ export const getMimeTypeFromFileName = (name: string): string => {
     }
 }
 
-export const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter' | 'trk' | 'verb', existingIds: string[]): string => {
+export const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter' | 'trk' | 'verb' | 'crd' | 'hot', existingIds: string[]): string => {
     let id;
     do {
         id = `${prefix}_${Math.random().toString(36).substring(2, 9)}`;

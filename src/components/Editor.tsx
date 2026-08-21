@@ -53,6 +53,9 @@ const SceneMap = lazy(() => import('./SceneMap'));
 const GlobalObjectsEditor = lazy(() => import('./GlobalObjectsEditor'));
 const TrackersEditor = lazy(() => import('./TrackersEditor'));
 const GlobalCommandsEditor = lazy(() => import('./GlobalCommandsEditor'));
+const HyperCardStackEditor = lazy(() =>
+  import('./HyperCardEditor/HyperCardStackEditor').then((module) => ({ default: module.HyperCardStackEditor }))
+);
 import { ConfirmationModal } from './ConfirmationModal';
 import { NewProjectModal } from './NewProjectModal';
 import { TransitionScreen } from './TransitionScreen';
@@ -1075,6 +1078,7 @@ const Editor: React.FC = () => {
 
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isNodeTypeModalOpen, setIsNodeTypeModalOpen] = useState(false);
+  const [isScenarioEditing, setIsScenarioEditing] = useState(false);
 
   const closeConfirmationModal = useCallback(() => {
     setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
@@ -1100,7 +1104,7 @@ const Editor: React.FC = () => {
     setConfirmationModal,
   });
 
-  const handleAddNodeType = (type: 'scene' | 'vignette') => {
+  const handleAddNodeType = (type: 'scene' | 'vignette' | 'hypercard_stack') => {
     setIsNodeTypeModalOpen(false);
     setIsNarrativeMenuOpen(false);
     handleAddScene(type);
@@ -1136,6 +1140,7 @@ const Editor: React.FC = () => {
   // Scene handlers and Reorder handlers moved to useSceneManagement
 
   const handleSelectScene = (id: string | null, tab?: string) => {
+    setIsScenarioEditing(false);
     attemptNavigation({ type: 'scene', id, tab });
   };
 
@@ -1603,47 +1608,49 @@ const Editor: React.FC = () => {
                       isNarrativeMenuOpen 
                         ? 'w-1/3'
                         : selectedScene
-                          ? isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
+                          ? selectedScene.sceneType === 'hypercard_stack'
+                            ? isScenarioEditing ? 'w-full' : 'w-80 flex-shrink-0'
+                            : 'w-1/3'
                           : 'w-0 border-l-0'
                     }`}
                   >
-                    {(isNarrativeMenuOpen || selectedScene) && (
-                       <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/50 shadow-md px-4 py-4 flex justify-between items-center">
-                           <div className="flex items-center gap-2">
-                             <button
-                               type="button"
-                               onClick={(e) => {
-                                 e.preventDefault();
-                                 e.stopPropagation();
-                                 if (isNarrativeMenuOpen) {
-                                   setIsNarrativeMenuOpen(false);
-                                 } else {
-                                   setIsNarrativeMenuOpen(true);
-                                 }
-                               }}
-                               className={`flex items-center gap-2 px-1 py-1 transition-colors group relative z-50 ${isNarrativeMenuOpen ? 'text-primary' : 'text-zinc-400 hover:text-white'}`}
-                               title={isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
-                             >
-                               <span className={`text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-current/30`}>
-                                 {isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
-                               </span>
-                             </button>
-                           </div>
-                           
-                           <div className="flex items-center gap-2">
-                               <button 
-                                 onClick={() => {
-                                   setIsNarrativeMenuOpen(false);
-                                   setSelectedSceneId(null);
-                                 }}
-                                 className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group"
-                               >
-                                 <X className="w-4 h-4 transition-transform group-hover:scale-110" />
-                                 <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.close', 'Fechar')}</span>
-                               </button>
-                           </div>
-                       </div>
-                     )}
+                    {((isNarrativeMenuOpen || selectedScene) && (!selectedScene || selectedScene.sceneType !== 'hypercard_stack')) && (
+                        <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/50 shadow-md px-4 py-4 flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (isNarrativeMenuOpen) {
+                                    setIsNarrativeMenuOpen(false);
+                                  } else {
+                                    setIsNarrativeMenuOpen(true);
+                                  }
+                                }}
+                                className={`flex items-center gap-2 px-1 py-1 transition-colors group relative z-50 ${isNarrativeMenuOpen ? 'text-primary' : 'text-zinc-400 hover:text-white'}`}
+                                title={isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
+                              >
+                                <span className={`text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-current/30`}>
+                                  {isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
+                                </span>
+                              </button>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={() => {
+                                    setIsNarrativeMenuOpen(false);
+                                    setSelectedSceneId(null);
+                                  }}
+                                  className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group"
+                                >
+                                  <X className="w-4 h-4 transition-transform group-hover:scale-110" />
+                                  <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.close', 'Fechar')}</span>
+                                </button>
+                            </div>
+                        </div>
+                      )}
 
                     <div className="flex-1 overflow-y-auto">
                       {isNarrativeMenuOpen ? (
@@ -1672,50 +1679,71 @@ const Editor: React.FC = () => {
                       </div>
                     ) : selectedScene ? (
                       <Suspense fallback={<LoadingOverlay message="Carregando Editor..." />}>
-                        <ErrorBoundary fallbackTitle="Erro ao carregar o Editor de Ramificação">
-                          <SceneEditor
-                            key={`side-editor-${selectedScene.id}`}
-                            scene={selectedScene}
-                            allScenes={scenesList}
-                            globalObjects={gameData.globalObjects}
-                            onUpdateScene={handleUpdateScene}
-                            onCopyScene={handleCopyScene}
-                            onCreateGlobalObject={handleCreateGlobalObject}
-                            onLinkObjectToScene={handleLinkObjectToScene}
-                            onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-                            onUpdateGlobalObject={handleUpdateGlobalObject}
-                            enableChances={
-                              (gameData.enableChances ?? detectedActiveSystems.chances) ||
-                              gameData.gameSystemEnabled === 'chances'
-                            }
-                            gameSystemEnabled={gameData.gameSystemEnabled}
-                            onPreviewScene={(scene) => {
-                              setPreviewSceneId(scene.id);
-                              setIsPreviewing(true);
-                            }}
-                            onSelectScene={handleSelectScene}
-                            isDirty={hasUnsavedTabChanges}
-                            onSetDirty={setHasUnsavedTabChanges}
-                            layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                            consequenceTrackers={consequenceTrackers}
-                            isStartScene={selectedScene.id === gameData.startScene}
-                            gameInteractionType={gameData.gameInteractionType || 'parser'}
-                            vignettes={gameData.vignettes || []}
-                            enableDiceRoll={gameData.enableDiceRoll ?? false}
-                            diceType={gameData.diceType || 'd20'}
-                            onViewMap={() => {}} // Redundant in three_panels
-                            globalSplashButtonText={gameData.gameSplashButtonText || ''}
-                            onUpdateGlobalSplashButtonText={(text) =>
-                              handleUpdateGameData('gameSplashButtonText', text)
-                            }
-                            isSidePanel={true}
-                            onClose={() => setSelectedSceneId(null)}
-                            onTabChange={setSidePanelTab}
-                            isNarrativeMenuOpen={isNarrativeMenuOpen}
-                            onToggleNarrative={() => {
-                              setIsNarrativeMenuOpen(true);
-                            }}
-                          />
+                        <ErrorBoundary fallbackTitle="Erro ao carregar o Editor">
+                          {selectedScene.sceneType === 'hypercard_stack' ? (
+                            <HyperCardStackEditor
+                              key={`stack-editor-${selectedScene.id}`}
+                              scene={selectedScene}
+                              allScenes={scenesList}
+                              globalObjects={gameData.globalObjects}
+                              consequenceTrackers={consequenceTrackers}
+                              onUpdateScene={handleUpdateScene}
+                              onClose={() => {
+                                setIsScenarioEditing(false);
+                                setSelectedSceneId(null);
+                              }}
+                              isExpanded={isScenarioEditing}
+                              onToggleExpand={setIsScenarioEditing}
+                              onViewMap={() => {
+                                setIsScenarioEditing(false);
+                                attemptNavigation({ type: 'view', view: 'map' });
+                              }}
+                            />
+                          ) : (
+                            <SceneEditor
+                              key={`side-editor-${selectedScene.id}`}
+                              scene={selectedScene}
+                              allScenes={scenesList}
+                              globalObjects={gameData.globalObjects}
+                              onUpdateScene={handleUpdateScene}
+                              onCopyScene={handleCopyScene}
+                              onCreateGlobalObject={handleCreateGlobalObject}
+                              onLinkObjectToScene={handleLinkObjectToScene}
+                              onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                              onUpdateGlobalObject={handleUpdateGlobalObject}
+                              enableChances={
+                                (gameData.enableChances ?? detectedActiveSystems.chances) ||
+                                gameData.gameSystemEnabled === 'chances'
+                              }
+                              gameSystemEnabled={gameData.gameSystemEnabled}
+                              onPreviewScene={(scene) => {
+                                setPreviewSceneId(scene.id);
+                                setIsPreviewing(true);
+                              }}
+                              onSelectScene={handleSelectScene}
+                              isDirty={hasUnsavedTabChanges}
+                              onSetDirty={setHasUnsavedTabChanges}
+                              layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                              consequenceTrackers={consequenceTrackers}
+                              isStartScene={selectedScene.id === gameData.startScene}
+                              gameInteractionType={gameData.gameInteractionType || 'parser'}
+                              vignettes={gameData.vignettes || []}
+                              enableDiceRoll={gameData.enableDiceRoll ?? false}
+                              diceType={gameData.diceType || 'd20'}
+                              onViewMap={() => {}} // Redundant in three_panels
+                              globalSplashButtonText={gameData.gameSplashButtonText || ''}
+                              onUpdateGlobalSplashButtonText={(text) =>
+                                handleUpdateGameData('gameSplashButtonText', text)
+                              }
+                              isSidePanel={true}
+                              onClose={() => setSelectedSceneId(null)}
+                              onTabChange={setSidePanelTab}
+                              isNarrativeMenuOpen={isNarrativeMenuOpen}
+                              onToggleNarrative={() => {
+                                setIsNarrativeMenuOpen(true);
+                              }}
+                            />
+                          )}
                         </ErrorBoundary>
                       </Suspense>
                     ) : null}
