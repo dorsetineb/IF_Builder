@@ -17,6 +17,10 @@ import {
   Volume2,
   Lock,
   ArrowRight,
+  ArrowLeft,
+  ArrowUp,
+  ArrowDown,
+  Layers,
   X,
   Activity,
   Heart,
@@ -51,6 +55,10 @@ export const HOTSPOT_ICONS = [
   { name: 'mouse', component: MousePointer2, label: 'Ponteiro / Clique' },
   { name: 'hand', component: Hand, label: 'Mão (Interagir)' },
   { name: 'search', component: Search, label: 'Lupa (Investigar)' },
+  { name: 'arrow-up', component: ArrowUp, label: 'Seta Cima' },
+  { name: 'arrow-down', component: ArrowDown, label: 'Seta Baixo' },
+  { name: 'arrow-left', component: ArrowLeft, label: 'Seta Esquerda' },
+  { name: 'arrow-right', component: ArrowRight, label: 'Seta Direita' },
   { name: 'box', component: Box, label: 'Caixa / Objeto' },
   { name: 'key', component: Key, label: 'Chave' },
   { name: 'sword', component: Sword, label: 'Espada / Combate' },
@@ -78,6 +86,7 @@ export const HOTSPOT_ICONS = [
 interface HotspotInspectorProps {
   hotspot: CardHotspot | null;
   card: HyperCard;
+  onUpdateCard?: (updatedCard: HyperCard) => void;
   allCards: HyperCard[];
   allScenes: Scene[];
   globalObjects: { [id: string]: GameObject };
@@ -90,6 +99,7 @@ interface HotspotInspectorProps {
 export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   hotspot,
   card,
+  onUpdateCard,
   allCards,
   allScenes,
   globalObjects,
@@ -101,27 +111,13 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   const [activeTab, setActiveTab] = useState<'visual' | 'action' | 'conditions'>('visual');
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
 
-  if (!hotspot) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center text-muted-foreground select-none bg-card">
-        <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-4 text-muted-foreground">
-          <MousePointer className="w-6 h-6" />
-        </div>
-        <h4 className="font-bold text-foreground mb-1 text-sm">
-          {t('hypercard.noHotspotSelected', 'Nenhuma Área Selecionada')}
-        </h4>
-        <p className="text-xs max-w-[220px] text-muted-foreground leading-relaxed">
-          {t('hypercard.selectHotspotHint', 'Clique em uma área na imagem ou desenhe uma nova para configurar suas ações e propriedades.')}
-        </p>
-      </div>
-    );
-  }
-
   const handleFieldChange = <K extends keyof CardHotspot>(field: K, value: CardHotspot[K]) => {
+    if (!hotspot) return;
     onUpdateHotspot({ ...hotspot, [field]: value });
   };
 
   const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!hotspot) return;
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -134,14 +130,14 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
     }
   };
 
-  const activeIconName = hotspot.icon || 'eye';
+  const activeIconName = hotspot?.icon || 'eye';
   const CurrentIconComponent = HOTSPOT_ICONS.find(i => i.name === activeIconName)?.component || Eye;
   const currentIconLabel = HOTSPOT_ICONS.find(i => i.name === activeIconName)?.label || 'Olho (Observar)';
 
   const normalizedHighlightStyle = 
-    hotspot.highlightStyle === 'always-visible' || hotspot.highlightStyle === 'icons-visible' || hotspot.highlightStyle === 'pulsing-pin'
+    hotspot?.highlightStyle === 'always-visible' || hotspot?.highlightStyle === 'icons-visible' || hotspot?.highlightStyle === 'pulsing-pin'
       ? 'icons-visible'
-      : hotspot.highlightStyle === 'hidden'
+      : hotspot?.highlightStyle === 'hidden'
       ? 'hidden'
       : 'icons-hover';
 
@@ -150,58 +146,108 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
       className="w-full h-full flex flex-col overflow-hidden bg-card select-none"
       onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}
     >
-      {/* Header with Direct Inline Title Edit */}
-      <div className="p-3.5 border-b border-muted-foreground/30 flex flex-col gap-1 flex-shrink-0 bg-card">
-        <input
-          type="text"
-          value={hotspot.title}
-          onChange={(e) => handleFieldChange('title', e.target.value)}
-          placeholder={t('hypercard.hotspotDefault', 'Nome da Área Interativa')}
-          className="w-full bg-transparent hover:bg-background/50 focus:bg-background border border-transparent hover:border-muted-foreground/30 focus:border-primary rounded-lg px-2 py-1 font-bold text-sm text-foreground focus:outline-none transition-all"
-        />
-        <span className="text-[10px] text-muted-foreground font-mono uppercase px-2">
-          ID: {hotspot.id}
-        </span>
+      {/* SECTION 1: DETALHES DA VISTA (SEMPRE NO TOPO) */}
+      <div className="p-4 space-y-4 flex flex-col flex-shrink-0 border-b border-muted-foreground/30 bg-card">
+        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+          <Layers className="w-4 h-4" />
+          {t('hypercard.viewDetails', 'Detalhes da Vista')}
+        </h3>
+
+        <div className="space-y-3">
+          {/* NOME DA VISTA */}
+          <div>
+            <label
+              htmlFor="hypercardViewName"
+              className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
+            >
+              {t('hypercard.viewName', 'NOME DA VISTA')}
+            </label>
+            <input
+              type="text"
+              id="hypercardViewName"
+              value={card.name}
+              onChange={(e) => onUpdateCard?.({ ...card, name: e.target.value })}
+              placeholder={t('hypercard.defaultCardName', 'Vista 1')}
+              className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
+            />
+          </div>
+
+          {/* NOME DA ÁREA INTERATIVA (SELECIONADA) - DENTRO DA MESMA SEÇÃO, SEM SEPARADOR */}
+          {hotspot && (
+            <div>
+              <label
+                htmlFor="hypercardHotspotTitle"
+                className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
+              >
+                {t('hypercard.hotspotName', 'NOME DA ÁREA INTERATIVA')}
+              </label>
+              <input
+                type="text"
+                id="hypercardHotspotTitle"
+                value={hotspot.title}
+                onChange={(e) => handleFieldChange('title', e.target.value)}
+                placeholder={t('hypercard.hotspotDefault', 'Área Interativa')}
+                className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="grid grid-cols-3 border-b border-muted-foreground/30 p-1.5 bg-background/50 flex-shrink-0 gap-1">
-        <button
-          onClick={() => setActiveTab('visual')}
-          className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === 'visual'
-              ? 'bg-card text-primary shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Sliders className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">{t('hypercard.tabs.visual', 'Visual')}</span>
-        </button>
+      {!hotspot ? (
+        /* Empty State when no Hotspot is selected */
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground select-none bg-card">
+          <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-4 text-muted-foreground">
+            <MousePointer className="w-6 h-6" />
+          </div>
+          <h4 className="font-bold text-foreground mb-1 text-sm">
+            {t('hypercard.noHotspotSelected', 'Nenhuma Área Selecionada')}
+          </h4>
+          <p className="text-xs max-w-[220px] text-muted-foreground leading-relaxed">
+            {t('hypercard.selectHotspotHint', 'Clique em uma área na imagem ou desenhe uma nova para configurar suas ações e propriedades.')}
+          </p>
+        </div>
+      ) : (
+        /* Hotspot Configuration when selected */
+        <>
+          {/* Tabs */}
+          <div className="grid grid-cols-3 border-b border-muted-foreground/30 p-1.5 bg-background/50 flex-shrink-0 gap-1">
+            <button
+              onClick={() => setActiveTab('visual')}
+              className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === 'visual'
+                  ? 'bg-card text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Sliders className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{t('hypercard.tabs.visual', 'Visual')}</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('action')}
-          className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === 'action'
-              ? 'bg-card text-primary shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <ArrowRight className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">{t('hypercard.tabs.action', 'Ação')}</span>
-        </button>
+            <button
+              onClick={() => setActiveTab('action')}
+              className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === 'action'
+                  ? 'bg-card text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <ArrowRight className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{t('hypercard.tabs.action', 'Ação')}</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('conditions')}
-          className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === 'conditions'
-              ? 'bg-card text-primary shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Lock className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">{t('hypercard.tabs.conditions', 'Condições')}</span>
-        </button>
-      </div>
+            <button
+              onClick={() => setActiveTab('conditions')}
+              className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === 'conditions'
+                  ? 'bg-card text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Lock className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{t('hypercard.tabs.conditions', 'Condições')}</span>
+            </button>
+          </div>
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -599,16 +645,18 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
         )}
       </div>
 
-      {/* Footer: Prominent Delete Hotspot Button */}
-      <div className="p-3 border-t border-muted-foreground/30 bg-background/50 flex-shrink-0">
-        <button
-          onClick={() => onDeleteHotspot(hotspot.id)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 text-sm font-bold text-red-400 hover:text-red-300 transition-all shadow-sm active:scale-98"
-        >
-          <Trash2 className="w-4 h-4" />
-          <span>{t('hypercard.deleteHotspotBtn', 'Excluir Área Interativa')}</span>
-        </button>
-      </div>
+          {/* Footer: Prominent Delete Hotspot Button */}
+          <div className="p-3 border-t border-muted-foreground/30 bg-background/50 flex-shrink-0">
+            <button
+              onClick={() => onDeleteHotspot(hotspot.id)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 text-sm font-bold text-red-400 hover:text-red-300 transition-all shadow-sm active:scale-98"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>{t('hypercard.deleteHotspotBtn', 'Excluir Área Interativa')}</span>
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

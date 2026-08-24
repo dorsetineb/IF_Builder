@@ -450,13 +450,6 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
-          <button
-            onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
-            className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            title="Resetar Posição"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
         </div>
 
         {/* Test Hotspots Toggle Button */}
@@ -752,8 +745,8 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
                     isTestMode
                       ? 'w-9 h-9'
                       : isSelected
-                      ? 'w-8 h-8 ring-2 ring-blue-500 shadow-lg'
-                      : 'w-7 h-7 shadow'
+                      ? 'w-8 h-8 ring-2 ring-blue-500'
+                      : 'w-7 h-7'
                   }`}
                   style={{
                     left: `${centerX}%`,
@@ -761,7 +754,8 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
                     backgroundColor: hotspot.hideIconBg ? 'transparent' : (hotspot.iconBgColor || 'rgba(0, 0, 0, 0.75)'),
                     border: hotspot.hideIconBg ? 'none' : `1.5px solid ${hotspot.iconBorderColor || 'rgba(255, 255, 255, 0.3)'}`,
                     color: hotspot.iconColor || (isSelected ? '#ffffff' : '#10b981'),
-                    boxShadow: hotspot.hideIconBg ? 'none' : '0 4px 14px rgba(0, 0, 0, 0.5)',
+                    boxShadow: 'none',
+                    filter: 'none',
                     opacity: isTestMode && !isAlwaysVisible && !revealedInTest && !isHovered ? 0 : 1,
                   }}
                 >
@@ -781,7 +775,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
                   transform: 'translateY(-100%) translateY(-3px)',
                 }}
               >
-                <span className="inline-block bg-black/85 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow border border-white/15 whitespace-nowrap">
+                <span className="inline-block bg-black/85 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white/15 whitespace-nowrap">
                   {hotspot.title}
                 </span>
               </div>

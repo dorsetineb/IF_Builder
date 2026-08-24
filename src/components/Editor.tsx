@@ -1044,7 +1044,7 @@ const Editor: React.FC = () => {
   const [sidePanelTab, setSidePanelTab] = useState<string>('properties');
   const mainRef = useRef<HTMLElement>(null);
 
-  const isSidePanelExpanded = sidePanelTab === 'objects' || sidePanelTab === 'interactions';
+  const isSidePanelExpanded = sidePanelTab === 'objects' || sidePanelTab === 'interactions' || sidePanelTab === 'choices';
 
   // Scroll to top when view or scene changes
   useEffect(() => {
@@ -1609,12 +1609,12 @@ const Editor: React.FC = () => {
                         ? 'w-1/3'
                         : selectedScene
                           ? selectedScene.sceneType === 'hypercard_stack'
-                            ? isScenarioEditing ? 'w-full' : 'w-80 flex-shrink-0'
-                            : 'w-1/3'
+                            ? isScenarioEditing ? 'w-full' : 'w-1/3'
+                            : isSidePanelExpanded ? 'w-1/2 min-w-[550px]' : 'w-1/3'
                           : 'w-0 border-l-0'
                     }`}
                   >
-                    {((isNarrativeMenuOpen || selectedScene) && (!selectedScene || selectedScene.sceneType !== 'hypercard_stack')) && (
+                    {((isNarrativeMenuOpen || selectedScene) && !isScenarioEditing) && (
                         <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/50 shadow-md px-4 py-4 flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <button
@@ -1643,10 +1643,10 @@ const Editor: React.FC = () => {
                                     setIsNarrativeMenuOpen(false);
                                     setSelectedSceneId(null);
                                   }}
-                                  className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group"
+                                  className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group flex items-center justify-center"
+                                  title={t('common.close', 'Fechar')}
                                 >
                                   <X className="w-4 h-4 transition-transform group-hover:scale-110" />
-                                  <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.close', 'Fechar')}</span>
                                 </button>
                             </div>
                         </div>

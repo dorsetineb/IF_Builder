@@ -64,7 +64,7 @@ export const useSceneManagement = ({
         const firstCardId = generateUniqueId('crd', []);
         const initialCard = isStack ? {
             id: firstCardId,
-            name: t('editor.defaultCardName', 'Slide 1'),
+            name: t('hypercard.defaultCardName', 'Vista 1'),
             image: '',
             description: '',
             hotspots: [],

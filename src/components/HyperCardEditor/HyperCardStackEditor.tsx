@@ -56,7 +56,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
     ? scene.stackCards
     : [{
         id: generateUniqueId('crd', []),
-        name: t('editor.defaultCardName', 'Cenário 1'),
+        name: t('hypercard.defaultCardName', 'Vista 1'),
         image: scene.image || '',
         hotspots: [],
         transition: 'dissolve',
@@ -96,7 +96,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
     const newCardId = generateUniqueId('crd', cards.map(c => c.id));
     const newCard: HyperCard = {
       id: newCardId,
-      name: `${t('hypercard.cardPrefix', 'Cenário')} ${cards.length + 1}`,
+      name: `${t('hypercard.cardPrefix', 'Vista')} ${cards.length + 1}`,
       image: '',
       hotspots: [],
       transition: 'dissolve',
@@ -226,23 +226,8 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       {/* ========================================================================= */}
       {!isExpanded && (
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Top Bar if onClose */}
-          {onClose && (
-            <div className="p-3.5 bg-card border-b border-muted-foreground/30 flex items-center justify-between flex-shrink-0">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                {t('hypercard.stackConfig', 'Configuração de Cenários')}
-              </span>
-              <button
-                onClick={onClose}
-                className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex-shrink-0"
-                title={t('common.close', 'Fechar')}
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {/* FIXED TOP SECTION (From base of create button up) */}
+          <div className="p-4 pb-3 space-y-4 flex-shrink-0 border-b border-muted-foreground/30 bg-background z-10">
             {/* DETALHES DO CENÁRIO */}
             <div className="space-y-4 flex flex-col">
               <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
@@ -290,133 +275,126 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               </div>
             </div>
 
-            {/* LISTA DE CENÁRIOS */}
-            <div className="space-y-3 pt-4 border-t border-muted-foreground/30">
+            {/* LISTA DE VISTAS HEADER & CREATE BUTTON */}
+            <div className="space-y-3 pt-3 border-t border-muted-foreground/30">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Lista de Cenários ({cards.length})
+                  {t('hypercard.viewsListTitle', 'Lista de Vistas')} ({cards.length})
                 </span>
               </div>
 
-              {/* Vertical Stack List */}
-              <div className="space-y-3">
-                {cards.map((card, idx) => {
-                  const isSelected = card.id === selectedCardId;
-                  const isStart = card.id === scene.startCardId || (!scene.startCardId && idx === 0);
-
-                  return (
-                    <div
-                      key={card.id}
-                      onClick={() => setSelectedCardId(card.id)}
-                      className={`group relative rounded-xl border overflow-hidden transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-card border-primary shadow-md shadow-primary/10 ring-1 ring-primary'
-                          : 'bg-card/70 hover:bg-card border-muted-foreground/30 hover:border-muted-foreground/60'
-                      }`}
-                    >
-                      {/* Thumbnail Box */}
-                      <div className="relative w-full aspect-video bg-black/50 overflow-hidden flex items-center justify-center">
-                        {card.image ? (
-                          <img
-                            src={card.image}
-                            alt={card.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-muted-foreground/40 gap-1">
-                            <ImageIcon className="w-6 h-6" />
-                            <span className="text-[10px]">Sem imagem</span>
-                          </div>
-                        )}
-
-                        {/* Number Badge Top Left */}
-                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-bold text-white leading-none shadow">
-                          {idx + 1}
-                        </div>
-
-                        {/* Start Badge Top Right */}
-                        {isStart && (
-                          <div
-                            className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-amber-500 text-zinc-950 font-bold text-[9px] flex items-center gap-0.5 shadow"
-                            title="Cenário Inicial"
-                          >
-                            <Star className="w-2.5 h-2.5 fill-current" />
-                            <span>Início</span>
-                          </div>
-                        )}
-
-                        {/* HOVER OVERLAY: EDIT BUTTON AT EXACT CENTER */}
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                          <button
-                            onClick={(e) => handleStartEditCard(card.id, e)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-lg shadow-primary/30 active:scale-95 transition-all transform translate-y-1 group-hover:translate-y-0"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                            <span>Editar</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Card Footer: Name + Hotspot Count + Quick Actions */}
-                      <div className="p-2.5 flex items-center justify-between border-t border-muted-foreground/10 bg-card">
-                        <div className="min-w-0 flex-1 pr-2">
-                          <p className={`text-xs font-bold truncate ${isSelected ? 'text-primary' : 'text-foreground'}`}>
-                            {card.name || `Cenário ${idx + 1}`}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                            <MousePointerClick className="w-3 h-3 text-primary" />
-                            <span>{card.hotspots?.length || 0} {card.hotspots?.length === 1 ? 'área' : 'áreas'}</span>
-                          </p>
-                        </div>
-
-                        {/* Quick Action Icons */}
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          {!isStart && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onUpdateScene({ ...scene, startCardId: card.id });
-                              }}
-                              className="p-1 rounded text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors"
-                              title="Tornar Cenário Inicial"
-                            >
-                              <Star className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                          <button
-                            onClick={(e) => handleDuplicateCard(card, e)}
-                            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                            title="Duplicar Cenário"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
-                          {cards.length > 1 && (
-                            <button
-                              onClick={(e) => handleDeleteCard(card.id, e)}
-                              className="p-1 rounded text-muted-foreground hover:text-red-400 hover:bg-muted transition-colors"
-                              title="Excluir Cenário"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Standard Creation Button Pattern */}
-              <div className="pt-2 pb-4">
-                <button
-                  onClick={handleAddCard}
-                  className="w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 mt-2 flex-shrink-0 shadow-sm"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  <span>{t('hypercard.addCard', 'Criar Novo Cenário')}</span>
-                </button>
-              </div>
+              {/* Standard Creation Button Pattern - Fixed above the list */}
+              <button
+                onClick={handleAddCard}
+                className="w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 flex-shrink-0 shadow-sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span>{t('hypercard.addCard', 'Criar Vista')}</span>
+              </button>
             </div>
+          </div>
+
+          {/* SCROLLABLE VIEWS LIST (ONLY CARDS SCROLL) */}
+          <div className="flex-1 overflow-y-auto min-h-0 p-4 pt-3 pb-8 space-y-3">
+            {cards.map((card, idx) => {
+              const isSelected = card.id === selectedCardId;
+              const isStart = card.id === scene.startCardId || (!scene.startCardId && idx === 0);
+
+              return (
+                <div
+                  key={card.id}
+                  onClick={() => setSelectedCardId(card.id)}
+                  className={`group relative rounded-xl border overflow-hidden transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-card border-primary shadow-md shadow-primary/10 ring-1 ring-primary'
+                      : 'bg-card/70 hover:bg-card border-muted-foreground/30 hover:border-muted-foreground/60'
+                  }`}
+                >
+                  {/* Thumbnail Box - Height adjusted by +1/4 */}
+                  <div className="relative w-full h-[94px] bg-black/50 overflow-hidden flex items-center justify-center">
+                    {card.image ? (
+                      <img
+                        src={card.image}
+                        alt={card.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-muted-foreground/40 gap-1">
+                        <ImageIcon className="w-5 h-5" />
+                        <span className="text-[10px]">Sem imagem</span>
+                      </div>
+                    )}
+
+                    {/* View Name Badge Top Left */}
+                    <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-bold text-white leading-none shadow flex items-center gap-1 max-w-[70%] z-10">
+                      <span className="truncate">{card.name || `${t('hypercard.cardPrefix', 'Vista')} ${idx + 1}`}</span>
+                    </div>
+
+                    {/* Start Badge Top Right */}
+                    {isStart && (
+                      <div
+                        className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-amber-500 text-zinc-950 font-bold text-[9px] flex items-center gap-0.5 shadow z-10"
+                        title={t('hypercard.initialView', 'Vista Inicial')}
+                      >
+                        <Star className="w-2.5 h-2.5 fill-current" />
+                        <span>{t('hypercard.startCard', 'Início')}</span>
+                      </div>
+                    )}
+
+                    {/* HOVER OVERLAY: EDIT BUTTON AT EXACT CENTER */}
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center z-20">
+                      <button
+                        onClick={(e) => handleStartEditCard(card.id, e)}
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md shadow-primary/30 active:scale-95 transition-all transform translate-y-1 group-hover:translate-y-0"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Editar</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Card Footer: Hotspot Count + Quick Actions */}
+                  <div className="py-2 px-2.5 flex items-center justify-between border-t border-muted-foreground/10 bg-card">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <MousePointerClick className="w-3.5 h-3.5 text-primary" />
+                      <span className="font-medium text-[11px]">{card.hotspots?.length || 0} {card.hotspots?.length === 1 ? t('hypercard.zone', 'área') : t('hypercard.zones', 'áreas')}</span>
+                    </div>
+
+                    {/* Quick Action Icons */}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {!isStart && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onUpdateScene({ ...scene, startCardId: card.id });
+                          }}
+                          className="p-1 rounded text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors"
+                          title={t('hypercard.setAsStart', 'Tornar Vista Inicial')}
+                        >
+                          <Star className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => handleDuplicateCard(card, e)}
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        title={t('hypercard.duplicateView', 'Duplicar Vista')}
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                      {cards.length > 1 && (
+                        <button
+                          onClick={(e) => handleDeleteCard(card.id, e)}
+                          className="p-1 rounded text-muted-foreground hover:text-red-400 hover:bg-muted transition-colors"
+                          title={t('hypercard.deleteView', 'Excluir Vista')}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -432,7 +410,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               <button
                 onClick={() => onToggleExpand?.(false)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-bold border border-muted-foreground/30 transition-colors"
-                title="Voltar à lista de cenários"
+                title={t('hypercard.backToViewsList', 'Voltar à lista de vistas')}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Voltar</span>
@@ -481,6 +459,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               <HotspotInspector
                 hotspot={selectedHotspot}
                 card={currentCard}
+                onUpdateCard={handleUpdateCard}
                 allCards={cards}
                 allScenes={allScenes}
                 globalObjects={globalObjects}

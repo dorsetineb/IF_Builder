@@ -682,7 +682,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             {/* LEFT SIDEBAR - List */}
             <div className="w-1/3 min-w-[250px] flex flex-col bg-muted-foreground/20 border-r border-primary/20">
                 {/* Header/Search */}
-                <div className="px-3 pt-4 pb-4 space-y-4">
+                <div className="px-3 pt-3 pb-3 space-y-3">
                     <div className="relative">
                         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
@@ -704,13 +704,8 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                     </button>
                 </div>
 
-
-
                 {/* List */}
                 <div className="flex-1 overflow-y-auto min-h-0 pt-0 pb-8 pr-0 flex flex-col items-stretch relative">
-                    {/* Soft top gradient */}
-                    <div className="sticky top-0 left-0 right-0 h-4 bg-gradient-to-b from-[hsl(var(--muted-foreground)/0.2)] to-transparent pointer-events-none z-10" />
-
                     {filteredInteractions.length > 0 && (
                         filteredInteractions.map(({ inter, index }) => (
                             <button

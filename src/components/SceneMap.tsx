@@ -299,8 +299,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
     // 2. Calculate Heights
     const nodeHeights = new Map<string, number>();
     allNodesMap.forEach((node) => {
-      const isStack = node.type === 'scene' && (node.data as Scene).sceneType === 'hypercard_stack';
-      const headerH = isStack ? 86 : NODE_HEADER_HEIGHT;
+      const headerH = NODE_HEADER_HEIGHT;
       const linkingItems = getLinkingItems(node);
       const interactionsHeight =
         linkingItems.length > 0
@@ -490,14 +489,19 @@ const SceneMap: React.FC<SceneMapProps> = ({
         const targetNode = positionedNodes.find((n) => n.id === item.targetId);
         if (!targetNode) return;
 
+        const sBorder = 4;
+        const tBorder = 4;
+
         const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
         const y1_offset =
+          sBorder +
           NODE_HEADER_HEIGHT +
           imagePadding +
           PADDING_TOP +
           index * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y) +
-          INTERACTION_ITEM_HEIGHT / 2;
-        const y2_offset = NODE_HEADER_HEIGHT / 2;
+          INTERACTION_ITEM_HEIGHT / 2 +
+          1;
+        const y2_offset = tBorder + NODE_HEADER_HEIGHT / 2;
 
         const sL = { x: sourceNode.x, y: sourceNode.y + y1_offset };
         const sR = { x: sourceNode.x + NODE_WIDTH, y: sourceNode.y + y1_offset };
@@ -863,18 +867,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
               const linkingItems = getLinkingItems(sourceNode);
               const itemIndex = linkingItems.findIndex((item) => item.id === edge.sourceItemId);
-              const getBorderWidth = (n: typeof sourceNode) => {
-                if (n.type === 'vignette') return 4;
-                if (n.type === 'scene') {
-                  const s = n.data as Scene;
-                  if (s.vignetteType === 'opening' || s.vignetteType === 'conclusion') return 4;
-                  return 2;
-                }
-                return 0;
-              };
-
-              const sBorder = getBorderWidth(sourceNode);
-              const tBorder = getBorderWidth(targetNode);
+              const sBorder = 4;
+              const tBorder = 4;
 
               const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
               const y1_offset =
@@ -1140,7 +1134,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 >
                 <div
                   className="p-2.5 relative flex-shrink-0 text-center bg-zinc-900/50 flex flex-col justify-center items-center"
-                  style={{ height: isStack ? 86 : NODE_HEADER_HEIGHT }}
+                  style={{ height: NODE_HEADER_HEIGHT }}
                 >
                   {/* Anchor Points Visualization */}
                   {!node.isStart && (
@@ -1157,11 +1151,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
                     (ID: {node.id})
                   </p>
-                  {isStack && (
-                    <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded mt-1 inline-block shadow-sm">
-                      {scene.stackCards?.length || 0} {t('sceneMap.cards', 'Cartões')}
-                    </span>
-                  )}
                   {isEnding && (
                     <p className="text-[10px] font-bold text-white mt-1 uppercase tracking-widest">
                       {t('sceneMap.ending', 'Final')}
