@@ -1688,6 +1688,13 @@ const Editor: React.FC = () => {
                               globalObjects={gameData.globalObjects}
                               consequenceTrackers={consequenceTrackers}
                               onUpdateScene={handleUpdateScene}
+                              onCopyScene={handleCopyScene}
+                              onPreviewScene={(scene) => {
+                                setPreviewSceneId(scene.id);
+                                setIsPreviewOpen(true);
+                              }}
+                              isDirty={isDirty}
+                              onSetDirty={setIsDirty}
                               onClose={() => {
                                 setIsScenarioEditing(false);
                                 setSelectedSceneId(null);

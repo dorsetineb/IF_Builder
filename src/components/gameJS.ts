@@ -1457,40 +1457,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (standardActionBar) standardActionBar.classList.remove('hidden');
         if (endingActionBar) endingActionBar.classList.add('hidden');
         
-        const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
-        
         if (gameContainer && !isVignette) {
             gameContainer.classList.remove('hidden');
-            if (window.isSceneTest) {
-                const hasImage = startScene && startScene.image && gameData.enableImages !== false;
-                
-                const showGame = () => {
-                     if (gameContainer) gameContainer.classList.add('ready');
-                };
-
-                if (hasImage) {
-                     const img = document.getElementById('scene-image');
-                     if (img && img instanceof HTMLImageElement) {
-                         if (img.complete && img.naturalHeight !== 0) {
-                             showGame();
-                         } else {
-                             img.onload = showGame;
-                             img.onerror = showGame;
-                             // Safety timeout
-                             setTimeout(showGame, 2000);
-                         }
-                     } else {
-                         showGame();
-                     }
-                } else {
-                     // Small delay to ensure layout frames are ready
-                     setTimeout(showGame, 50);
-                }
-
-            } else {
-                // Unhide game container instantly in standard play
-                gameContainer.classList.add('ready');
-            }
+            gameContainer.classList.add('ready');
         }
     };
 
@@ -2306,13 +2275,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
-        if (!sceneId || !gameData.cenas || !gameData.cenas[sceneId]) {
-            const keys = Object.keys((gameData && gameData.cenas) || {});
-            if (keys.length > 0) sceneId = keys[0];
-            else return;
+    const findScene = (sceneId) => {
+        if (!sceneId) return null;
+        const cenas = (gameData && (gameData.cenas || gameData.scenes)) || {};
+        if (cenas[sceneId]) return cenas[sceneId];
+        const lowerId = String(sceneId).trim().toLowerCase();
+        for (const key of Object.keys(cenas)) {
+            if (key.trim().toLowerCase() === lowerId) {
+                return cenas[key];
+            }
         }
-        const scene = gameData.cenas[sceneId]; if (!scene) return;
+        for (const val of Object.values(cenas)) {
+            if (val && val.id && String(val.id).trim().toLowerCase() === lowerId) {
+                return val;
+            }
+        }
+        return null;
+    };
+
+    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
+        let scene = findScene(sceneId);
+        if (!scene) {
+            const keys = Object.keys((gameData && gameData.cenas) || {});
+            if (keys.length > 0) {
+                sceneId = keys[0];
+                scene = gameData.cenas[sceneId];
+            } else {
+                return;
+            }
+        }
+        if (!scene) return;
+        sceneId = scene.id;
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
         } else if (scene.stopBackgroundMusic) {
@@ -2387,7 +2380,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const defaultDuration = speed + 's';
         document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
-        if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
+
+        const isTargetHyperCard = scene.sceneType === 'hypercard_stack';
+        const isCurrentHyperCard = gameContainer && gameContainer.classList.contains('hypercard-fullscreen');
+
+        if (isTargetHyperCard && !isCurrentHyperCard && transition && gameData.enableImages !== false) {
+            // Transitioning from Branch/Chapter to Scenario (HyperCard Fullscreen)
+            // Create a clean smooth fading curtain
+            const curtain = document.createElement('div');
+            curtain.className = 'scene-curtain-transition ' + (effectiveTransition !== 'none' ? 'trans-' + effectiveTransition + '-out' : 'trans-fade-out');
+            curtain.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background-color:var(--bg-color, #0d1117);z-index:9999;pointer-events:none;';
+            document.body.appendChild(curtain);
+
+            // Render scenario in fullscreen directly underneath
+            renderScene(scene, successPrefix, inputEchoText);
+
+            setTimeout(() => {
+                curtain.remove();
+            }, speed * 1000 + 50);
+
+            autoSaveGame();
+            return;
+        }
+
+        if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false && !isTargetHyperCard) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
@@ -2439,6 +2455,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imagePanel = imageContainer ? imageContainer.parentElement : null;
         const textPanel = document.querySelector('.text-panel');
         const chancesContainer = document.getElementById('chances-container');
+        const isImagesEnabled = gameData.enableImages !== false;
         
         if (sceneNameOverlay) {
             sceneNameOverlay.style.whiteSpace = 'nowrap';
@@ -2563,10 +2580,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (standardActionBar) standardActionBar.classList.remove('hidden');
             
-            // Remove text-scene-header if present
+            // Remove text-scene-header and hypercard stage if present
             const textSceneHeader = document.getElementById('text-scene-header');
             if (textSceneHeader) {
                 textSceneHeader.remove();
+            }
+            const stage = document.getElementById('hypercard-stage');
+            if (stage && imageContainer) {
+                if (sceneImage && sceneImage.parentElement === stage) {
+                    imageContainer.appendChild(sceneImage);
+                }
+                stage.remove();
             }
             
             // Move scene-name-overlay back inside imageContainer
@@ -2684,6 +2708,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneNameOverlay.style.opacity = '1';
         }
 
+        applySceneOverlay(scene.overlayEffect);
+
         if (imageContainer && sceneImage) {
             let stage = document.getElementById('hypercard-stage');
             if (!stage) {
@@ -2691,6 +2717,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 stage.id = 'hypercard-stage';
                 imageContainer.appendChild(stage);
             }
+
+            if (sceneOverlay && sceneOverlay.parentElement !== imageContainer) {
+                imageContainer.appendChild(sceneOverlay);
+            }
+
+            let imageBack = document.getElementById('hypercard-image-back');
+            if (!imageBack) {
+                imageBack = document.createElement('img');
+                imageBack.id = 'hypercard-image-back';
+                imageBack.className = 'hidden';
+                stage.appendChild(imageBack);
+            }
+
             if (sceneImage.parentElement !== stage) {
                 stage.appendChild(sceneImage);
             }
@@ -2700,11 +2739,16 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneImage.classList.toggle('hidden', !card.image);
             if (imageContainer) imageContainer.classList.toggle('no-image', !card.image);
 
+            // Clean up existing overlay and icon badges from previous cards
+            const existingOverlay = stage.querySelector('#hypercard-hotspot-overlay');
+            if (existingOverlay) existingOverlay.remove();
+            stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => el.remove());
+
             const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             overlay.id = 'hypercard-hotspot-overlay';
             overlay.setAttribute('viewBox', '0 0 1000 1000');
             overlay.setAttribute('preserveAspectRatio', 'none');
-            overlay.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;z-index:25;pointer-events:auto;');
+            overlay.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;z-index:25;pointer-events:auto;overflow:visible;');
             stage.appendChild(overlay);
 
             const updateStageDimensions = () => {
@@ -2718,8 +2762,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const stageW = Math.round(nw * scale);
                 const stageH = Math.round(nh * scale);
 
+                let filterStyle = '';
+                if (scene.overlayEffect === 'nosferatu') {
+                    filterStyle = 'filter:sepia(0.8) contrast(1.1) brightness(0.9);';
+                } else if (scene.overlayEffect === 'glitch') {
+                    filterStyle = 'filter:url(#glitch-distortion-filter);';
+                }
                 stage.style.cssText = 'position:relative;display:block;width:' + stageW + 'px;height:' + stageH + 'px;flex-shrink:0;overflow:visible;line-height:0;margin:0;';
-                sceneImage.style.cssText = 'display:block;width:100%;height:100%;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;';
+                sceneImage.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:2;' + filterStyle;
+                if (imageBack) {
+                    imageBack.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:1;' + filterStyle;
+                }
             };
 
             if (sceneImage.complete && sceneImage.naturalWidth > 0) {
@@ -2731,38 +2784,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const HOTSPOT_ICONS_SVG = {
                 eye: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
-                mouse: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="m13 13 6 6"/></svg>',
+                mouse: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/></svg>',
                 hand: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>',
                 search: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
-                'arrow-up': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
-                'arrow-down': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
-                'arrow-left': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
-                'arrow-right': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+                'arrow-up': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>',
+                'arrow-down': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>',
+                'arrow-left': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
+                'arrow-right': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
                 box: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
                 key: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
                 sword: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg>',
-                flask: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.12 19a2 2 0 0 0 1.66 3h12.44a2 2 0 0 0 1.66-3L14 9.31V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>',
-                book: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 2v20"/></svg>',
+                flask: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.15 19.3c-.85 1.34.11 3.1 1.69 3.1h12.32c1.58 0 2.54-1.76 1.69-3.1L14 9.31V2"/><line x1="8.5" x2="15.5" y1="2" y2="2"/><line x1="6.5" x2="17.5" y1="15" y2="15"/></svg>',
+                book: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',
                 map: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>',
-                crown: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.203a4 4 0 0 1-3.86 2.928H8.713a4 4 0 0 1-3.86-2.928L2.018 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/></svg>',
+                crown: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>',
                 star: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
                 heart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
                 zap: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
                 shield: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-                coins: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>',
+                coins: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18 6v1a6 6 0 0 1-6 6H9"/><circle cx="16" cy="16" r="6"/></svg>',
                 clock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-                skull: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/></svg>',
+                skull: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>',
                 user: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-                trophy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.45.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+                trophy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
                 alert: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>',
                 flame: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
                 droplet: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>',
                 sun: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
                 moon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
-                activity: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+                activity: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
             };
 
-            let isRevealingZones = false;
+            const isRevealingZones = false;
 
             (card.hotspots || []).forEach(hotspot => {
                 const hx = hotspot.x * 10;
@@ -2797,22 +2850,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 elem.setAttribute('class', 'hypercard-hotspot-zone');
                 elem.style.cursor = 'pointer';
 
-                // Centered Icon Badge in the middle of the hotspot (Square, customizable)
+                // Centered Icon Badge in the middle of the hotspot (Square, strict color fidelity)
                 const iconName = hotspot.icon || 'eye';
                 const iconSvg = HOTSPOT_ICONS_SVG[iconName] || HOTSPOT_ICONS_SVG['eye'];
                 const centerX = hotspot.x + hotspot.width / 2;
                 const centerY = hotspot.y + hotspot.height / 2;
 
                 const hideBg = !!hotspot.hideIconBg;
-                const iconColor = hotspot.iconColor || '#10b981';
-                const bgColor = hideBg ? 'transparent' : (hotspot.iconBgColor || 'rgba(0,0,0,0.75)');
-                const borderColor = hideBg ? 'transparent' : (hotspot.iconBorderColor || 'rgba(255,255,255,0.3)');
-                const borderCss = hideBg ? 'border:none;' : 'border:1.5px solid ' + borderColor + ';';
-                const shadowCss = hideBg ? 'box-shadow:none;' : 'box-shadow:0 4px 14px rgba(0,0,0,0.5);';
+                const iconColor = hotspot.iconColor || '#ffffff';
+                const bgColor = hideBg ? 'transparent' : (hotspot.iconBgColor || '#000000');
+                const borderColor = hideBg ? 'transparent' : (hotspot.iconBorderColor || '#30363d');
+                const borderCss = hideBg ? 'border:none;' : 'border:1px solid ' + borderColor + ';';
+                const shadowCss = 'box-shadow:none;';
 
                 const iconEl = document.createElement('div');
                 iconEl.className = 'hypercard-hotspot-icon-badge';
-                iconEl.style.cssText = 'position:absolute;left:' + centerX + '%;top:' + centerY + '%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:0;background:' + bgColor + ';' + borderCss + 'display:flex;align-items:center;justify-content:center;color:' + iconColor + ';' + shadowCss + 'pointer-events:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:28;';
+                iconEl.style.cssText = 'position:absolute;left:' + centerX + '%;top:' + centerY + '%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:0;background:' + bgColor + ';' + borderCss + 'display:flex;align-items:center;justify-content:center;color:' + iconColor + ';' + shadowCss + 'pointer-events:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:28;';
                 iconEl.innerHTML = iconSvg;
 
                 const isAlwaysVisible = hotspot.highlightStyle === 'icons-visible' || hotspot.highlightStyle === 'always-visible' || hotspot.highlightStyle === 'pulsing-pin';
@@ -2831,22 +2884,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 stage.appendChild(iconEl);
 
-                // Hover interaction
+                // Hover interaction - STRICT COLOR FIDELITY & NO GLOW
                 elem.addEventListener('mouseenter', () => {
                     if (!isAlwaysVisible && !isHidden) {
                         iconEl.style.display = 'flex';
                         iconEl.style.opacity = '1';
-                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.12)';
-                        if (!hideBg) {
-                            iconEl.style.borderColor = iconColor;
-                            iconEl.style.boxShadow = '0 0 16px ' + iconColor;
-                        }
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.08)';
                     } else if (isAlwaysVisible) {
-                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.15)';
-                        if (!hideBg) {
-                            iconEl.style.borderColor = iconColor;
-                            iconEl.style.boxShadow = '0 0 16px ' + iconColor;
-                        }
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.08)';
                     }
                 });
 
@@ -2854,16 +2899,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!isAlwaysVisible && !isHidden) {
                         iconEl.style.opacity = isRevealingZones ? '1' : '0';
                         iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
-                        if (!hideBg) {
-                            iconEl.style.borderColor = borderColor;
-                            iconEl.style.boxShadow = '0 4px 14px rgba(0,0,0,0.5)';
-                        }
                     } else if (isAlwaysVisible) {
                         iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
-                        if (!hideBg) {
-                            iconEl.style.borderColor = borderColor;
-                            iconEl.style.boxShadow = '0 4px 14px rgba(0,0,0,0.5)';
-                        }
                     }
                 });
 
@@ -2908,10 +2945,82 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
 
+                    const effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
+
                     if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId) {
-                        renderHyperCardStack(scene, hotspot.targetCardId);
+                        const targetCard = cards.find(c => c.id === hotspot.targetCardId);
+                        const targetImg = targetCard ? targetCard.image : '';
+
+                        // Immediately hide all current icons alongside the transitioning image
+                        stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => {
+                            el.style.transition = 'opacity 0.25s ease-out';
+                            el.style.opacity = '0';
+                            el.style.pointerEvents = 'none';
+                        });
+                        overlay.style.pointerEvents = 'none';
+
+                        if (effectiveTrans !== 'none' && sceneImage && sceneImage.src && targetImg && imageBack) {
+                            imageBack.src = targetImg;
+                            imageBack.classList.remove('hidden');
+                            const animClass = 'trans-' + effectiveTrans + '-out';
+                            sceneImage.classList.add(animClass);
+                            setTimeout(() => {
+                                renderHyperCardStack(scene, hotspot.targetCardId);
+                                sceneImage.classList.remove(animClass);
+                                imageBack.src = '';
+                                imageBack.classList.add('hidden');
+                            }, 380);
+                        } else {
+                            renderHyperCardStack(scene, hotspot.targetCardId);
+                        }
                     } else if (hotspot.actionType === 'navigate_scene' && hotspot.targetSceneId) {
-                        loadScene(hotspot.targetSceneId);
+                        const targetScene = findScene(hotspot.targetSceneId);
+
+                        // Immediately hide all current icons alongside the transitioning image
+                        stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => {
+                            el.style.transition = 'opacity 0.25s ease-out';
+                            el.style.opacity = '0';
+                            el.style.pointerEvents = 'none';
+                        });
+                        overlay.style.pointerEvents = 'none';
+
+                        const isTargetScenario = targetScene && targetScene.sceneType === 'hypercard_stack';
+
+                        if (!isTargetScenario) {
+                            // Transitioning from Scenario to Branch/Chapter
+                            // Create a temporary standalone curtain snapshot of the current view
+                            const currentViewImg = (sceneImage && sceneImage.src) ? sceneImage.src : (card && card.image ? card.image : '');
+                            if (effectiveTrans !== 'none' && currentViewImg) {
+                                const curtain = document.createElement('div');
+                                curtain.className = 'scene-curtain-transition ' + ('trans-' + effectiveTrans + '-out');
+                                curtain.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url("' + currentViewImg + '");background-size:cover;background-position:center;background-repeat:no-repeat;z-index:9999;pointer-events:none;';
+                                document.body.appendChild(curtain);
+
+                                setTimeout(() => {
+                                    curtain.remove();
+                                }, 380);
+                            }
+
+                            // Load target branch scene directly
+                            loadScene(hotspot.targetSceneId, false);
+                        } else {
+                            // Scenario to another Scenario
+                            const targetImg = targetScene ? (targetScene.stackCards && targetScene.stackCards[0] ? targetScene.stackCards[0].image : (targetScene.image || '')) : '';
+                            if (effectiveTrans !== 'none' && sceneImage && sceneImage.src && targetImg && imageBack) {
+                                imageBack.src = targetImg;
+                                imageBack.classList.remove('hidden');
+                                const animClass = 'trans-' + effectiveTrans + '-out';
+                                sceneImage.classList.add(animClass);
+                                setTimeout(() => {
+                                    loadScene(hotspot.targetSceneId, false);
+                                    sceneImage.classList.remove(animClass);
+                                    imageBack.src = '';
+                                    imageBack.classList.add('hidden');
+                                }, 380);
+                            } else {
+                                loadScene(hotspot.targetSceneId, false);
+                            }
+                        }
                     } else if (hotspot.actionType === 'examine') {
                         showFloatingDialogue(hotspot.examineTitle || "Examinar", hotspot.examineText || "", hotspot.examineImage);
                     }
@@ -2919,139 +3028,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 overlay.appendChild(elem);
             });
-
-            // Floating Reveal Zones Button
-            const revealBtn = document.createElement('button');
-            revealBtn.id = 'hypercard-reveal-btn';
-            revealBtn.setAttribute('style', 'position:absolute;bottom:16px;right:16px;z-index:30;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:bold;cursor:pointer;transition:all 0.2s;');
-            revealBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Zonas</span>';
-            revealBtn.title = "Revelar Áreas Interativas (Espaço)";
-
-            let isRevealed = false;
-            const toggleReveal = (e) => {
-                if (e) e.stopPropagation();
-                isRevealed = !isRevealed;
-                overlay.querySelectorAll('.hypercard-hotspot-zone').forEach(z => {
-                    if (isRevealed) {
-                        z.setAttribute('fill', 'rgba(16, 185, 129, 0.3)');
-                        z.setAttribute('stroke', '#10b981');
-                    } else {
-                        z.setAttribute('fill', 'transparent');
-                        z.setAttribute('stroke', 'transparent');
-                    }
-                });
-                revealBtn.style.background = isRevealed ? '#10b981' : 'rgba(0,0,0,0.6)';
-            };
-
-            revealBtn.addEventListener('click', toggleReveal);
-            imageContainer.appendChild(revealBtn);
         }
     };
 
-    const renderScene = (scene, successPrefix = null, inputEchoText = null) => {
-        // Clear any previous HyperCard overlay if entering standard scene
-        const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
-        if (existingOverlay && scene.sceneType !== 'hypercard_stack') existingOverlay.remove();
-        const existingRevealBtn = document.getElementById('hypercard-reveal-btn');
-        if (existingRevealBtn && scene.sceneType !== 'hypercard_stack') existingRevealBtn.remove();
+    const applySceneOverlay = (overlayEffect) => {
+        if (!sceneOverlay) return;
+        sceneOverlay.className = 'scene-overlay'; // Reset
+        sceneOverlay.style.opacity = '1';
+        sceneOverlay.style.zIndex = '20';
+        sceneOverlay.style.pointerEvents = 'none';
 
-        if (scene.sceneType === 'hypercard_stack') {
-            renderHyperCardStack(scene);
+        // Clear previous effect DOM
+        const existingBlur = sceneOverlay.querySelector('.blur-overlay-container');
+        if (existingBlur) existingBlur.remove();
+        const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
+        if (existingChromatic) existingChromatic.remove();
+        const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
+        if (existingTV) existingTV.remove();
+        const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
+        if (existingConfetti) existingConfetti.remove();
+        const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
+        if (existingGlitch) existingGlitch.remove();
+
+        if (overlayEffect) {
+            sceneOverlay.classList.add('overlay-' + overlayEffect);
         }
 
-        const isImagesEnabled = gameData.enableImages !== false;
-        if (scene.image && isImagesEnabled && scene.sceneType !== 'hypercard_stack') { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
-        else if (scene.sceneType !== 'hypercard_stack') { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
-        if (sceneNameOverlay && scene.sceneType !== 'hypercard_stack') { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
-        
-        // Handle Overlay Effect
-        if (sceneOverlay) {
-            sceneOverlay.className = 'scene-overlay'; // Reset
-            sceneOverlay.style.opacity = '1';
-            // Clear previous effect DOM
-            const existingBlur = sceneOverlay.querySelector('.blur-overlay-container');
-            if (existingBlur) existingBlur.remove();
-            const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
-            if (existingChromatic) existingChromatic.remove();
-            const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
-            if (existingTV) existingTV.remove();
-            const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
-            if (existingConfetti) existingConfetti.remove();
-            const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
-            if (existingGlitch) existingGlitch.remove();
+        // Rain Effect Logic
+        if (overlayEffect === 'rain') {
+            if (typeof rainEffect !== 'undefined') rainEffect.start('scene-overlay');
+        } else {
+            if (typeof rainEffect !== 'undefined') rainEffect.stop();
+        }
+
+        // Blur Effect Logic
+        if (overlayEffect === 'blur') {
+            const blurContainer = document.createElement('div');
+            blurContainer.className = 'blur-overlay-container';
+            blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
+            sceneOverlay.appendChild(blurContainer);
+        }
+
+        // Chromatic Aberration Effect Logic
+        if (overlayEffect === 'chromatic') {
+            const chromaticContainer = document.createElement('div');
+            chromaticContainer.className = 'chromatic-overlay-container';
+            chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
+            sceneOverlay.appendChild(chromaticContainer);
+        }
+
+        // TV Effect Logic
+        if (overlayEffect === 'tv') {
+            sceneOverlay.parentElement?.classList.add('tv-distortion-active');
             
-            if (scene.overlayEffect) {
-                sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
-            }
-
-            // Rain Effect Logic
-            if (scene.overlayEffect === 'rain') {
-                if (typeof rainEffect !== 'undefined') rainEffect.start('scene-overlay');
-            } else {
-                if (typeof rainEffect !== 'undefined') rainEffect.stop();
-            }
-
-            // Blur Effect Logic - Inject DOM structure
-            if (scene.overlayEffect === 'blur') {
-                const blurContainer = document.createElement('div');
-                blurContainer.className = 'blur-overlay-container';
-                blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
-                sceneOverlay.appendChild(blurContainer);
-            }
-
-            // Chromatic Aberration Effect Logic - Inject DOM structure
-            if (scene.overlayEffect === 'chromatic') {
-                const chromaticContainer = document.createElement('div');
-                chromaticContainer.className = 'chromatic-overlay-container';
-                chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
-                sceneOverlay.appendChild(chromaticContainer);
-            }
-
-            // TV Effect Logic - Inject DOM structure
-            if (scene.overlayEffect === 'tv') {
-                sceneOverlay.parentElement?.classList.add('tv-distortion-active');
-                
-                const tvContainer = document.createElement('div');
-                tvContainer.className = 'tv-overlay-container';
-                tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
-                sceneOverlay.appendChild(tvContainer);
-            } else {
-                sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
-            }
-
-            // Confetti Effect Logic - Inject canvas and start animation
-            if (scene.overlayEffect === 'confetti') {
-                if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
-            } else {
-                if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
-            }
-
-            // Glitch Effect Logic - Inject SVG filter and apply to image
-            if (scene.overlayEffect === 'glitch') {
-                // Ensure SVG filter exists
-                if (!document.getElementById('glitch-distortion-filter')) {
-                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svg.setAttribute('style', 'position:absolute;width:0;height:0;');
-                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
-                    document.body.appendChild(svg);
-                }
-                // Apply filter directly to images
-                if (sceneImage) sceneImage.style.filter = 'url(#glitch-distortion-filter)';
-                if (sceneImageBack) sceneImageBack.style.filter = 'url(#glitch-distortion-filter)';
-                sceneOverlay.parentElement?.classList.add('glitch-distortion-active');
-                if (typeof glitchEffect !== 'undefined') glitchEffect.start('scene-overlay');
-            } else {
-                // Remove filter from images
-                if (sceneImage) sceneImage.style.filter = '';
-                if (sceneImageBack) sceneImageBack.style.filter = '';
-                sceneOverlay.parentElement?.classList.remove('glitch-distortion-active');
-                if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
-            }
+            const tvContainer = document.createElement('div');
+            tvContainer.className = 'tv-overlay-container';
+            tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+            sceneOverlay.appendChild(tvContainer);
+        } else {
+            sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
         }
 
-        // Nosferatu Effect Logic for Scene
-        if (scene.overlayEffect === 'nosferatu') {
-            // Clear any existing nosferatu container first
+        // Confetti Effect Logic
+        if (overlayEffect === 'confetti') {
+            if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
+        } else {
+            if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+        }
+
+        // Glitch Effect Logic
+        if (overlayEffect === 'glitch') {
+            if (!document.getElementById('glitch-distortion-filter')) {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('style', 'position:absolute;width:0;height:0;');
+                svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                document.body.appendChild(svg);
+            }
+            if (sceneImage) sceneImage.style.filter = 'url(#glitch-distortion-filter)';
+            if (sceneImageBack) sceneImageBack.style.filter = 'url(#glitch-distortion-filter)';
+            sceneOverlay.parentElement?.classList.add('glitch-distortion-active');
+            if (typeof glitchEffect !== 'undefined') glitchEffect.start('scene-overlay');
+        } else {
+            if (sceneImage) sceneImage.style.filter = '';
+            if (sceneImageBack) sceneImageBack.style.filter = '';
+            sceneOverlay.parentElement?.classList.remove('glitch-distortion-active');
+            if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+        }
+
+        // Nosferatu Effect Logic
+        if (overlayEffect === 'nosferatu') {
             const existing = sceneOverlay.querySelector('.nosferatu-container');
             if (existing) existing.remove();
             
@@ -3064,26 +3129,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sceneImageBack) sceneImageBack.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
             sceneOverlay.parentElement?.classList.add('nosferatu-active');
         } else {
-            // Remove nosferatu effects if not active
             const existing = sceneOverlay.querySelector('.nosferatu-container');
             if (existing) existing.remove();
             sceneOverlay.parentElement?.classList.remove('nosferatu-active');
-            // Only clear filter if not another filter effect
-            if (scene.overlayEffect !== 'glitch' && scene.overlayEffect !== 'tv') {
+            if (overlayEffect !== 'glitch' && overlayEffect !== 'tv') {
                 if (sceneImage) sceneImage.style.filter = '';
                 if (sceneImageBack) sceneImageBack.style.filter = '';
             }
         }
 
-        // Wiggle Effect Logic for Scene
-        if (scene.overlayEffect === 'wiggle') {
+        // Wiggle Effect Logic
+        if (overlayEffect === 'wiggle') {
             sceneOverlay.parentElement?.classList.add('wiggle-active');
         } else {
             sceneOverlay.parentElement?.classList.remove('wiggle-active');
         }
 
-        // Fog Effect Logic for Scene
-        if (scene.overlayEffect === 'fog') {
+        // Fog Effect Logic
+        if (overlayEffect === 'fog') {
              const existing = sceneOverlay.querySelector('.fog-container');
              if (existing) existing.remove();
 
@@ -3099,6 +3162,29 @@ document.addEventListener('DOMContentLoaded', () => {
              const existing = sceneOverlay.querySelector('.fog-container');
              if (existing) existing.remove();
         }
+    };
+
+    const renderScene = (scene, successPrefix = null, inputEchoText = null) => {
+        adjustLayoutForImagesAndChances(scene);
+
+        // Clear any previous HyperCard overlay if entering standard scene
+        const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
+        if (existingOverlay && scene.sceneType !== 'hypercard_stack') existingOverlay.remove();
+        const existingRevealBtn = document.getElementById('hypercard-reveal-btn');
+        if (existingRevealBtn && scene.sceneType !== 'hypercard_stack') existingRevealBtn.remove();
+
+        // Always apply scene overlay (works for both hypercard stacks and standard scenes)
+        applySceneOverlay(scene.overlayEffect);
+
+        if (scene.sceneType === 'hypercard_stack') {
+            renderHyperCardStack(scene);
+            return;
+        }
+
+        const isImagesEnabled = gameData.enableImages !== false;
+        if (scene.image && isImagesEnabled && scene.sceneType !== 'hypercard_stack') { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        else if (scene.sceneType !== 'hypercard_stack') { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
+        if (sceneNameOverlay && scene.sceneType !== 'hypercard_stack') { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
 
         sceneDescription.innerHTML = '';
         

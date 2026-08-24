@@ -850,9 +850,7 @@ select option {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 5;
-  opacity: 0.8;
-  mix-blend-mode: overlay;
+  z-index: 20;
   overflow: hidden;
 }
 
@@ -1219,3 +1217,25 @@ select option {
     transform: translate(0, 0);
   }
 }
+
+/* Animações de Transição de Imagem */
+:root {
+  --image-anim-speed: 0.38s;
+}
+
+.trans-fade-out { animation: imgFadeOut var(--image-anim-speed) forwards ease-in-out; }
+.trans-slide-out { animation: imgSlideLeftOut var(--image-anim-speed) forwards ease-in-out; }
+.trans-slide-left-out { animation: imgSlideLeftOut var(--image-anim-speed) forwards ease-in-out; }
+.trans-slide-right-out { animation: imgSlideRightOut var(--image-anim-speed) forwards ease-in-out; }
+.trans-slide-up-out { animation: imgSlideUpOut var(--image-anim-speed) forwards ease-in-out; }
+.trans-slide-down-out { animation: imgSlideDownOut var(--image-anim-speed) forwards ease-in-out; }
+.trans-zoom-out { animation: imgZoomOut var(--image-anim-speed) forwards ease-in; }
+.trans-blur-out { animation: imgBlurOut var(--image-anim-speed) forwards ease-in; }
+
+@keyframes imgFadeOut { to { opacity: 0; } }
+@keyframes imgSlideLeftOut { to { transform: translateX(-100%); opacity: 0; } }
+@keyframes imgSlideRightOut { to { transform: translateX(100%); opacity: 0; } }
+@keyframes imgSlideUpOut { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes imgSlideDownOut { to { transform: translateY(100%); opacity: 0; } }
+@keyframes imgZoomOut { from { transform: scale(1); opacity: 1; } to { transform: scale(1.25); opacity: 0; } }
+@keyframes imgBlurOut { from { filter: blur(0); opacity: 1; } to { filter: blur(20px); opacity: 0; } }

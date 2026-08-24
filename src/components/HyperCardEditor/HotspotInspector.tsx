@@ -51,36 +51,36 @@ import {
 } from 'lucide-react';
 
 export const HOTSPOT_ICONS = [
-  { name: 'eye', component: Eye, label: 'Olho (Observar)' },
-  { name: 'mouse', component: MousePointer2, label: 'Ponteiro / Clique' },
-  { name: 'hand', component: Hand, label: 'Mão (Interagir)' },
-  { name: 'search', component: Search, label: 'Lupa (Investigar)' },
-  { name: 'arrow-up', component: ArrowUp, label: 'Seta Cima' },
-  { name: 'arrow-down', component: ArrowDown, label: 'Seta Baixo' },
-  { name: 'arrow-left', component: ArrowLeft, label: 'Seta Esquerda' },
-  { name: 'arrow-right', component: ArrowRight, label: 'Seta Direita' },
-  { name: 'box', component: Box, label: 'Caixa / Objeto' },
-  { name: 'key', component: Key, label: 'Chave' },
-  { name: 'sword', component: Sword, label: 'Espada / Combate' },
-  { name: 'flask', component: FlaskConical, label: 'Poção / Frasco' },
-  { name: 'book', component: Book, label: 'Livro / Texto' },
-  { name: 'map', component: MapIcon, label: 'Mapa / Navegação' },
-  { name: 'crown', component: Crown, label: 'Coroa / Recompensa' },
-  { name: 'star', component: Star, label: 'Estrela' },
-  { name: 'heart', component: Heart, label: 'Coração / Vida' },
-  { name: 'zap', component: Zap, label: 'Raio / Energia' },
-  { name: 'shield', component: Shield, label: 'Escudo / Proteção' },
-  { name: 'coins', component: Coins, label: 'Moedas / Valor' },
-  { name: 'clock', component: Clock, label: 'Relógio / Tempo' },
-  { name: 'skull', component: Skull, label: 'Caveira / Perigo' },
-  { name: 'user', component: User, label: 'Personagem' },
-  { name: 'trophy', component: Trophy, label: 'Troféu' },
-  { name: 'alert', component: AlertTriangle, label: 'Alerta' },
-  { name: 'flame', component: Flame, label: 'Fogo' },
-  { name: 'droplet', component: Droplet, label: 'Gota / Água' },
-  { name: 'sun', component: Sun, label: 'Sol / Luz' },
-  { name: 'moon', component: Moon, label: 'Lua / Noite' },
-  { name: 'activity', component: Activity, label: 'Atividade' },
+  { name: 'eye', component: Eye, labelKey: 'hypercard.icons.eye', defaultLabel: 'Olho (Observar)' },
+  { name: 'mouse', component: MousePointer2, labelKey: 'hypercard.icons.mouse', defaultLabel: 'Ponteiro / Clique' },
+  { name: 'hand', component: Hand, labelKey: 'hypercard.icons.hand', defaultLabel: 'Mão (Interagir)' },
+  { name: 'search', component: Search, labelKey: 'hypercard.icons.search', defaultLabel: 'Lupa (Investigar)' },
+  { name: 'arrow-up', component: ArrowUp, labelKey: 'hypercard.icons.arrowUp', defaultLabel: 'Seta Cima' },
+  { name: 'arrow-down', component: ArrowDown, labelKey: 'hypercard.icons.arrowDown', defaultLabel: 'Seta Baixo' },
+  { name: 'arrow-left', component: ArrowLeft, labelKey: 'hypercard.icons.arrowLeft', defaultLabel: 'Seta Esquerda' },
+  { name: 'arrow-right', component: ArrowRight, labelKey: 'hypercard.icons.arrowRight', defaultLabel: 'Seta Direita' },
+  { name: 'box', component: Box, labelKey: 'hypercard.icons.box', defaultLabel: 'Caixa / Objeto' },
+  { name: 'key', component: Key, labelKey: 'hypercard.icons.key', defaultLabel: 'Chave' },
+  { name: 'sword', component: Sword, labelKey: 'hypercard.icons.sword', defaultLabel: 'Espada / Combate' },
+  { name: 'flask', component: FlaskConical, labelKey: 'hypercard.icons.flask', defaultLabel: 'Poção / Frasco' },
+  { name: 'book', component: Book, labelKey: 'hypercard.icons.book', defaultLabel: 'Livro / Texto' },
+  { name: 'map', component: MapIcon, labelKey: 'hypercard.icons.map', defaultLabel: 'Mapa / Navegação' },
+  { name: 'crown', component: Crown, labelKey: 'hypercard.icons.crown', defaultLabel: 'Coroa / Recompensa' },
+  { name: 'star', component: Star, labelKey: 'hypercard.icons.star', defaultLabel: 'Estrela' },
+  { name: 'heart', component: Heart, labelKey: 'hypercard.icons.heart', defaultLabel: 'Coração / Vida' },
+  { name: 'zap', component: Zap, labelKey: 'hypercard.icons.zap', defaultLabel: 'Raio / Energia' },
+  { name: 'shield', component: Shield, labelKey: 'hypercard.icons.shield', defaultLabel: 'Escudo / Proteção' },
+  { name: 'coins', component: Coins, labelKey: 'hypercard.icons.coins', defaultLabel: 'Moedas / Valor' },
+  { name: 'clock', component: Clock, labelKey: 'hypercard.icons.clock', defaultLabel: 'Relógio / Tempo' },
+  { name: 'skull', component: Skull, labelKey: 'hypercard.icons.skull', defaultLabel: 'Caveira / Perigo' },
+  { name: 'user', component: User, labelKey: 'hypercard.icons.user', defaultLabel: 'Personagem' },
+  { name: 'trophy', component: Trophy, labelKey: 'hypercard.icons.trophy', defaultLabel: 'Troféu' },
+  { name: 'alert', component: AlertTriangle, labelKey: 'hypercard.icons.alert', defaultLabel: 'Alerta' },
+  { name: 'flame', component: Flame, labelKey: 'hypercard.icons.flame', defaultLabel: 'Fogo' },
+  { name: 'droplet', component: Droplet, labelKey: 'hypercard.icons.droplet', defaultLabel: 'Gota / Água' },
+  { name: 'sun', component: Sun, labelKey: 'hypercard.icons.sun', defaultLabel: 'Sol / Luz' },
+  { name: 'moon', component: Moon, labelKey: 'hypercard.icons.moon', defaultLabel: 'Lua / Noite' },
+  { name: 'activity', component: Activity, labelKey: 'hypercard.icons.activity', defaultLabel: 'Atividade' },
 ];
 
 interface HotspotInspectorProps {
@@ -131,8 +131,9 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   };
 
   const activeIconName = hotspot?.icon || 'eye';
-  const CurrentIconComponent = HOTSPOT_ICONS.find(i => i.name === activeIconName)?.component || Eye;
-  const currentIconLabel = HOTSPOT_ICONS.find(i => i.name === activeIconName)?.label || 'Olho (Observar)';
+  const currentIconObj = HOTSPOT_ICONS.find(i => i.name === activeIconName);
+  const CurrentIconComponent = currentIconObj?.component || Eye;
+  const currentIconLabel = currentIconObj ? t(currentIconObj.labelKey, currentIconObj.defaultLabel) : t('hypercard.icons.eye', 'Olho (Observar)');
 
   const normalizedHighlightStyle = 
     hotspot?.highlightStyle === 'always-visible' || hotspot?.highlightStyle === 'icons-visible' || hotspot?.highlightStyle === 'pulsing-pin'
@@ -254,6 +255,27 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
         {/* TAB 1: VISUAL & APPEARANCE */}
         {activeTab === 'visual' && (
           <div className="space-y-4">
+            {/* Transição ao Interagir */}
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                {t('hypercard.fields.transition', 'Transição')}
+              </label>
+              <select
+                value={hotspot.transition || 'fade'}
+                onChange={(e) => handleFieldChange('transition', e.target.value as any)}
+                className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors font-medium"
+              >
+                <option value="fade">{t('hypercard.transitions.fade', 'Fade (Esmaecer)')}</option>
+                <option value="slide-left">{t('hypercard.transitions.slideLeft', 'Deslizar para Esquerda')}</option>
+                <option value="slide-right">{t('hypercard.transitions.slideRight', 'Deslizar para Direita')}</option>
+                <option value="slide-up">{t('hypercard.transitions.slideUp', 'Deslizar para Cima')}</option>
+                <option value="slide-down">{t('hypercard.transitions.slideDown', 'Deslizar para Baixo')}</option>
+                <option value="zoom">{t('hypercard.transitions.zoom', 'Zoom In / Out')}</option>
+                <option value="blur">{t('hypercard.transitions.blur', 'Desfoque (Blur)')}</option>
+                <option value="none">{t('hypercard.transitions.none', 'Nenhuma (Corte Seco)')}</option>
+              </select>
+            </div>
+
             {/* Highlight Style */}
             <div>
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
@@ -270,13 +292,16 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
               </select>
             </div>
 
-            {/* Icon Picker */}
+            {/* Icon Picker & Customization - Single Box */}
             {normalizedHighlightStyle !== 'hidden' && (
-              <div className="space-y-3">
-                <div className="relative">
-                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                    {t('hypercard.fields.hotspotIcon', 'Ícone de Realce')}
-                  </label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  {t('hypercard.fields.hotspotIcon', 'Ícone de Realce')}
+                </label>
+
+                {/* Caixa única que contém todos os componentes editáveis do ícone */}
+                <div className="space-y-3 p-3 bg-background/50 rounded-xl border border-muted-foreground/30">
+                  {/* Seletor de Ícone */}
                   <div className="relative">
                     <button
                       type="button"
@@ -297,9 +322,9 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                         >
                           <CurrentIconComponent className="w-4 h-4" />
                         </div>
-                        <span className="truncate">{currentIconLabel}</span>
+                        <span className="truncate text-xs">{currentIconLabel}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground font-normal">Alterar</span>
+                      <span className="text-xs text-muted-foreground font-normal">{t('common.change', 'Alterar')}</span>
                     </button>
 
                     {/* Icon Picker Popover Grid */}
@@ -324,7 +349,7 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                                   ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105'
                                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                               }`}
-                              title={item.label}
+                              title={t(item.labelKey, item.defaultLabel)}
                             >
                               <ItemIcon className="w-4 h-4" />
                             </button>
@@ -333,40 +358,34 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                       </div>
                     )}
                   </div>
-                </div>
 
-                {/* Colors & Background Customization */}
-                <div className="space-y-3 p-3 bg-background/50 rounded-xl border border-muted-foreground/30">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-foreground">
-                      {t('hypercard.fields.iconColors', 'Cores do Ícone')}
-                    </span>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={!!hotspot.hideIconBg}
-                        onChange={(e) => handleFieldChange('hideIconBg', e.target.checked)}
-                        className="rounded border-muted-foreground text-primary focus:ring-primary w-4 h-4"
-                      />
-                      <span className="text-xs text-muted-foreground font-medium">
-                        {t('hypercard.fields.removeBg', 'Remover fundo')}
-                      </span>
-                    </label>
-                  </div>
-
+                  {/* Configurações de Cores */}
                   <div className="space-y-2.5">
                     <ColorInput
-                      label="Cor do Ícone"
+                      label={t('hypercard.fields.iconColor', 'Cor do Ícone')}
                       id={`hotspot-icon-color-${hotspot.id}`}
                       value={hotspot.iconColor || '#ffffff'}
                       onChange={(val) => handleFieldChange('iconColor', val)}
                       placeholder="#ffffff"
+                      headerRight={
+                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={!!hotspot.hideIconBg}
+                            onChange={(e) => handleFieldChange('hideIconBg', e.target.checked)}
+                            className="rounded border-muted-foreground text-primary focus:ring-primary w-3.5 h-3.5"
+                          />
+                          <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                            {t('hypercard.fields.removeBg', 'Remover fundo')}
+                          </span>
+                        </label>
+                      }
                     />
 
                     {!hotspot.hideIconBg && (
-                      <>
+                      <div className="grid grid-cols-2 gap-2.5">
                         <ColorInput
-                          label="Cor do Fundo (Quadrado)"
+                          label={t('hypercard.fields.iconBg', 'Fundo')}
                           id={`hotspot-bg-color-${hotspot.id}`}
                           value={hotspot.iconBgColor || '#000000'}
                           onChange={(val) => handleFieldChange('iconBgColor', val)}
@@ -374,13 +393,13 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                         />
 
                         <ColorInput
-                          label="Cor da Borda"
+                          label={t('hypercard.fields.iconBorder', 'Borda')}
                           id={`hotspot-border-color-${hotspot.id}`}
                           value={hotspot.iconBorderColor || '#30363d'}
                           onChange={(val) => handleFieldChange('iconBorderColor', val)}
                           placeholder="#30363d"
                         />
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>

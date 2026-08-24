@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Scene,
   HyperCard,
@@ -8,12 +8,11 @@ import {
 } from '../../types';
 import { generateUniqueId } from '../../utils/helpers';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '../ToastContext';
 import { HotspotCanvas } from './HotspotCanvas';
 import { HotspotInspector } from './HotspotInspector';
 import {
   Layers,
-  Sparkles,
-  X,
   Plus,
   Trash2,
   Copy,
@@ -22,8 +21,10 @@ import {
   Image as ImageIcon,
   MousePointerClick,
   ArrowLeft,
-  CheckCircle2,
   Edit3,
+  Hammer,
+  RotateCcw,
+  Save,
 } from 'lucide-react';
 
 interface HyperCardStackEditorProps {
@@ -32,6 +33,10 @@ interface HyperCardStackEditorProps {
   globalObjects: { [id: string]: GameObject };
   consequenceTrackers: ConsequenceTracker[];
   onUpdateScene: (updatedScene: Scene) => void;
+  onCopyScene?: (scene: Scene) => void;
+  onPreviewScene?: (scene: Scene) => void;
+  isDirty?: boolean;
+  onSetDirty?: (isDirty: boolean) => void;
   onClose?: () => void;
   onViewMap?: () => void;
   isExpanded?: boolean;
@@ -44,27 +49,59 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   globalObjects,
   consequenceTrackers,
   onUpdateScene,
+  onCopyScene,
+  onPreviewScene,
+  isDirty: parentIsDirty,
+  onSetDirty,
   onClose,
   isExpanded = false,
   onToggleExpand,
 }) => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Local scene state (independent from parent until saved)
+  const [localScene, setLocalScene] = useState<Scene>(scene);
+  const initialSceneJson = useRef(JSON.stringify(scene));
+
+  // Reset when switching to a different scene id
+  useEffect(() => {
+    setLocalScene(scene);
+    initialSceneJson.current = JSON.stringify(scene);
+  }, [scene.id]);
+
+  // Compute local dirty state and notify parent
+  const isSceneDirty = JSON.stringify(localScene) !== initialSceneJson.current;
+
+  useEffect(() => {
+    onSetDirty?.(isSceneDirty);
+  }, [isSceneDirty, onSetDirty]);
+
+  // Sync initial state when scene prop updates content (e.g. after a save)
+  useEffect(() => {
+    if (JSON.stringify(scene) === JSON.stringify(localScene)) {
+      initialSceneJson.current = JSON.stringify(scene);
+      if (parentIsDirty) {
+        onSetDirty?.(false);
+      }
+    }
+  }, [scene, localScene, parentIsDirty, onSetDirty]);
+
   // Ensure stackCards has at least 1 card
-  const cards: HyperCard[] = scene.stackCards && scene.stackCards.length > 0
-    ? scene.stackCards
+  const cards: HyperCard[] = localScene.stackCards && localScene.stackCards.length > 0
+    ? localScene.stackCards
     : [{
         id: generateUniqueId('crd', []),
         name: t('hypercard.defaultCardName', 'Vista 1'),
-        image: scene.image || '',
+        image: localScene.image || '',
         hotspots: [],
-        transition: 'dissolve',
+        transition: 'fade',
       }];
 
   const [selectedCardId, setSelectedCardId] = useState<string>(
-    scene.startCardId && cards.some(c => c.id === scene.startCardId)
-      ? scene.startCardId
+    localScene.startCardId && cards.some(c => c.id === localScene.startCardId)
+      ? localScene.startCardId
       : cards[0].id
   );
 
@@ -81,14 +118,14 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   // Current Card
   const currentCard = cards.find(c => c.id === selectedCardId) || cards[0];
 
-  // Update Stack Cards in Scene
+  // Update Stack Cards in Local Scene
   const updateCards = (newCards: HyperCard[], newStartId?: string) => {
-    onUpdateScene({
-      ...scene,
+    setLocalScene(prev => ({
+      ...prev,
       stackCards: newCards,
-      startCardId: newStartId !== undefined ? newStartId : (scene.startCardId || newCards[0]?.id),
-      image: newCards[0]?.image || scene.image,
-    });
+      startCardId: newStartId !== undefined ? newStartId : (prev.startCardId || newCards[0]?.id),
+      image: newCards[0]?.image || prev.image,
+    }));
   };
 
   // Add Card / Slide
@@ -99,7 +136,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       name: `${t('hypercard.cardPrefix', 'Vista')} ${cards.length + 1}`,
       image: '',
       hotspots: [],
-      transition: 'dissolve',
+      transition: 'fade',
     };
     const newCards = [...cards, newCard];
     updateCards(newCards);
@@ -131,7 +168,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
     if (e) e.stopPropagation();
     if (cards.length <= 1) return;
     const newCards = cards.filter(c => c.id !== cardId);
-    const newStart = scene.startCardId === cardId ? newCards[0].id : scene.startCardId;
+    const newStart = localScene.startCardId === cardId ? newCards[0].id : localScene.startCardId;
     updateCards(newCards, newStart);
     if (selectedCardId === cardId) {
       setSelectedCardId(newCards[0].id);
@@ -153,6 +190,27 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       handleUpdateCard({ ...currentCard, image: base64 });
     };
     reader.readAsDataURL(file);
+  };
+
+  // Action Handlers for Bottom Bar (Save, Undo, Test, Copy)
+  const handleSave = () => {
+    onUpdateScene(localScene);
+    initialSceneJson.current = JSON.stringify(localScene);
+    onSetDirty?.(false);
+    toast(t('editor.sceneSaved', 'Cenário salvo com sucesso!'), 'success');
+  };
+
+  const handleUndo = () => {
+    const restored = JSON.parse(initialSceneJson.current) as Scene;
+    setLocalScene(restored);
+    if (!restored.stackCards?.some(c => c.id === selectedCardId)) {
+      setSelectedCardId(restored.stackCards?.[0]?.id || '');
+    }
+    setSelectedHotspotId(null);
+  };
+
+  const handlePreview = () => {
+    onPreviewScene?.(localScene);
   };
 
   // Test Mode Action Handlers
@@ -225,7 +283,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       {/* CASE 1: UNEXPANDED COMPACT SIDE PANEL (VERTICAL SLIDES / LAYERS LIST)     */}
       {/* ========================================================================= */}
       {!isExpanded && (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden relative">
           {/* FIXED TOP SECTION (From base of create button up) */}
           <div className="p-4 pb-3 space-y-4 flex-shrink-0 border-b border-muted-foreground/30 bg-background z-10">
             {/* DETALHES DO CENÁRIO */}
@@ -246,8 +304,8 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                   <input
                     type="text"
                     id="scenarioSceneName"
-                    value={scene.name}
-                    onChange={(e) => onUpdateScene({ ...scene, name: e.target.value })}
+                    value={localScene.name}
+                    onChange={(e) => setLocalScene(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
                     placeholder={t('sceneEditor.titlePlaceholder', 'Título do Cenário')}
                   />
@@ -263,7 +321,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                     <input
                       type="text"
                       id="scenarioSceneId"
-                      value={scene.id}
+                      value={localScene.id}
                       disabled
                       className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2.5 text-xs text-muted-foreground font-mono"
                     />
@@ -272,6 +330,32 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                     </span>
                   </div>
                 </div>
+              </div>
+
+              {/* OVERLAY VISUAL EFFECT (Applies to all views in scenario) */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                  {t('sceneEditor.overlayLabel', 'Efeito Visual (Overlay)')}
+                </label>
+                <select
+                  value={localScene.overlayEffect || ''}
+                  onChange={(e) =>
+                    setLocalScene(prev => ({ ...prev, overlayEffect: e.target.value }))
+                  }
+                  className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                >
+                  <option value="">{t('sceneEditor.effects.none', 'Nenhum')}</option>
+                  <option value="grain">{t('sceneEditor.effects.grain', 'Granulado')}</option>
+                  <option value="rain">{t('sceneEditor.effects.rain', 'Chuva')}</option>
+                  <option value="blur">{t('sceneEditor.effects.blur', 'Vintage')}</option>
+                  <option value="chromatic">{t('sceneEditor.effects.chromatic', 'Fósforo verde')}</option>
+                  <option value="tv">{t('sceneEditor.effects.tv', 'Televisor CRT')}</option>
+                  <option value="confetti">{t('sceneEditor.effects.confetti', 'Confetes')}</option>
+                  <option value="glitch">{t('sceneEditor.effects.glitch', 'Glitch')}</option>
+                  <option value="nosferatu">{t('sceneEditor.effects.nosferatu', 'Nosferatu')}</option>
+                  <option value="wiggle">{t('sceneEditor.effects.wiggle', 'Tremido')}</option>
+                  <option value="fog">{t('sceneEditor.effects.fog', 'Neblina')}</option>
+                </select>
               </div>
             </div>
 
@@ -298,7 +382,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
           <div className="flex-1 overflow-y-auto min-h-0 p-4 pt-3 pb-8 space-y-3">
             {cards.map((card, idx) => {
               const isSelected = card.id === selectedCardId;
-              const isStart = card.id === scene.startCardId || (!scene.startCardId && idx === 0);
+              const isStart = card.id === localScene.startCardId || (!localScene.startCardId && idx === 0);
 
               return (
                 <div
@@ -321,7 +405,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                     ) : (
                       <div className="flex flex-col items-center justify-center text-muted-foreground/40 gap-1">
                         <ImageIcon className="w-5 h-5" />
-                        <span className="text-[10px]">Sem imagem</span>
+                        <span className="text-[10px]">{t('hypercard.noImage', 'Sem imagem')}</span>
                       </div>
                     )}
 
@@ -348,7 +432,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                         className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md shadow-primary/30 active:scale-95 transition-all transform translate-y-1 group-hover:translate-y-0"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
-                        <span>Editar</span>
+                        <span>{t('hypercard.edit', 'Editar')}</span>
                       </button>
                     </div>
                   </div>
@@ -366,7 +450,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onUpdateScene({ ...scene, startCardId: card.id });
+                            setLocalScene(prev => ({ ...prev, startCardId: card.id }));
                           }}
                           className="p-1 rounded text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors"
                           title={t('hypercard.setAsStart', 'Tornar Vista Inicial')}
@@ -396,6 +480,58 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               );
             })}
           </div>
+
+          {/* STICKY FOOTER ACTION BUTTONS (Exact match with SceneEditor.tsx) */}
+          <div className="sticky bottom-0 left-0 right-0 bg-background px-4 pb-4 pt-2 flex flex-col gap-3 z-30">
+            {/* Gradient transition above footer */}
+            <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+
+            <div className="flex w-full items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePreview}
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                  title={t('sceneEditor.testTooltip', 'Testar este cenário')}
+                >
+                  <Hammer className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  <span className="hidden min-[450px]:inline-block">
+                    {t('sceneEditor.testBtn', 'Testar')}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => onCopyScene?.(localScene)}
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                  title={t('sceneEditor.copyTooltip', 'Copiar Cenário')}
+                >
+                  <Copy className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  <span className="hidden min-[450px]:inline-block">
+                    {t('sceneEditor.copyBranch', 'Copiar')}
+                  </span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleUndo}
+                  disabled={!isSceneDirty}
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none"
+                >
+                  <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  <span className="hidden min-[450px]:inline-block">{t('sceneEditor.undoBtn', 'Desfazer')}</span>
+                </button>
+
+                <button
+                  onClick={handleSave}
+                  disabled={!isSceneDirty}
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shadow-lg"
+                >
+                  <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  <span className="hidden min-[450px]:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -413,7 +549,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                 title={t('hypercard.backToViewsList', 'Voltar à lista de vistas')}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Voltar</span>
+                <span>{t('hypercard.back', 'Voltar')}</span>
               </button>
             </div>
 
@@ -422,18 +558,20 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-semibold border border-muted-foreground/30 transition-colors"
-                title="Enviar ou trocar imagem de fundo deste cenário"
+                title={t('hypercard.uploadImageBtn', 'Escolher Imagem')}
               >
                 <Upload className="w-3.5 h-3.5 text-primary" />
-                <span>{currentCard.image ? 'Trocar Imagem' : 'Enviar Imagem'}</span>
+                <span>{currentCard.image ? t('hypercard.changeImage', 'Trocar Imagem') : t('hypercard.uploadImageBtn', 'Escolher Imagem')}</span>
               </button>
 
               <button
-                onClick={() => onToggleExpand?.(false)}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-md shadow-primary/20 transition-all active:scale-95"
+                onClick={handleSave}
+                disabled={!isSceneDirty}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-zinc-950 text-xs font-bold shadow-md shadow-yellow-500/20 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-all active:scale-95"
+                title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
               >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Concluir Edição</span>
+                <Save className="w-3.5 h-3.5 shrink-0" />
+                <span>{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
               </button>
             </div>
           </div>
@@ -444,6 +582,8 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
             <div className="flex-1 h-full overflow-hidden relative">
               <HotspotCanvas
                 card={currentCard}
+                allCards={cards}
+                overlayEffect={localScene.overlayEffect}
                 onUpdateCard={handleUpdateCard}
                 selectedHotspotId={selectedHotspotId}
                 onSelectHotspot={setSelectedHotspotId}

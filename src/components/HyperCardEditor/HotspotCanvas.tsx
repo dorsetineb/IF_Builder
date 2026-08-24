@@ -3,6 +3,15 @@ import { CardHotspot, HotspotShape, HyperCard } from '../../types';
 import { generateUniqueId } from '../../utils/helpers';
 import { useTranslation } from 'react-i18next';
 import { HOTSPOT_ICONS } from './HotspotInspector';
+import RainOverlay from '../effects/RainOverlay';
+import BlurOverlay from '../effects/BlurOverlay';
+import ChromaticOverlay from '../effects/ChromaticOverlay';
+import TVOverlay from '../effects/TVOverlay';
+import ConfettiOverlay from '../effects/ConfettiOverlay';
+import GlitchOverlay from '../effects/GlitchOverlay';
+import NosferatuOverlay from '../effects/NosferatuOverlay';
+import WiggleOverlay from '../effects/WiggleOverlay';
+import FogOverlay from '../effects/FogOverlay';
 import {
   MousePointer,
   Square,
@@ -22,6 +31,8 @@ import {
 
 interface HotspotCanvasProps {
   card: HyperCard;
+  allCards?: HyperCard[];
+  overlayEffect?: string;
   onUpdateCard: (updatedCard: HyperCard) => void;
   selectedHotspotId: string | null;
   onSelectHotspot: (hotspotId: string | null) => void;
@@ -36,6 +47,8 @@ type DrawTool = 'select' | 'rect' | 'circle' | 'polygon';
 
 export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
   card,
+  allCards,
+  overlayEffect,
   onUpdateCard,
   selectedHotspotId,
   onSelectHotspot,
@@ -51,7 +64,6 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
 
   const [tool, setTool] = useState<DrawTool>('select');
   const [isTestMode, setIsTestMode] = useState(false);
-  const [revealedInTest, setRevealedInTest] = useState(false);
 
   // Zoom & Pan
   const [zoom, setZoom] = useState(1);
@@ -85,15 +97,15 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
   // Hovered Hotspot in test mode
   const [hoveredHotspotId, setHoveredHotspotId] = useState<string | null>(null);
 
-  // Convert client coordinates to percentage (0-100) relative to image element
+  // Convert client coordinates to percentage relative to image element (unclamped to allow extending outside)
   const getRelativeCoords = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!imageRef.current) return { x: 0, y: 0 };
     const rect = imageRef.current.getBoundingClientRect();
     const clientX = e.clientX;
     const clientY = e.clientY;
 
-    const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-    const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    const y = ((clientY - rect.top) / rect.height) * 100;
     return { x, y };
   }, []);
 
@@ -112,10 +124,6 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
         if (tool === 'polygon') {
           setPolygonPoints([]);
           setTool('select');
-        }
-      } else if (e.key === ' ' || e.code === 'Space') {
-        if (isTestMode) {
-          setRevealedInTest(prev => !prev);
         }
       } else if (e.key.toLowerCase() === 'r') {
         setTool('rect');
@@ -161,6 +169,10 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
       width: Math.max(1, maxX - minX),
       height: Math.max(1, maxY - minY),
       points: pts,
+      icon: 'eye',
+      iconColor: '#ffffff',
+      iconBgColor: '#000000',
+      iconBorderColor: '#30363d',
       highlightStyle: 'hover-glow',
       cursor: 'pointer',
       actionType: 'examine',
@@ -250,8 +262,8 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
       if (!hotspot) return;
 
       if (dragAction.type === 'move') {
-        const newX = Math.max(0, Math.min(100 - hotspot.width, dragAction.initialX + dx));
-        const newY = Math.max(0, Math.min(100 - hotspot.height, dragAction.initialY + dy));
+        const newX = dragAction.initialX + dx;
+        const newY = dragAction.initialY + dy;
         
         let newPoints = hotspot.points;
         if (hotspot.shape === 'polygon' && hotspot.points) {
@@ -271,22 +283,22 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
         let newH = dragAction.initialH;
 
         if (dragAction.handle.includes('e')) {
-          newW = Math.max(2, Math.min(100 - dragAction.initialX, dragAction.initialW + dx));
+          newW = Math.max(2, dragAction.initialW + dx);
         }
         if (dragAction.handle.includes('s')) {
-          newH = Math.max(2, Math.min(100 - dragAction.initialY, dragAction.initialH + dy));
+          newH = Math.max(2, dragAction.initialH + dy);
         }
         if (dragAction.handle.includes('w')) {
           const possibleW = dragAction.initialW - dx;
           if (possibleW >= 2) {
-            newX = Math.max(0, dragAction.initialX + dx);
+            newX = dragAction.initialX + dx;
             newW = possibleW;
           }
         }
         if (dragAction.handle.includes('n')) {
           const possibleH = dragAction.initialH - dy;
           if (possibleH >= 2) {
-            newY = Math.max(0, dragAction.initialY + dy);
+            newY = dragAction.initialY + dy;
             newH = possibleH;
           }
         }
@@ -331,6 +343,10 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           y: currentDrawBox.y,
           width: currentDrawBox.width,
           height: currentDrawBox.height,
+          icon: 'eye',
+          iconColor: '#ffffff',
+          iconBgColor: '#000000',
+          iconBorderColor: '#30363d',
           highlightStyle: 'hover-glow',
           cursor: 'pointer',
           actionType: 'examine',
@@ -348,19 +364,43 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
     }
   };
 
+  const [transitionAnim, setTransitionAnim] = useState<string | null>(null);
+  const [nextCardImage, setNextCardImage] = useState<string | null>(null);
+
   // Handle Hotspot Click in Test Mode
   const handleHotspotTestClick = (hotspot: CardHotspot, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isTestMode) return;
+    if (!isTestMode || transitionAnim) return;
 
     if (hotspot.soundEffect && onTestSound) {
       onTestSound(hotspot.soundEffect);
     }
 
+    const transitionType = hotspot.transition || 'fade';
+
     if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId && onTestNavigateCard) {
-      onTestNavigateCard(hotspot.targetCardId);
+      const targetCard = allCards?.find(c => c.id === hotspot.targetCardId);
+      if (transitionType !== 'none' && targetCard?.image) {
+        setNextCardImage(targetCard.image);
+        setTransitionAnim(`trans-${transitionType}-out`);
+        setTimeout(() => {
+          onTestNavigateCard(hotspot.targetCardId!);
+          setTransitionAnim(null);
+          setNextCardImage(null);
+        }, 380);
+      } else {
+        onTestNavigateCard(hotspot.targetCardId);
+      }
     } else if (hotspot.actionType === 'navigate_scene' && hotspot.targetSceneId && onTestNavigateScene) {
-      onTestNavigateScene(hotspot.targetSceneId);
+      if (transitionType !== 'none') {
+        setTransitionAnim(`trans-${transitionType}-out`);
+        setTimeout(() => {
+          onTestNavigateScene(hotspot.targetSceneId!);
+          setTransitionAnim(null);
+        }, 380);
+      } else {
+        onTestNavigateScene(hotspot.targetSceneId);
+      }
     } else if (hotspot.actionType === 'examine' && onTestExamine) {
       onTestExamine(hotspot.examineTitle, hotspot.examineText, hotspot.examineImage);
     }
@@ -381,7 +421,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
-          title="Mover e Selecionar (V)"
+          title={t('hypercard.tools.selectTitle', 'Mover e Selecionar (V)')}
         >
           <MousePointer className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{t('hypercard.tools.select', 'Mover')}</span>
@@ -394,7 +434,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
-          title="Retângulo (R)"
+          title={t('hypercard.tools.rectTitle', 'Retângulo (R)')}
         >
           <Square className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{t('hypercard.tools.rect', 'Retângulo')}</span>
@@ -407,7 +447,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
-          title="Círculo (C)"
+          title={t('hypercard.tools.circleTitle', 'Círculo (C)')}
         >
           <Circle className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{t('hypercard.tools.circle', 'Círculo')}</span>
@@ -420,7 +460,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
-          title="Polígono Livre (P)"
+          title={t('hypercard.tools.polygonTitle', 'Polígono Livre (P)')}
         >
           <Shapes className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{t('hypercard.tools.polygon', 'Polígono')}</span>
@@ -436,7 +476,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           <button
             onClick={() => setZoom(z => Math.max(0.5, z - 0.2))}
             className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            title="Diminuir Zoom"
+            title={t('hypercard.zoomOut', 'Diminuir Zoom')}
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
@@ -446,7 +486,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           <button
             onClick={() => setZoom(z => Math.min(3, z + 0.2))}
             className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            title="Aumentar Zoom"
+            title={t('hypercard.zoomIn', 'Aumentar Zoom')}
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
@@ -476,10 +516,10 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           <span>
             {polygonPoints.length === 0
-              ? 'Clique na imagem para iniciar os pontos do polígono'
+              ? t('hypercard.polygonPill.start', 'Clique na imagem para iniciar os pontos do polígono')
               : isNearPolygonStart
-              ? '🎯 Clique no ponto inicial para FECHAR a área'
-              : `${polygonPoints.length} pontos adicionados. Dê duplo clique ou clique no início para fechar`}
+              ? t('hypercard.polygonPill.close', '🎯 Clique no ponto inicial para FECHAR a área')
+              : `${polygonPoints.length} ${t('hypercard.polygonPill.pointsAdded', 'pontos adicionados. Dê duplo clique ou clique no início para fechar')}`}
           </span>
         </div>
       )}
@@ -505,18 +545,64 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               transformOrigin: 'center center',
             }}
           >
-            {/* Background Card Image - EXACT CONTAINER WRAPPER WITH 0px LETTERBOX */}
+            {/* Background Card Image - NEXT / TARGET IMAGE (Direct underneath for zero-black cross-fade) */}
+            {nextCardImage && (
+              <img
+                src={nextCardImage}
+                alt="Next view"
+                className="absolute inset-0 w-full h-full object-contain rounded-xl select-none pointer-events-none block m-0 p-0 z-0"
+                draggable={false}
+              />
+            )}
+
+            {/* Background Card Image - CURRENT FRONT IMAGE */}
             <img
               ref={imageRef}
               src={card.image}
               alt={card.name}
-              className="max-w-[85vw] max-h-[82vh] w-auto h-auto object-contain rounded-xl select-none pointer-events-none block m-0 p-0"
+              style={{
+                filter:
+                  overlayEffect === 'nosferatu'
+                    ? 'sepia(0.8) contrast(1.1) brightness(0.9)'
+                    : overlayEffect === 'glitch'
+                    ? 'url(#glitch-distortion-filter)'
+                    : undefined,
+              }}
+              className={`max-w-[85vw] max-h-[82vh] w-auto h-auto object-contain rounded-xl select-none pointer-events-none block m-0 p-0 relative z-10 transition-all ${
+                transitionAnim ? transitionAnim : ''
+              }`}
               draggable={false}
             />
 
+            {/* Scene Visual Overlay Layer */}
+            {overlayEffect && (
+              <div
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{ zIndex: 15 }}
+              >
+                <div
+                  className={`scene-overlay overlay-${overlayEffect}`}
+                  style={{ display: 'block', position: 'absolute', inset: 0 }}
+                />
+                {overlayEffect === 'rain' && <RainOverlay />}
+                {overlayEffect === 'blur' && <BlurOverlay />}
+                {overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                {overlayEffect === 'tv' && <TVOverlay />}
+                {overlayEffect === 'confetti' && <ConfettiOverlay />}
+                {overlayEffect === 'glitch' && <GlitchOverlay />}
+                {overlayEffect === 'nosferatu' && <NosferatuOverlay />}
+                {overlayEffect === 'wiggle' && <WiggleOverlay />}
+                {overlayEffect === 'fog' && (
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
+                    <FogOverlay />
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* SVG Overlay Layer - 100% Locked with viewBox 0 0 1000 1000 */}
             <svg
-              className="absolute inset-0 w-full h-full pointer-events-auto rounded-xl"
+              className="absolute inset-0 w-full h-full pointer-events-auto rounded-xl z-20"
               viewBox="0 0 1000 1000"
               preserveAspectRatio="none"
               style={{ overflow: 'visible' }}
@@ -726,10 +812,10 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               const isHidden = hotspot.highlightStyle === 'hidden';
 
               const shouldShow =
-                !isTestMode ||
+                !transitionAnim &&
+                (!isTestMode ||
                 isAlwaysVisible ||
-                (revealedInTest && !isHidden) ||
-                (!isHidden && isHovered);
+                (!isHidden && isHovered));
 
               if (!shouldShow && isTestMode) return null;
 
@@ -737,6 +823,10 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               const IconComp = HOTSPOT_ICONS.find((i) => i.name === iconName)?.component || Eye;
               const centerX = hotspot.x + hotspot.width / 2;
               const centerY = hotspot.y + hotspot.height / 2;
+
+              const iconColor = hotspot.iconColor || '#ffffff';
+              const iconBgColor = hotspot.hideIconBg ? 'transparent' : (hotspot.iconBgColor || '#000000');
+              const iconBorderColor = hotspot.hideIconBg ? 'transparent' : (hotspot.iconBorderColor || '#30363d');
 
               return (
                 <div
@@ -751,12 +841,12 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
                   style={{
                     left: `${centerX}%`,
                     top: `${centerY}%`,
-                    backgroundColor: hotspot.hideIconBg ? 'transparent' : (hotspot.iconBgColor || 'rgba(0, 0, 0, 0.75)'),
-                    border: hotspot.hideIconBg ? 'none' : `1.5px solid ${hotspot.iconBorderColor || 'rgba(255, 255, 255, 0.3)'}`,
-                    color: hotspot.iconColor || (isSelected ? '#ffffff' : '#10b981'),
+                    backgroundColor: iconBgColor,
+                    border: hotspot.hideIconBg ? 'none' : `1px solid ${iconBorderColor}`,
+                    color: iconColor,
                     boxShadow: 'none',
                     filter: 'none',
-                    opacity: isTestMode && !isAlwaysVisible && !revealedInTest && !isHovered ? 0 : 1,
+                    opacity: isTestMode && !isAlwaysVisible && !isHovered ? 0 : 1,
                   }}
                 >
                   <IconComp className={isTestMode ? 'w-5 h-5' : 'w-3.5 h-3.5'} />
@@ -784,7 +874,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
             {/* Resize Handles for Selected Hotspot (in edit mode) */}
             {!isTestMode && selectedHotspot && selectedHotspot.shape !== 'polygon' && (
               <div
-                className="absolute pointer-events-none"
+                className="absolute pointer-events-none z-30"
                 style={{
                   left: `${selectedHotspot.x}%`,
                   top: `${selectedHotspot.y}%`,
@@ -863,21 +953,6 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
               />
             </label>
           </div>
-        )}
-
-        {/* Test Mode Floating Reveal Button */}
-        {isTestMode && (
-          <button
-            onClick={() => setRevealedInTest(prev => !prev)}
-            className={`absolute bottom-6 right-6 flex items-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-xs shadow-xl backdrop-blur-md transition-all z-30 ${
-              revealedInTest
-                ? 'bg-primary text-primary-foreground shadow-primary/30'
-                : 'bg-black/70 hover:bg-black/90 text-zinc-300 border border-white/20'
-            }`}
-          >
-            <Eye className="w-4 h-4" />
-            <span>{revealedInTest ? t('hypercard.hideZones', 'Ocultar Zonas') : t('hypercard.revealZones', 'Revelar Zonas (Espaço)')}</span>
-          </button>
         )}
       </div>
     </div>

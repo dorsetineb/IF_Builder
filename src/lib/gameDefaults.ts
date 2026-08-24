@@ -1018,10 +1018,10 @@ body.with-spacing .main-wrapper { height: 100%; }
 .trans-blur-out { animation: blurOut var(--image-anim-speed) ease-in forwards; }
 
 @keyframes fadeOut { to { opacity: 0; } }
-@keyframes slideLeftOut { to { transform: translateX(-100%); } }
-@keyframes slideRightOut { to { transform: translateX(100%); } }
-@keyframes slideUpOut { to { transform: translateY(-100%); } }
-@keyframes slideDownOut { to { transform: translateY(100%); } }
+@keyframes slideLeftOut { to { transform: translateX(-100%); opacity: 0; } }
+@keyframes slideRightOut { to { transform: translateX(100%); opacity: 0; } }
+@keyframes slideUpOut { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes slideDownOut { to { transform: translateY(100%); opacity: 0; } }
 @keyframes zoomOut { from { transform: scale(1); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
 @keyframes blurOut { from { filter: blur(0); opacity: 1; } to { filter: blur(20px); opacity: 0; } }
 
@@ -1185,7 +1185,7 @@ export const OVERLAY_CSS = `
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 3;
+    z-index: 20;
     display: none;
     overflow: hidden;
 }

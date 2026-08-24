@@ -166,6 +166,7 @@ export interface CardHotspot {
   hideIconBg?: boolean;
   soundEffect?: string;
   soundEffectName?: string;
+  transition?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   // Actions & Outcomes
   actionType: HotspotActionType;
   targetCardId?: string;
