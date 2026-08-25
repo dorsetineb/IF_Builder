@@ -245,6 +245,22 @@ export const gameHTML = `
             </div>
         </div>
     </div>
+    
+    <!-- Scenario Examine / Floating Dialogue Modal -->
+    <div id="hypercard-floating-dialogue" class="modal-overlay hidden">
+        <div class="modal-content hypercard-dialogue-content">
+            <button class="modal-close-button" id="hypercard-dialogue-close">&times;</button>
+            <div class="item-modal-body">
+                <div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden">
+                    <img id="hypercard-dialogue-image" src="" alt="Imagem">
+                </div>
+                <div id="hypercard-dialogue-text-container" class="item-modal-text-container">
+                    <h3 id="hypercard-dialogue-name" class="item-modal-name"></h3>
+                    <p id="hypercard-dialogue-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
   <svg style="display: none;">
     <defs>
       <filter id="tv-distortion-filter" x="-20%" y="-20%" width="140%" height="140%">
@@ -615,6 +631,20 @@ body.with-spacing .main-wrapper { height: 100%; }
 .acquisition-modal-text-container { width: 100%; padding-bottom: 10px; }
 #acquisition-modal-description { color: var(--text-color); line-height: 1.6; font-size: 1em; margin: 0; }
 .text-center { text-align: center; }
+
+.hypercard-dialogue-content { max-width: 540px; width: 90%; }
+.hypercard-dialogue-content.has-image { max-width: 620px; }
+.hypercard-dialogue-content .item-modal-body { display: flex; flex-direction: row; gap: 24px; align-items: flex-start; }
+.hypercard-dialogue-content .item-modal-image-container { width: 220px; min-width: 220px; height: 220px; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); flex-shrink: 0; }
+.hypercard-dialogue-content .item-modal-image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hypercard-dialogue-content .item-modal-text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.hypercard-dialogue-content .item-modal-name { margin: 0; font-size: 1.3em; color: var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; font-family: var(--font-family); font-weight: bold; }
+.hypercard-dialogue-content #hypercard-dialogue-description { color: var(--text-color); line-height: 1.6; font-size: 1em; font-family: var(--font-family); white-space: pre-wrap; margin: 0; }
+@media (max-width: 768px) {
+  .hypercard-dialogue-content { max-width: 90vw; }
+  .hypercard-dialogue-content .item-modal-body { flex-direction: column; align-items: center; }
+  .hypercard-dialogue-content .item-modal-image-container { width: 100%; max-width: 220px; height: auto; aspect-ratio: 1; }
+}
 
 .system-modal-content { max-width: 400px; text-align: center; }
 .system-menu { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }

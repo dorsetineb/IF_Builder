@@ -2648,54 +2648,66 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'hypercard-floating-dialogue';
-            modal.className = 'modal-overlay';
-            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:3000;padding:20px;box-sizing:border-box;';
-            modal.innerHTML = '<div class="modal-content" style="background-color:var(--panel-bg, #0d1117);padding:25px;border:2px solid var(--border-color, #30363d);position:relative;max-width:540px;width:100%;border-radius:0;box-shadow:none;box-sizing:border-box;display:flex;flex-direction:column;font-family:var(--font-family);">' +
-                '<button class="modal-close-button" id="hypercard-dialogue-close" style="position:absolute;top:10px;right:15px;background:none;border:none;color:var(--text-dim-color, #8b949e);font-size:2em;cursor:pointer;line-height:1;font-family:var(--font-family);">&times;</button>' +
-                '<h2 id="hypercard-dialogue-title" style="margin-top:0;margin-bottom:16px;font-size:1.3em;color:var(--accent-color, var(--title-color, #58a6ff));font-family:var(--font-family);font-weight:bold;"></h2>' +
-                '<div id="hypercard-dialogue-img-container" style="max-height:240px;overflow:hidden;border:2px solid var(--border-color, #30363d);margin-bottom:16px;display:none;">' +
-                '<img id="hypercard-dialogue-img" src="" alt="" style="width:100%;height:auto;max-height:240px;object-fit:cover;display:block;" />' +
-                '</div>' +
-                '<p id="hypercard-dialogue-text" style="margin:0 0 20px 0;font-size:1em;line-height:1.6;color:var(--text-color, #c9d1d9);font-family:var(--font-family);white-space:pre-wrap;"></p>' +
-                '<div style="display:flex;justify-content:flex-end;">' +
-                '<button id="hypercard-dialogue-ok-btn" style="padding:8px 16px;border:2px solid var(--border-color, #30363d);background-color:var(--action-button-bg, #ffffff);color:var(--action-button-text-color, #0d1117);font-family:var(--font-family);cursor:pointer;font-weight:bold;font-size:1em;transition:all 0.2s;border-radius:0;">Continuar</button>' +
-                '</div>' +
+            modal.className = 'modal-overlay hidden';
+            modal.innerHTML = 
+                '<div class="modal-content hypercard-dialogue-content">' +
+                    '<button class="modal-close-button" id="hypercard-dialogue-close">&times;</button>' +
+                    '<div class="item-modal-body">' +
+                        '<div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden">' +
+                            '<img id="hypercard-dialogue-image" src="" alt="Imagem" />' +
+                        '</div>' +
+                        '<div id="hypercard-dialogue-text-container" class="item-modal-text-container">' +
+                            '<h3 id="hypercard-dialogue-name" class="item-modal-name"></h3>' +
+                            '<p id="hypercard-dialogue-description"></p>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>';
             document.body.appendChild(modal);
 
             const closeDialogue = () => {
-                modal.style.display = 'none';
+                modal.classList.add('hidden');
             };
-            modal.querySelector('#hypercard-dialogue-close').addEventListener('click', closeDialogue);
-            const okBtn = modal.querySelector('#hypercard-dialogue-ok-btn');
-            okBtn.addEventListener('click', closeDialogue);
-            okBtn.addEventListener('mouseenter', () => {
-                okBtn.style.backgroundColor = 'var(--action-button-hover-bg, #f0f0f0)';
-            });
-            okBtn.addEventListener('mouseleave', () => {
-                okBtn.style.backgroundColor = 'var(--action-button-bg, #ffffff)';
-            });
+            const closeBtn = modal.querySelector('.modal-close-button');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeDialogue();
+                });
+            }
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeDialogue();
             });
         }
 
-        const titleEl = modal.querySelector('#hypercard-dialogue-title');
-        const textEl = modal.querySelector('#hypercard-dialogue-text');
-        const imgContainer = modal.querySelector('#hypercard-dialogue-img-container');
-        const imgEl = modal.querySelector('#hypercard-dialogue-img');
+        // Clean up any legacy duplicate title elements if existing in DOM
+        const legacyTopTitle = modal.querySelector('#hypercard-dialogue-title');
+        if (legacyTopTitle) legacyTopTitle.remove();
 
-        if (titleEl) titleEl.textContent = title || "Examinar";
-        if (textEl) textEl.textContent = text || "";
+        const modalContent = modal.querySelector('.modal-content');
+        const nameEl = modal.querySelector('#hypercard-dialogue-name');
+        const descEl = modal.querySelector('#hypercard-dialogue-description') || modal.querySelector('#hypercard-dialogue-text');
+        const imgContainer = modal.querySelector('#hypercard-dialogue-image-container') || modal.querySelector('#hypercard-dialogue-img-container');
+        const imgEl = modal.querySelector('#hypercard-dialogue-image') || modal.querySelector('#hypercard-dialogue-img');
+
+        const finalTitle = title || "Examinar";
+        if (nameEl) nameEl.textContent = finalTitle;
+        if (descEl) {
+            descEl.innerHTML = window.safeHTML(formatText(text || ""), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+            setupHighlights(descEl);
+        }
+        
         if (imgContainer && imgEl) {
             if (image) {
                 imgEl.src = image;
-                imgContainer.style.display = 'block';
+                imgContainer.classList.remove('hidden');
+                if (modalContent) modalContent.classList.add('has-image');
             } else {
-                imgContainer.style.display = 'none';
+                imgEl.src = '';
+                imgContainer.classList.add('hidden');
+                if (modalContent) modalContent.classList.remove('has-image');
             }
         }
-        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
     };
 
     const renderHyperCardStack = (scene, targetCardId = null) => {
@@ -3011,7 +3023,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     } else if (hotspot.actionType === 'examine') {
-                        showFloatingDialogue(hotspot.examineTitle || "Examinar", hotspot.examineText || "", hotspot.examineImage);
+                        const dialogTitle = hotspot.title || hotspot.examineTitle || "Examinar";
+                        showFloatingDialogue(dialogTitle, hotspot.examineText || "", hotspot.examineImage);
                     }
                 });
 
