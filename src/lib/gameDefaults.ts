@@ -1008,6 +1008,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 }
 
 /* Animações de Imagem */
+.trans-fade-in { animation: fadeIn var(--image-anim-speed) forwards; }
 .trans-fade-out { animation: fadeOut var(--image-anim-speed) forwards; }
 .trans-slide-out { animation: slideLeftOut var(--image-anim-speed) forwards; }
 .trans-slide-left-out { animation: slideLeftOut var(--image-anim-speed) forwards; }
@@ -1017,6 +1018,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .trans-zoom-out { animation: zoomOut var(--image-anim-speed) ease-in forwards; }
 .trans-blur-out { animation: blurOut var(--image-anim-speed) ease-in forwards; }
 
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeOut { to { opacity: 0; } }
 @keyframes slideLeftOut { to { transform: translateX(-100%); opacity: 0; } }
 @keyframes slideRightOut { to { transform: translateX(100%); opacity: 0; } }

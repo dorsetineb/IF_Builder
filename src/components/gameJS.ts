@@ -2386,18 +2386,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isTargetHyperCard && !isCurrentHyperCard && transition && gameData.enableImages !== false) {
             // Transitioning from Branch/Chapter to Scenario (HyperCard Fullscreen)
-            // Create a clean smooth fading curtain
-            const curtain = document.createElement('div');
-            curtain.className = 'scene-curtain-transition ' + (effectiveTransition !== 'none' ? 'trans-' + effectiveTransition + '-out' : 'trans-fade-out');
-            curtain.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background-color:var(--bg-color, #0d1117);z-index:9999;pointer-events:none;';
-            document.body.appendChild(curtain);
-
-            // Render scenario in fullscreen directly underneath
             renderScene(scene, successPrefix, inputEchoText);
 
-            setTimeout(() => {
-                curtain.remove();
-            }, speed * 1000 + 50);
+            if (effectiveTransition !== 'none' && sceneImage) {
+                const animClass = 'trans-fade-in';
+                sceneImage.classList.add(animClass);
+                setTimeout(() => {
+                    sceneImage.classList.remove(animClass);
+                }, speed * 1000 + 50);
+            }
 
             autoSaveGame();
             return;
@@ -2751,36 +2748,17 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;z-index:25;pointer-events:auto;overflow:visible;');
             stage.appendChild(overlay);
 
-            const updateStageDimensions = () => {
-                const nw = sceneImage.naturalWidth || 1920;
-                const nh = sceneImage.naturalHeight || 1080;
-                const viewportW = window.innerWidth;
-                const viewportH = window.innerHeight;
-
-                // Scale to cover full screen maintaining 100% natural aspect ratio (0% distortion)
-                const scale = Math.max(viewportW / nw, viewportH / nh);
-                const stageW = Math.round(nw * scale);
-                const stageH = Math.round(nh * scale);
-
-                let filterStyle = '';
-                if (scene.overlayEffect === 'nosferatu') {
-                    filterStyle = 'filter:sepia(0.8) contrast(1.1) brightness(0.9);';
-                } else if (scene.overlayEffect === 'glitch') {
-                    filterStyle = 'filter:url(#glitch-distortion-filter);';
-                }
-                stage.style.cssText = 'position:relative;display:block;width:' + stageW + 'px;height:' + stageH + 'px;flex-shrink:0;overflow:visible;line-height:0;margin:0;';
-                sceneImage.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:2;' + filterStyle;
-                if (imageBack) {
-                    imageBack.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:1;' + filterStyle;
-                }
-            };
-
-            if (sceneImage.complete && sceneImage.naturalWidth > 0) {
-                updateStageDimensions();
-            } else {
-                sceneImage.addEventListener('load', updateStageDimensions, { once: true });
+            let filterStyle = '';
+            if (scene.overlayEffect === 'nosferatu') {
+                filterStyle = 'filter:sepia(0.8) contrast(1.1) brightness(0.9);';
+            } else if (scene.overlayEffect === 'glitch') {
+                filterStyle = 'filter:url(#glitch-distortion-filter);';
             }
-            window.addEventListener('resize', updateStageDimensions);
+            stage.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:0;padding:0;';
+            sceneImage.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:2;' + filterStyle;
+            if (imageBack) {
+                imageBack.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:1;' + filterStyle;
+            }
 
             const HOTSPOT_ICONS_SVG = {
                 eye: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
