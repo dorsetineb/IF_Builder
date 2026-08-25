@@ -29,12 +29,10 @@ interface SceneMapProps {
 const NODE_WIDTH = 250;
 const NODE_HEADER_HEIGHT = 70;
 const THUMBNAIL_HEIGHT = 140;
-const INTERACTION_ITEM_HEIGHT = 36;
+const SCENARIO_THUMBNAIL_HEIGHT = 94; // 1/3 smaller than 140px (140 * 2/3 ≈ 94)
+const INTERACTION_ITEM_HEIGHT = 40;
 const X_GAP = 150;
 const Y_GAP = 50;
-const INTERACTION_ITEM_MARGIN_Y = 4;
-const PADDING_BOTTOM = 8;
-const PADDING_TOP = 4;
 
 type MapNodeType = 'scene' | 'vignette';
 
@@ -224,9 +222,11 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 items.push({
                   id: `link-hotspot-${card.id}-${h.id}`,
                   targetId: h.targetSceneId,
-                  label: `${card.name}: ${h.title || t('sceneMap.hotspotExit', 'Saída')}`,
+                  label: h.title || t('sceneMap.hotspotExit', 'Saída'),
                   type: 'scene',
                   original: h,
+                  cardId: card.id,
+                  isHotspot: true,
                 });
               }
             });
@@ -301,15 +301,25 @@ const SceneMap: React.FC<SceneMapProps> = ({
     allNodesMap.forEach((node) => {
       const headerH = NODE_HEADER_HEIGHT;
       const linkingItems = getLinkingItems(node);
-      const interactionsHeight =
-        linkingItems.length > 0
-          ? linkingItems.length * INTERACTION_ITEM_HEIGHT +
-            (linkingItems.length - 1) * INTERACTION_ITEM_MARGIN_Y +
-            PADDING_BOTTOM +
-            PADDING_TOP
-          : 0;
+
+      if (node.type === 'scene') {
+        const scene = node.data as Scene;
+        if (scene.sceneType === 'hypercard_stack' && scene.stackCards && scene.stackCards.length > 0) {
+          let stackHeight = headerH;
+          scene.stackCards.forEach((card) => {
+            const cardImageH = card.image ? SCENARIO_THUMBNAIL_HEIGHT : 0;
+            const cardLinks = linkingItems.filter((it: any) => it.cardId === card.id);
+            const cardInteractionsH = cardLinks.length * INTERACTION_ITEM_HEIGHT;
+            stackHeight += cardImageH + cardInteractionsH;
+          });
+          nodeHeights.set(node.id, stackHeight + 4);
+          return;
+        }
+      }
+
+      const interactionsHeight = linkingItems.length * INTERACTION_ITEM_HEIGHT;
       const imagePadding = node.image ? THUMBNAIL_HEIGHT : 0;
-      nodeHeights.set(node.id, headerH + imagePadding + interactionsHeight);
+      nodeHeights.set(node.id, headerH + imagePadding + interactionsHeight + 4);
     });
 
     // 3. Right-Bifurcation Layout Algorithm
@@ -485,22 +495,50 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
     positionedNodes.forEach((sourceNode) => {
       const linkingItems = getLinkingItems(sourceNode);
-      linkingItems.forEach((item, index) => {
+      const isStack =
+        sourceNode.type === 'scene' &&
+        (sourceNode.data as Scene).sceneType === 'hypercard_stack';
+      const sceneData = isStack ? (sourceNode.data as Scene) : null;
+      const cards = sceneData?.stackCards || [];
+
+      linkingItems.forEach((item: any, index) => {
         const targetNode = positionedNodes.find((n) => n.id === item.targetId);
         if (!targetNode) return;
 
         const sBorder = 4;
         const tBorder = 4;
 
-        const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
-        const y1_offset =
-          sBorder +
-          NODE_HEADER_HEIGHT +
-          imagePadding +
-          PADDING_TOP +
-          index * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y) +
-          INTERACTION_ITEM_HEIGHT / 2 +
-          1;
+        let y1_offset: number;
+
+        if (isStack && item.cardId && cards.length > 0) {
+          let accumulatedY = sBorder + NODE_HEADER_HEIGHT;
+          for (const card of cards) {
+            const cardImageH = card.image ? SCENARIO_THUMBNAIL_HEIGHT : 0;
+            const cardLinks = linkingItems.filter((it: any) => it.cardId === card.id);
+
+            if (card.id === item.cardId) {
+              const itemIdxInCard = cardLinks.findIndex((it: any) => it.id === item.id);
+              accumulatedY +=
+                cardImageH +
+                itemIdxInCard * INTERACTION_ITEM_HEIGHT +
+                INTERACTION_ITEM_HEIGHT / 2;
+              break;
+            } else {
+              const cardInteractionsH = cardLinks.length * INTERACTION_ITEM_HEIGHT;
+              accumulatedY += cardImageH + cardInteractionsH;
+            }
+          }
+          y1_offset = accumulatedY;
+        } else {
+          const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
+          y1_offset =
+            sBorder +
+            NODE_HEADER_HEIGHT +
+            imagePadding +
+            index * INTERACTION_ITEM_HEIGHT +
+            INTERACTION_ITEM_HEIGHT / 2;
+        }
+
         const y2_offset = tBorder + NODE_HEADER_HEIGHT / 2;
 
         const sL = { x: sourceNode.x, y: sourceNode.y + y1_offset };
@@ -870,14 +908,52 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const sBorder = 4;
               const tBorder = 4;
 
-              const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
-              const y1_offset =
-                sBorder +
-                NODE_HEADER_HEIGHT +
-                imagePadding +
-                PADDING_TOP +
-                itemIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y) +
-                INTERACTION_ITEM_HEIGHT / 2 + 1;
+              const isStack =
+                sourceNode.type === 'scene' &&
+                (sourceNode.data as Scene).sceneType === 'hypercard_stack';
+              const sceneData = isStack ? (sourceNode.data as Scene) : null;
+              const cards = sceneData?.stackCards || [];
+
+              let y1_offset: number;
+              if (isStack && edge.sourceItemId && cards.length > 0) {
+                const item = linkingItems.find((it) => it.id === edge.sourceItemId);
+                if (item && (item as any).cardId) {
+                  let accumulatedY = sBorder + NODE_HEADER_HEIGHT;
+                  for (const card of cards) {
+                    const cardImageH = card.image ? SCENARIO_THUMBNAIL_HEIGHT : 0;
+                    const cardLinks = linkingItems.filter((it: any) => it.cardId === card.id);
+
+                    if (card.id === (item as any).cardId) {
+                      const itemIdxInCard = cardLinks.findIndex((it: any) => it.id === item.id);
+                      accumulatedY +=
+                        cardImageH +
+                        (itemIdxInCard >= 0 ? itemIdxInCard : 0) * INTERACTION_ITEM_HEIGHT +
+                        INTERACTION_ITEM_HEIGHT / 2;
+                      break;
+                    } else {
+                      const cardInteractionsH = cardLinks.length * INTERACTION_ITEM_HEIGHT;
+                      accumulatedY += cardImageH + cardInteractionsH;
+                    }
+                  }
+                  y1_offset = accumulatedY;
+                } else {
+                  const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
+                  y1_offset =
+                    sBorder +
+                    NODE_HEADER_HEIGHT +
+                    imagePadding +
+                    (itemIndex >= 0 ? itemIndex : 0) * INTERACTION_ITEM_HEIGHT +
+                    INTERACTION_ITEM_HEIGHT / 2;
+                }
+              } else {
+                const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
+                y1_offset =
+                  sBorder +
+                  NODE_HEADER_HEIGHT +
+                  imagePadding +
+                  (itemIndex >= 0 ? itemIndex : 0) * INTERACTION_ITEM_HEIGHT +
+                  INTERACTION_ITEM_HEIGHT / 2;
+              }
               const y2_offset = tBorder + NODE_HEADER_HEIGHT / 2;
 
               const realX1 = sourceNode.x + (edge.sSide === 'L' ? 0 : NODE_WIDTH);
@@ -952,17 +1028,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     userSelect: 'none',
                   }}
                 >
-                  {/* Delete Button - Floating outside */}
+                  {/* Delete Button - Attached on top right */}
                   {selectedSceneId === node.id && !isOpening && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onDeleteScene(node.id);
                       }}
-                      className="absolute top-0 left-full w-10 h-10 bg-red-600 hover:bg-red-500 text-white flex items-center justify-center z-[60] transition-colors shadow-lg rounded-r-xl border-y-2 border-r-2 border-white/10"
+                      className="absolute bottom-full right-0 w-10 h-8 bg-red-600 hover:bg-red-500 text-white flex items-center justify-center z-[60] transition-colors shadow-lg rounded-t-lg rounded-b-none border-t-2 border-x-2 border-white/20"
                       title={t('sceneList.deleteScene', 'Deletar ramificação')}
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   )}
 
@@ -1023,17 +1099,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
                   {/* Outgoing Links (Next Scene) */}
                   {linkingItems.length > 0 && (
-                    <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-muted-foreground/50">
+                    <div className="flex flex-col border-t border-muted-foreground/50">
                       {linkingItems.map((item) => (
                         <div
                           key={item.id}
-                          className={`relative font-bold py-1 flex items-center w-full ${isConclusion ? 'text-zinc-400 bg-zinc-100/5' : isOpening ? 'text-sky-500 bg-sky-500/5' : 'text-amber-500 bg-amber-500/5'}`}
+                          className={`relative font-bold flex items-center justify-center w-full flex-shrink-0 border-t border-muted-foreground/30 first:border-t-0 ${isConclusion ? 'text-zinc-400 bg-zinc-100/5' : isOpening ? 'text-sky-500 bg-sky-500/5' : 'text-amber-500 bg-amber-500/5'}`}
                           style={{ height: INTERACTION_ITEM_HEIGHT }}
                         >
                           <div
                             className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                           />
-                          <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider">
+                          <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider font-bold">
                             {item.label}
                           </span>
                           <div
@@ -1111,17 +1187,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   userSelect: 'none',
                 }}
               >
-                {/* Delete Button - Floating outside */}
+                {/* Delete Button - Attached on top right */}
                 {isSelected && !node.isStart && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeleteScene(node.id);
                     }}
-                    className="absolute top-0 left-full w-10 h-10 bg-red-600 hover:bg-red-500 text-white flex items-center justify-center z-[60] transition-colors shadow-lg rounded-r-xl border-y-2 border-r-2 border-white/10"
+                    className="absolute bottom-full right-0 w-10 h-8 bg-red-600 hover:bg-red-500 text-white flex items-center justify-center z-[60] transition-colors shadow-lg rounded-t-lg rounded-b-none border-t-2 border-x-2 border-white/20"
                     title={t('sceneList.deleteScene', 'Deletar ramificação')}
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 )}
 
@@ -1163,73 +1239,135 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   )}
                 </div>
 
-                {node.image && (
-                  <div
-                    className="w-full bg-black flex-shrink-0"
-                    style={{ height: THUMBNAIL_HEIGHT }}
-                  >
-                    <img
-                      src={node.image}
-                      alt={node.name}
-                      className="w-full h-full object-cover opacity-80"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                  </div>
-                )}
-
-                {linkingItems.length > 0 && (
-                  <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-muted-foreground/50">
-                    {linkingItems.map((item) => {
-                      let displayLabel = item.label;
-                      // Logic for detailed label recovery if needed for Parser
-                      if (gameInteractionType === 'parser' && item.original) {
-                        const inter = item.original;
-                        const actionText = inter.verbs?.[0] || t('sceneMap.action', 'Ação');
-                        const reqObj = inter.requiresInInventory
-                          ? globalObjects[inter.requiresInInventory]
-                          : null;
-                        const targetObj = inter.target ? globalObjects[inter.target] : null;
-                        displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;
-                      }
-
-                      const isVignetteLink = item.type === 'vignette';
-                      // Use Amber for generic links, or specific logic if needed
-                      const linkColor = isVignetteLink
-                        ? 'text-amber-500 bg-amber-500/5'
-                        : `text-${colorBase}-400 bg-${colorBase}-500/5`;
-
-
-                      // Determine anchor side based on which is active
-                      const isLeftActive = activeAnchors.has(`${item.id}-L`);
-                      const isRightActive = activeAnchors.has(`${item.id}-R`);
-
+                {isStack && scene.stackCards && scene.stackCards.length > 0 ? (
+                  <div className="flex flex-col">
+                    {scene.stackCards.map((card) => {
+                      const cardLinks = linkingItems.filter((it: any) => it.cardId === card.id);
                       return (
-                        <div
-                          key={item.id}
-                          className={`relative ${linkColor} font-bold py-1 flex items-center w-full`}
-                          style={{ height: INTERACTION_ITEM_HEIGHT }}
-                        >
-                          {isLeftActive && (
+                        <div key={card.id} className="flex flex-col border-t border-muted-foreground/40 first:border-t-0">
+                          {/* Imagem da Vista (reduzida em 1/3 = 94px) */}
+                          {card.image && (
                             <div
-                              className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
-                            />
+                              className="w-full bg-black relative flex-shrink-0"
+                              style={{ height: SCENARIO_THUMBNAIL_HEIGHT }}
+                            >
+                              <img
+                                src={card.image}
+                                alt={card.name}
+                                className="w-full h-full object-cover opacity-85"
+                                style={{ pointerEvents: 'none' }}
+                              />
+                            </div>
                           )}
-                          <span
-                            className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider"
-                            title={displayLabel}
-                          >
-                            {displayLabel}
-                          </span>
-                          {isRightActive && (
-                            <div
-                              className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
-                            />
+
+                          {/* Áreas Interativas da Vista coladas diretamente */}
+                          {cardLinks.length > 0 && (
+                            <div className="flex flex-col border-t border-muted-foreground/40">
+                              {cardLinks.map((item) => {
+                                const displayLabel = item.label;
+                                const linkColor = `text-emerald-400 bg-emerald-500/10`;
+                                const isLeftActive = activeAnchors.has(`${item.id}-L`);
+                                const isRightActive = activeAnchors.has(`${item.id}-R`);
+
+                                return (
+                                  <div
+                                    key={item.id}
+                                    className={`relative ${linkColor} font-bold flex items-center justify-center w-full flex-shrink-0 border-t border-muted-foreground/20 first:border-t-0`}
+                                    style={{ height: INTERACTION_ITEM_HEIGHT }}
+                                  >
+                                    {isLeftActive && (
+                                      <div
+                                        className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
+                                      />
+                                    )}
+                                    <span
+                                      className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider font-bold"
+                                      title={displayLabel}
+                                    >
+                                      {displayLabel}
+                                    </span>
+                                    {isRightActive && (
+                                      <div
+                                        className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
                           )}
                         </div>
                       );
                     })}
-                    </div>
-                  )}
+                  </div>
+                ) : (
+                  <>
+                    {node.image && (
+                      <div
+                        className="w-full bg-black flex-shrink-0"
+                        style={{ height: THUMBNAIL_HEIGHT }}
+                      >
+                        <img
+                          src={node.image}
+                          alt={node.name}
+                          className="w-full h-full object-cover opacity-80"
+                          style={{ pointerEvents: 'none' }}
+                        />
+                      </div>
+                    )}
+
+                    {linkingItems.length > 0 && (
+                      <div className="flex flex-col border-t border-muted-foreground/50">
+                        {linkingItems.map((item) => {
+                          let displayLabel = item.label;
+                          // Logic for detailed label recovery if needed for Parser
+                          if (gameInteractionType === 'parser' && item.original && !(item as any).isHotspot) {
+                            const inter = item.original;
+                            const actionText = inter.verbs?.[0] || t('sceneMap.action', 'Ação');
+                            const reqObj = inter.requiresInInventory
+                              ? globalObjects[inter.requiresInInventory]
+                              : null;
+                            const targetObj = inter.target ? globalObjects[inter.target] : null;
+                            displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;
+                          }
+
+                          const isVignetteLink = item.type === 'vignette';
+                          const linkColor = isVignetteLink
+                            ? 'text-amber-500 bg-amber-500/5'
+                            : `text-${colorBase}-400 bg-${colorBase}-500/5`;
+
+                          const isLeftActive = activeAnchors.has(`${item.id}-L`);
+                          const isRightActive = activeAnchors.has(`${item.id}-R`);
+
+                          return (
+                            <div
+                              key={item.id}
+                              className={`relative ${linkColor} font-bold flex items-center justify-center w-full flex-shrink-0 border-t border-muted-foreground/30 first:border-t-0`}
+                              style={{ height: INTERACTION_ITEM_HEIGHT }}
+                            >
+                              {isLeftActive && (
+                                <div
+                                  className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
+                                />
+                              )}
+                              <span
+                                className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider font-bold"
+                                title={displayLabel}
+                              >
+                                {displayLabel}
+                              </span>
+                              {isRightActive && (
+                                <div
+                                  className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
                 </div>
               </div>
             );
