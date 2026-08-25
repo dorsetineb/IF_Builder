@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '../ToastContext';
 import { HotspotCanvas } from './HotspotCanvas';
 import { HotspotInspector } from './HotspotInspector';
+import ObjectEditor from '../ObjectEditor';
 import {
   Layers,
   Plus,
@@ -32,6 +33,7 @@ import {
   SlidersHorizontal,
   Search,
   X,
+  Package,
 } from 'lucide-react';
 
 interface HyperCardStackEditorProps {
@@ -42,6 +44,11 @@ interface HyperCardStackEditorProps {
   onUpdateScene: (updatedScene: Scene) => void;
   onCopyScene?: (scene: Scene) => void;
   onPreviewScene?: (scene: Scene) => void;
+  onCreateGlobalObject?: (obj: GameObject, linkToSceneId?: string) => void;
+  onLinkObjectToScene?: (sceneId: string, objectId: string) => void;
+  onUnlinkObjectFromScene?: (sceneId: string, objectId: string) => void;
+  onUpdateGlobalObject?: (objectId: string, data: Partial<GameObject>) => void;
+  onTabChange?: (tab: string) => void;
   isDirty?: boolean;
   onSetDirty?: (isDirty: boolean) => void;
   onClose?: () => void;
@@ -58,6 +65,11 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   onUpdateScene,
   onCopyScene,
   onPreviewScene,
+  onCreateGlobalObject,
+  onLinkObjectToScene,
+  onUnlinkObjectFromScene,
+  onUpdateGlobalObject,
+  onTabChange,
   isDirty: parentIsDirty,
   onSetDirty,
   onClose,
@@ -75,7 +87,9 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   // Reset when switching to a different scene id
   useEffect(() => {
     setLocalScene(scene);
+    setPendingObjectUpdates({});
     initialSceneJson.current = JSON.stringify(scene);
+    setActiveTab('properties');
   }, [scene.id]);
 
   // Compute local dirty state and notify parent
@@ -114,8 +128,67 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
 
   const [selectedHotspotId, setSelectedHotspotId] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<{ [key: string]: boolean }>({});
-  const [activeTab, setActiveTab] = useState<'properties' | 'views'>('properties');
+  const [activeTab, setActiveTab] = useState<'properties' | 'views' | 'objects'>('properties');
   const [viewsSearchQuery, setViewsSearchQuery] = useState('');
+
+  // Sync active tab with parent (controls side panel expansion)
+  useEffect(() => {
+    onTabChange?.(activeTab);
+  }, [activeTab, onTabChange]);
+
+  // Object updates pending save
+  const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{
+    [id: string]: Partial<GameObject>;
+  }>({});
+
+  const mergedGlobalObjects = useMemo(() => {
+    const merged = { ...globalObjects };
+    Object.entries(pendingObjectUpdates).forEach(([id, updates]) => {
+      if (merged[id]) {
+        merged[id] = { ...merged[id], ...updates };
+      }
+    });
+    return merged;
+  }, [globalObjects, pendingObjectUpdates]);
+
+  const currentSceneObjects = useMemo(() => {
+    return (localScene.objectIds || [])
+      .map((id) => mergedGlobalObjects[id])
+      .filter(Boolean);
+  }, [localScene.objectIds, mergedGlobalObjects]);
+
+  const handleUpdateGlobalObjectLocal = (objectId: string, updatedData: Partial<GameObject>) => {
+    setPendingObjectUpdates((prev) => ({
+      ...prev,
+      [objectId]: { ...(prev[objectId] || {}), ...updatedData },
+    }));
+  };
+
+  const handleCreateGlobalObjectWrapper = (obj: GameObject, linkToSceneId?: string) => {
+    onCreateGlobalObject?.(obj, '');
+    setLocalScene((prev) => ({
+      ...prev,
+      objectIds: [...(prev.objectIds || []), obj.id],
+    }));
+  };
+
+  const handleLinkObjectWrapper = (sceneId: string, objectId: string) => {
+    setLocalScene((prev) => {
+      const currentIds = prev.objectIds || [];
+      if (currentIds.includes(objectId)) return prev;
+      return {
+        ...prev,
+        objectIds: [...currentIds, objectId],
+      };
+    });
+  };
+
+  const handleUnlinkObjectWrapper = (sceneId: string, objectId: string) => {
+    setLocalScene((prev) => ({
+      ...prev,
+      objectIds: (prev.objectIds || []).filter((id) => id !== objectId),
+    }));
+  };
 
   const toggleSection = (sectionKey: string) => {
     setCollapsedSections(prev => ({
@@ -234,6 +307,12 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
 
   // Action Handlers for Bottom Bar (Save, Undo, Test, Copy)
   const handleSave = () => {
+    if (onUpdateGlobalObject && Object.keys(pendingObjectUpdates).length > 0) {
+      Object.entries(pendingObjectUpdates).forEach(([id, updates]) => {
+        onUpdateGlobalObject(id, updates);
+      });
+      setPendingObjectUpdates({});
+    }
     onUpdateScene(localScene);
     initialSceneJson.current = JSON.stringify(localScene);
     onSetDirty?.(false);
@@ -243,6 +322,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   const handleUndo = () => {
     const restored = JSON.parse(initialSceneJson.current) as Scene;
     setLocalScene(restored);
+    setPendingObjectUpdates({});
     if (!restored.stackCards?.some(c => c.id === selectedCardId)) {
       setSelectedCardId(restored.stackCards?.[0]?.id || '');
     }
@@ -355,12 +435,24 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                   <Eye className="w-3.5 h-3.5" />
                   <span>{t('hypercard.viewsTab', 'VISTAS')}</span>
                 </button>
+
+                <button
+                  onClick={() => setActiveTab('objects')}
+                  className={`py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 justify-center px-4 ${
+                    activeTab === 'objects'
+                      ? 'bg-primary text-primary-foreground font-bold'
+                      : 'text-muted-foreground hover:bg-primary/25 hover:text-white'
+                  }`}
+                >
+                  <Package className="w-3.5 h-3.5" />
+                  <span>{t('sceneEditor.tabs.objects', 'OBJETOS')}</span>
+                </button>
               </div>
             </div>
           </div>
 
           {/* SCROLLABLE SIDEBAR CONTAINER (Scroll starts below top tabs) */}
-          <div className="relative flex-1 flex flex-col h-full min-h-0 overflow-y-auto pt-6 px-4 pb-28">
+          <div className={`relative flex-1 flex flex-col h-full min-h-0 ${activeTab !== 'objects' ? 'overflow-y-auto pt-6 px-4 pb-28' : 'pt-0'}`}>
             {activeTab === 'properties' && (
               <div className="flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
                 {/* SEÇÃO 1: DETALHES DO CENÁRIO */}
@@ -694,6 +786,20 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                 </div>
               </div>
             )}
+            {activeTab === 'objects' && (
+              <div key={localScene.id} className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <ObjectEditor
+                  sceneId={localScene.id}
+                  objects={currentSceneObjects}
+                  allGlobalObjects={Object.values(mergedGlobalObjects)}
+                  onCreateGlobalObject={handleCreateGlobalObjectWrapper}
+                  onLinkObject={handleLinkObjectWrapper}
+                  onUnlinkObject={handleUnlinkObjectWrapper}
+                  onUpdateGlobalObject={handleUpdateGlobalObjectLocal}
+                  isSidePanel={true}
+                />
+              </div>
+            )}
           </div>
 
           {/* STICKY FOOTER ACTION BUTTONS (Exact match with SceneEditor.tsx) */}
@@ -814,10 +920,11 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               <HotspotInspector
                 hotspot={selectedHotspot}
                 card={currentCard}
+                scene={localScene}
                 onUpdateCard={handleUpdateCard}
                 allCards={cards}
                 allScenes={allScenes}
-                globalObjects={globalObjects}
+                globalObjects={mergedGlobalObjects}
                 consequenceTrackers={consequenceTrackers}
                 onUpdateHotspot={handleUpdateHotspot}
                 onDeleteHotspot={handleDeleteHotspot}

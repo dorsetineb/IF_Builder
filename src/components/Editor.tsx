@@ -1608,8 +1608,8 @@ const Editor: React.FC = () => {
                       isNarrativeMenuOpen 
                         ? 'w-1/3'
                         : selectedScene
-                          ? selectedScene.sceneType === 'hypercard_stack'
-                            ? isScenarioEditing ? 'w-full' : 'w-1/3'
+                          ? selectedScene.sceneType === 'hypercard_stack' && isScenarioEditing
+                            ? 'w-full'
                             : isSidePanelExpanded ? 'w-1/2 min-w-[550px]' : 'w-1/3'
                           : 'w-0 border-l-0'
                     }`}
@@ -1689,6 +1689,11 @@ const Editor: React.FC = () => {
                               consequenceTrackers={consequenceTrackers}
                               onUpdateScene={handleUpdateScene}
                               onCopyScene={handleCopyScene}
+                              onCreateGlobalObject={handleCreateGlobalObject}
+                              onLinkObjectToScene={handleLinkObjectToScene}
+                              onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                              onUpdateGlobalObject={handleUpdateGlobalObject}
+                              onTabChange={setSidePanelTab}
                               onPreviewScene={(scene) => {
                                 setPreviewSceneId(scene.id);
                                 setIsPreviewOpen(true);

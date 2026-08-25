@@ -1435,12 +1435,17 @@
       "targetScene": "Ramificación / Capítulo de Destino",
       "examineTitle": "Título del Diálogo",
       "examineText": "Texto del Mensaje",
+      "examineImage": "Imagen del Diálogo (Opcional)",
+      "examineTextPlaceholder": "Describe lo que el jugador lee, siente u observa...",
       "collectItem": "Objeto a Recoger",
       "requiresInInventory": "Requiere Objeto en Inventario",
       "consumesItem": "Consumir/eliminar objeto al usar",
       "lockedMessage": "Mensaje de Bloqueo",
       "trackers": "Efecto en Contadores"
     },
+    "examineImageHint": "Esta imagen se mostrará al examinar el área interactiva, junto al texto descriptivo.",
+    "sceneObjectsGroup": "Objetos del Escenario",
+    "otherObjectsGroup": "Otros Objetos del Proyecto",
     "styles": {
       "iconsVisible": "Iconos visibles",
       "iconsHover": "Iconos al pasar el cursor",

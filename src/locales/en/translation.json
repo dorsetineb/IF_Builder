@@ -1476,12 +1476,17 @@
       "targetScene": "Target Branch / Chapter",
       "examineTitle": "Dialogue Title",
       "examineText": "Message Text",
+      "examineImage": "Dialogue Image (Optional)",
+      "examineTextPlaceholder": "Describe what the player reads, feels or observes...",
       "collectItem": "Item to Collect",
       "requiresInInventory": "Requires Item in Inventory",
       "consumesItem": "Consume/remove item upon use",
       "lockedMessage": "Locked Message",
       "trackers": "Tracker Effects"
     },
+    "examineImageHint": "This image will be displayed when examining the interactive area, next to the descriptive text.",
+    "sceneObjectsGroup": "Scenario Objects",
+    "otherObjectsGroup": "Other Project Objects",
     "styles": {
       "iconsVisible": "Always visible",
       "iconsHover": "Visible on hover",

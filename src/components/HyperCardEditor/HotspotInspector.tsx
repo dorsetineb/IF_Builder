@@ -48,6 +48,8 @@ import {
   MousePointer2,
   Hand,
   Search,
+  Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 export const HOTSPOT_ICONS = [
@@ -86,6 +88,7 @@ export const HOTSPOT_ICONS = [
 interface HotspotInspectorProps {
   hotspot: CardHotspot | null;
   card: HyperCard;
+  scene?: Scene;
   onUpdateCard?: (updatedCard: HyperCard) => void;
   allCards: HyperCard[];
   allScenes: Scene[];
@@ -99,6 +102,7 @@ interface HotspotInspectorProps {
 export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   hotspot,
   card,
+  scene,
   onUpdateCard,
   allCards,
   allScenes,
@@ -110,6 +114,16 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'visual' | 'action' | 'conditions'>('visual');
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+
+  const sceneObjects = React.useMemo(() => {
+    if (!scene?.objectIds) return [];
+    return scene.objectIds.map(id => globalObjects[id]).filter(Boolean);
+  }, [scene?.objectIds, globalObjects]);
+
+  const otherObjects = React.useMemo(() => {
+    const sceneIdSet = new Set(scene?.objectIds || []);
+    return Object.values(globalObjects).filter(obj => !sceneIdSet.has(obj.id));
+  }, [scene?.objectIds, globalObjects]);
 
   const handleFieldChange = <K extends keyof CardHotspot>(field: K, value: CardHotspot[K]) => {
     if (!hotspot) return;
@@ -506,31 +520,94 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
 
             {/* ACTION: EXAMINE MODAL */}
             {hotspot.actionType === 'examine' && (
-              <div className="space-y-3 p-3 bg-background/60 rounded-xl border border-muted-foreground/30">
-                <div>
-                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
-                    {t('hypercard.fields.examineTitle', 'Título do Diálogo')}
-                  </label>
-                  <input
-                    type="text"
-                    value={hotspot.examineTitle || ''}
-                    onChange={(e) => handleFieldChange('examineTitle', e.target.value)}
-                    placeholder="Ex: Inscrição Antiga"
-                    className="w-full bg-background border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-
+              <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
                     {t('hypercard.fields.examineText', 'Texto da Mensagem')}
                   </label>
                   <textarea
-                    rows={3}
+                    rows={4}
                     value={hotspot.examineText || ''}
                     onChange={(e) => handleFieldChange('examineText', e.target.value)}
-                    placeholder="Descreva o que o jogador lê, sente ou observa..."
-                    className="w-full bg-background border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+                    placeholder={t('hypercard.fields.examineTextPlaceholder', 'Descreva o que o jogador lê, sente ou observa...')}
+                    className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
                   />
+                </div>
+
+                {/* EXAMINE IMAGE UPLOAD */}
+                <div>
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                    {t('hypercard.fields.examineImage', 'Imagem do Diálogo (Opcional)')}
+                  </label>
+                  <div className="relative border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 rounded-xl p-2 transition-all group bg-background/40">
+                    {hotspot.examineImage ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="relative w-full h-36 rounded-lg overflow-hidden border border-muted-foreground/30 bg-black/40">
+                          <img
+                            src={hotspot.examineImage}
+                            alt="Examine Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 w-full">
+                          <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-bold border border-muted-foreground/30 cursor-pointer transition-colors">
+                            <Upload className="w-3.5 h-3.5 text-primary" />
+                            <span>{t('sceneEditor.changeBtn', 'Trocar')}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (uploadEvent) => {
+                                    handleFieldChange('examineImage', uploadEvent.target?.result as string);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleFieldChange('examineImage', '')}
+                            className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/30 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>{t('sceneEditor.removeBtn', 'Remover')}</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center py-6 cursor-pointer group">
+                        <div className="w-10 h-10 rounded-full bg-background border border-muted-foreground/30 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                          <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+                        </div>
+                        <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground">
+                          {t('sceneEditor.loadImage', 'Carregar Imagem')}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (uploadEvent) => {
+                                handleFieldChange('examineImage', uploadEvent.target?.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground text-center mt-1.5 italic">
+                    {t('hypercard.examineImageHint', 'Esta imagem será exibida ao examinar a área interativa, ao lado do texto descritivo.')}
+                  </p>
                 </div>
               </div>
             )}
@@ -544,14 +621,27 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                 <select
                   value={hotspot.addsToInventory || ''}
                   onChange={(e) => handleFieldChange('addsToInventory', e.target.value)}
-                  className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+                  className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
                 >
                   <option value="">{t('hypercard.selectItemPlaceholder', '-- Selecione o Item --')}</option>
-                  {Object.values(globalObjects).map((obj) => (
-                    <option key={obj.id} value={obj.id}>
-                      {obj.name}
-                    </option>
-                  ))}
+                  {sceneObjects.length > 0 && (
+                    <optgroup label={t('hypercard.sceneObjectsGroup', 'Objetos do Cenário')}>
+                      {sceneObjects.map((obj) => (
+                        <option key={obj.id} value={obj.id}>
+                          {obj.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {otherObjects.length > 0 && (
+                    <optgroup label={t('hypercard.otherObjectsGroup', 'Outros Objetos do Projeto')}>
+                      {otherObjects.map((obj) => (
+                        <option key={obj.id} value={obj.id}>
+                          {obj.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </select>
               </div>
             )}
