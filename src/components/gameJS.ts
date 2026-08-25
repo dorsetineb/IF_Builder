@@ -1441,6 +1441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fix Audio Persistence: If the starting scene has no specific music.
         // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
+        const isStartVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
         if (startScene) {
             if (startScene.backgroundMusic) {
                 playBgm(startScene.backgroundMusic);
@@ -1457,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (standardActionBar) standardActionBar.classList.remove('hidden');
         if (endingActionBar) endingActionBar.classList.add('hidden');
         
-        if (gameContainer && !isVignette) {
+        if (gameContainer && !isStartVignette) {
             gameContainer.classList.remove('hidden');
             gameContainer.classList.add('ready');
         }
