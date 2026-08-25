@@ -2386,14 +2386,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isTargetHyperCard && !isCurrentHyperCard && transition && gameData.enableImages !== false) {
             // Transitioning from Branch/Chapter to Scenario (HyperCard Fullscreen)
-            renderScene(scene, successPrefix, inputEchoText);
+            const durationMs = speed * 1000;
 
-            if (effectiveTransition !== 'none' && sceneImage) {
-                const animClass = 'trans-fade-in';
-                sceneImage.classList.add(animClass);
+            if (effectiveTransition !== 'none' && gameContainer) {
+                // Clone the previous branch view container to perform smooth outgoing transition
+                const clone = gameContainer.cloneNode(true);
+                clone.id = 'branch-transition-clone';
+                clone.className = gameContainer.className + ' scene-curtain-transition ' + ('trans-' + effectiveTransition + '-out');
+                clone.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;background-color:var(--bg-color);margin:0;padding:0;';
+                document.body.appendChild(clone);
+
+                // Render scenario in fullscreen directly underneath
+                renderScene(scene, successPrefix, inputEchoText);
+
                 setTimeout(() => {
-                    sceneImage.classList.remove(animClass);
-                }, speed * 1000 + 50);
+                    clone.remove();
+                }, durationMs + 50);
+            } else {
+                renderScene(scene, successPrefix, inputEchoText);
             }
 
             autoSaveGame();

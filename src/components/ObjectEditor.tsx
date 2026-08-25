@@ -169,13 +169,13 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     </div>
 
                     <div className="relative">
-                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/70 pointer-events-none" />
                         <input
                             type="text"
                             placeholder={t('objectEditor.searchPlaceholder', 'Buscar objetos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-muted-foreground/30 focus:border-primary focus:bg-background"
+                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/60 hover:border-primary/90 focus:border-primary focus:bg-background shadow-sm transition-colors"
                         />
                     </div>
 

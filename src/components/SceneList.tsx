@@ -292,16 +292,16 @@ const SceneList: React.FC<SceneListProps> = ({
 
       {/* Search Input */}
       <div className={`relative flex-shrink-0 mb-3 px-4`}>
-        <Search className={`absolute left-7 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
+        <Search className={`absolute left-7 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/70 pointer-events-none`} />
         <input
           type="text"
           placeholder={t('sceneList.search', 'Buscar...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className={`w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] ${
+          className={`w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] transition-colors shadow-sm ${
             isLateralMenu 
-              ? 'bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background' 
-              : 'bg-input text-foreground border border-muted-foreground/50'
+              ? 'bg-background/50 text-foreground placeholder-muted-foreground border border-primary/60 hover:border-primary/90 focus:border-primary focus:bg-background' 
+              : 'bg-input text-foreground border border-primary/60 hover:border-primary/90 focus:border-primary'
           }`}
         />
       </div>

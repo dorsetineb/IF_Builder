@@ -916,10 +916,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const isOpening = vig.id === 'VNT_OPENING';
               const isConclusion = vig.isConclusion;
 
-              // Color Logic: Blue (Opening), Green (Conclusion), Amber (Others)
-              let colorBase = 'amber';
+              // Color Logic: Blue (Opening), Red (Chapter / Vignette)
+              let colorBase = 'red';
               if (isOpening) colorBase = 'blue';
-              else if (isConclusion) colorBase = 'green';
 
               const borderClass = `border-${colorBase}-500 border-4`;
               const shadowClass = `hover:shadow-${colorBase}-500/10 hover:border-${colorBase}-400`;
@@ -1052,10 +1051,11 @@ const SceneMap: React.FC<SceneMapProps> = ({
             // --- STANDARD SCENE NODE STYLE ---
             const scene = node.data as Scene;
 
-            // Color Rules: Opening = Blue, Transition = Blue, Conclusion = Green, Ending = Green, Stack = Emerald, Normal = Amber
+            // Color Rules: Opening = Blue, Chapter/Vignette = Red, Stack = Emerald, Ending = White, Normal Branch = Amber
             const isVignetteOpening = scene.vignetteType === 'opening';
             const isVignetteTransition = scene.vignetteType === 'transition';
             const isVignetteConclusion = scene.vignetteType === 'conclusion';
+            const isChapter = isVignetteTransition || isVignetteConclusion || (scene.sceneType === 'vignette' && !isVignetteOpening);
             const isStack = scene.sceneType === 'hypercard_stack';
             const isEnding = scene.isEndingScene;
             const isOrphan = highlightOrphans && orphanIds.has(node.id);
@@ -1065,8 +1065,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
             if (isOrphan) colorBase = 'red';
             else if (isStack) colorBase = 'emerald';
             else if (isEnding) colorBase = 'white';
-            else if (isVignetteOpening || isVignetteTransition) colorBase = 'blue';
-            else if (isVignetteConclusion) colorBase = 'green';
+            else if (isVignetteOpening) colorBase = 'blue';
+            else if (isChapter) colorBase = 'red';
 
             const borderColorClass = isOrphan
               ? 'border-red-500 animate-pulse'
@@ -1076,9 +1076,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   ? 'border-white border-4'
                   : isVignetteOpening
                     ? 'border-blue-500 border-4'
-                    : isVignetteConclusion
-                      ? 'border-green-500 border-4'
-                      : `border-${colorBase}-500 border-4`;
+                    : isChapter
+                      ? 'border-red-500 border-4'
+                      : 'border-amber-500 border-4';
 
             const isSelected = selectedSceneId === node.id;
             
@@ -1151,7 +1151,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
                     (ID: {node.id})
                   </p>
-                  {isEnding && (
+                  {isVignetteOpening && (
+                    <p className="text-[10px] font-bold text-sky-400 mt-1 uppercase tracking-widest">
+                      {t('sceneMap.opening', 'Abertura')}
+                    </p>
+                  )}
+                  {isEnding && !isChapter && (
                     <p className="text-[10px] font-bold text-white mt-1 uppercase tracking-widest">
                       {t('sceneMap.ending', 'Final')}
                     </p>
@@ -1233,32 +1238,38 @@ const SceneMap: React.FC<SceneMapProps> = ({
       </div>
       <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-2 transition-all duration-300">
         
-        <div className={`w-[160px] backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
+        <div className={`w-fit min-w-[150px] backdrop-blur-md px-4 py-3.5 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
             {t('sceneMap.legend', 'Legenda')}
           </h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-blue-500 bg-blue-500/20 shrink-0"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400 whitespace-nowrap`}>
                 {t('sceneMap.opening', 'Abertura')}
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-amber-500 bg-amber-500/20 shrink-0"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
-                {t('sceneMap.sceneVignette', 'Ramificação / Capítulo')}
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400 whitespace-nowrap`}>
+                {t('sceneMap.branch', 'Ramificação')}
+              </span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-red-500 bg-red-500/20 shrink-0"></div>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400 whitespace-nowrap`}>
+                {t('sceneMap.vignette', 'Capítulo')}
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-emerald-500 bg-emerald-500/20 shrink-0"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
-                {t('sceneMap.scenario', 'Cenário (Slides)')}
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400 whitespace-nowrap`}>
+                {t('sceneMap.scenario', 'Cenário')}
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-[2px] border-2 border-white bg-white/20 shrink-0"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400 whitespace-nowrap`}>
                 {t('sceneMap.ending', 'Final')}
               </span>
             </li>

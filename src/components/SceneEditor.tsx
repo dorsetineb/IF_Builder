@@ -37,6 +37,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   X,
   Hammer,
+  ChevronDown,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Columns3,
   Heart,
@@ -174,6 +175,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [choicesSearchQuery, setChoicesSearchQuery] = useState('');
     const [suggestionsInput, setSuggestionsInput] = useState('');
+    const [collapsedSections, setCollapsedSections] = useState<{ [key: string]: boolean }>({});
+
+    const toggleSection = (sectionKey: string) => {
+      setCollapsedSections((prev) => ({
+        ...prev,
+        [sectionKey]: !prev[sectionKey],
+      }));
+    };
 
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 
@@ -592,22 +601,37 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             {activeTab === 'properties' && (
               <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
                 {/* Left Column: Details & Rules */}
-                <div className="space-y-6 flex flex-col">
+                <div className="flex flex-col">
                   {/* Scene Details Card */}
                   <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
-                    <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
-                      <FileText className="w-4 h-4" />
-                      {isVignetteMode
-                        ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes do Capítulo')
-                        : t('sceneEditor.narrativeTitle')}
-                    </h3>
+                    <div
+                      className={`flex items-center justify-between cursor-pointer select-none group ${
+                        collapsedSections.details ? 'mb-0' : 'mb-4'
+                      }`}
+                      onClick={() => toggleSection('details')}
+                    >
+                      <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+                        <FileText className="w-4 h-4" />
+                        {isVignetteMode
+                          ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes do Capítulo')
+                          : t('sceneEditor.narrativeTitle')}
+                      </h3>
+                      <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                        <ChevronDown
+                          className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                            collapsedSections.details ? '-rotate-90' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
 
-                    <div className="space-y-4 flex flex-col">
-                      {isVignetteMode && localScene.vignetteType !== 'opening' && (
-                        <div className="mb-6">
-                          <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                            {t('sceneEditor.roleLabel', 'NATUREZA DO CAPÍTULO')}
-                          </label>
+                    {!collapsedSections.details && (
+                      <div className="space-y-4 flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
+                        {isVignetteMode && localScene.vignetteType !== 'opening' && (
+                          <div className="mb-6">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                              {t('sceneEditor.roleLabel', 'NATUREZA DO CAPÍTULO')}
+                            </label>
                           <div className="grid grid-cols-2 gap-2">
                             {[
                               {
@@ -864,150 +888,169 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         </div>
                       </div>
                     </div>
+                  )}
                   </div>
 
                   {/* Multimedia Card (Only when side panel - moved here to be below details) */}
                   {isSidePanel && (
                     <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                      <div className="flex justify-between items-center mb-4">
+                      <div
+                        className={`flex justify-between items-center cursor-pointer select-none group ${
+                          collapsedSections.multimedia ? 'mb-0' : 'mb-4'
+                        }`}
+                        onClick={() => toggleSection('multimedia')}
+                      >
                         <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
                           <ImageIcon className="w-4 h-4" />
                           {t('sceneEditor.multimediaTitle')}
                         </h3>
-                        <span className="text-[10px] text-muted-foreground">
-                          {layoutOrientation === 'vertical'
-                            ? t('sceneEditor.suggestedResVertical')
-                            : t('sceneEditor.suggestedResHorizontal')}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] text-muted-foreground">
+                            {layoutOrientation === 'vertical'
+                              ? t('sceneEditor.suggestedResVertical')
+                              : t('sceneEditor.suggestedResHorizontal')}
+                          </span>
+                          <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                            <ChevronDown
+                              className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                                collapsedSections.multimedia ? '-rotate-90' : ''
+                              }`}
+                            />
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
-                        <style>{OVERLAY_CSS}</style>
+                      {!collapsedSections.multimedia && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
+                            <style>{OVERLAY_CSS}</style>
 
-                        {localScene.image ? (
-                          <>
-                            <img
-                              src={localScene.image}
-                              alt={localScene.name}
-                              className="w-full h-full object-cover"
-                            />
+                            {localScene.image ? (
+                              <>
+                                <img
+                                  src={localScene.image}
+                                  alt={localScene.name}
+                                  className="w-full h-full object-cover"
+                                />
 
-                            <div
-                              className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
-                              style={{ zIndex: 10 }}
-                            ></div>
-                            {localScene.overlayEffect === 'rain' && <RainOverlay />}
-                            {localScene.overlayEffect === 'blur' && <BlurOverlay />}
-                            {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
-                            {localScene.overlayEffect === 'tv' && <TVOverlay />}
-                            {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
-                            {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
-                            {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
-                            {localScene.overlayEffect === 'wiggate' && <WiggleOverlay />}
-                            {localScene.overlayEffect === 'fog' && (
-                              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
-                                <FogOverlay />
-                              </div>
-                            )}
+                                <div
+                                  className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
+                                  style={{ zIndex: 10 }}
+                                ></div>
+                                {localScene.overlayEffect === 'rain' && <RainOverlay />}
+                                {localScene.overlayEffect === 'blur' && <BlurOverlay />}
+                                {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                                {localScene.overlayEffect === 'tv' && <TVOverlay />}
+                                {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
+                                {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
+                                {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
+                                {localScene.overlayEffect === 'wiggate' && <WiggleOverlay />}
+                                {localScene.overlayEffect === 'fog' && (
+                                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
+                                    <FogOverlay />
+                                  </div>
+                                )}
 
-                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
-                              <label htmlFor="image-upload-input-side" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors">
-                                <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-                                  <Upload className="w-5 h-5" />
+                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
+                                  <label htmlFor="image-upload-input-side" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors">
+                                    <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+                                      <Upload className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.changeBtn')}</span>
+                                    <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                  </label>
+                                  <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
+                                    <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
+                                      <Trash2 className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.removeBtn')}</span>
+                                  </button>
                                 </div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.changeBtn')}</span>
+                              </>
+                            ) : (
+                              <label htmlFor="image-upload-input-side" className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
+                                <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                                  <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+                                </div>
+                                <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">{t('sceneEditor.loadImage')}</span>
                                 <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                               </label>
-                              <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
-                                <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
-                                  <Trash2 className="w-5 h-5" />
-                                </div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.removeBtn')}</span>
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <label htmlFor="image-upload-input-side" className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
-                            <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                              <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                            </div>
-                            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">{t('sceneEditor.loadImage')}</span>
-                            <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                          </label>
-                        )}
-                      </div>
-
-                      <div className="space-y-2 mb-4">
-                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.overlayLabel')}</label>
-                        <select
-                          value={localScene.overlayEffect || ''}
-                          onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
-                          className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
-                        >
-                          <option value="">{t('sceneEditor.effects.none')}</option>
-                          <option value="grain">{t('sceneEditor.effects.grain')}</option>
-                          <option value="rain">{t('sceneEditor.effects.rain')}</option>
-                          <option value="blur">{t('sceneEditor.effects.blur')}</option>
-                          <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
-                          <option value="tv">{t('sceneEditor.effects.tv')}</option>
-                          <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
-                          <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
-                          <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
-                          <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
-                          <option value="fog">{t('sceneEditor.effects.fog')}</option>
-                        </select>
-                      </div>
-
-                      {localScene.vignetteType !== 'opening' && (
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.audioLabel')}</label>
-                          <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
-                            <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
-                              <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'}`} />
-                            </div>
-                            <div className="flex-grow min-w-0">
-                              {localScene.backgroundMusic ? (
-                                <div className="flex flex-col">
-                                  <span className="text-xs text-foreground truncate">{t('sceneEditor.customAudioSet')}</span>
-                                  <span className="text-[10px] text-green-500 truncate">{localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}</span>
-                                </div>
-                              ) : (
-                                <div className="flex flex-col">
-                                  <span className="text-xs text-muted-foreground italic">{t('sceneEditor.noAudio')}</span>
-                                  <span className="text-[9px] text-muted-foreground/60">{t('sceneEditor.leaveEmptyAudio')}</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-shrink-0">
-                              {localScene.backgroundMusic ? (
-                                <button onClick={() => setLocalScene(prev => ({ ...prev, backgroundMusic: undefined, backgroundMusicName: undefined }))} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all">
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              ) : (
-                                <label htmlFor="music-upload-side" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
-                                  {t('sceneEditor.loadBtn')}
-                                  <input id="music-upload-side" type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleMusicUpload} className="hidden" />
-                                </label>
-                              )}
-                            </div>
+                            )}
                           </div>
-                          {/* Checkbox to stop background music on entry */}
-                          <label className="flex items-center gap-2.5 mt-3 cursor-pointer group select-none">
-                            <input
-                              type="checkbox"
-                              className="custom-checkbox"
-                              checked={!!localScene.stopBackgroundMusic}
-                              onChange={(e) =>
-                                setLocalScene((prev) => ({
-                                  ...prev,
-                                  stopBackgroundMusic: e.target.checked,
-                                }))
-                              }
-                            />
-                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                              {t('sceneEditor.stopBackgroundMusicLabel', 'Interromper trilha em andamento')}
-                            </span>
-                          </label>
+
+                          <div className="space-y-2 mb-4">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.overlayLabel')}</label>
+                            <select
+                              value={localScene.overlayEffect || ''}
+                              onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
+                              className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                            >
+                              <option value="">{t('sceneEditor.effects.none')}</option>
+                              <option value="grain">{t('sceneEditor.effects.grain')}</option>
+                              <option value="rain">{t('sceneEditor.effects.rain')}</option>
+                              <option value="blur">{t('sceneEditor.effects.blur')}</option>
+                              <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
+                              <option value="tv">{t('sceneEditor.effects.tv')}</option>
+                              <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
+                              <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
+                              <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
+                              <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
+                              <option value="fog">{t('sceneEditor.effects.fog')}</option>
+                            </select>
+                          </div>
+
+                          {localScene.vignetteType !== 'opening' && (
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.audioLabel')}</label>
+                              <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
+                                <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
+                                  <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'}`} />
+                                </div>
+                                <div className="flex-grow min-w-0">
+                                  {localScene.backgroundMusic ? (
+                                    <div className="flex flex-col">
+                                      <span className="text-xs text-foreground truncate">{t('sceneEditor.customAudioSet')}</span>
+                                      <span className="text-[10px] text-green-500 truncate">{localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}</span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col">
+                                      <span className="text-xs text-muted-foreground italic">{t('sceneEditor.noAudio')}</span>
+                                      <span className="text-[9px] text-muted-foreground/60">{t('sceneEditor.leaveEmptyAudio')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-shrink-0">
+                                  {localScene.backgroundMusic ? (
+                                    <button onClick={() => setLocalScene(prev => ({ ...prev, backgroundMusic: undefined, backgroundMusicName: undefined }))} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all">
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  ) : (
+                                    <label htmlFor="music-upload-side" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
+                                      {t('sceneEditor.loadBtn')}
+                                      <input id="music-upload-side" type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleMusicUpload} className="hidden" />
+                                    </label>
+                                  )}
+                                </div>
+                              </div>
+                              {/* Checkbox to stop background music on entry */}
+                              <label className="flex items-center gap-2.5 mt-3 cursor-pointer group select-none">
+                                <input
+                                  type="checkbox"
+                                  className="custom-checkbox"
+                                  checked={!!localScene.stopBackgroundMusic}
+                                  onChange={(e) =>
+                                    setLocalScene((prev) => ({
+                                      ...prev,
+                                      stopBackgroundMusic: e.target.checked,
+                                    }))
+                                  }
+                                />
+                                <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                                  {t('sceneEditor.stopBackgroundMusicLabel', 'Interromper trilha em andamento')}
+                                </span>
+                              </label>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1016,106 +1059,140 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   {/* Narrative Rules Card */}
                   {(enableChances || gameSystemEnabled === 'chances') && localScene.vignetteType !== 'conclusion' && (
                     <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
-                      <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
-                        <Heart className="w-4 h-4" />
-                        {t('sceneEditor.chancesTitle')}
-                      </h3>
-                      <div className="space-y-3">
-                        {/* Chance Removal */}
-                        <label
-                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-red-500/5 border-red-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
-                        >
-                          <div className="relative flex items-center mt-0.5">
-                            <input
-                              type="checkbox"
-                              checked={!!localScene.removesChanceOnEntry}
-                              onChange={(e) =>
-                                handleToggle('removesChanceOnEntry', e.target.checked)
-                              }
-                              className="custom-checkbox"
-                              disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                            />
-                          </div>
-                          <div>
-                            <span
-                              className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-500' : 'text-muted-foreground group-hover:text-foreground'} `}
-                            >
-                              {t('sceneEditor.removesChance')}
-                            </span>
-                            <span className="block text-[10px] text-muted-foreground mt-0.5">
-                              {t('sceneEditor.removesChanceDesc')}
-                            </span>
-                          </div>
-                        </label>
-
-                        {/* Chance Restoration */}
-                        <label
-                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-green-500/5 border-green-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
-                        >
-                          <div className="relative flex items-center mt-0.5">
-                            <input
-                              type="checkbox"
-                              checked={!!localScene.restoresChanceOnEntry}
-                              onChange={(e) =>
-                                handleToggle('restoresChanceOnEntry', e.target.checked)
-                              }
-                              className="custom-checkbox"
-                              disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                            />
-                          </div>
-                          <div>
-                            <span
-                              className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-500' : 'text-muted-foreground group-hover:text-foreground'} `}
-                            >
-                              {t('sceneEditor.restoresChance')}
-                            </span>
-                            <span className="block text-[10px] text-muted-foreground mt-0.5">
-                              {t('sceneEditor.restoresChanceDesc')}
-                            </span>
-                          </div>
-                        </label>
+                      <div
+                        className={`flex justify-between items-center cursor-pointer select-none group ${
+                          collapsedSections.chances ? 'mb-0' : 'mb-4'
+                        }`}
+                        onClick={() => toggleSection('chances')}
+                      >
+                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+                          <Heart className="w-4 h-4" />
+                          {t('sceneEditor.chancesTitle')}
+                        </h3>
+                        <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                          <ChevronDown
+                            className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                              collapsedSections.chances ? '-rotate-90' : ''
+                            }`}
+                          />
+                        </div>
                       </div>
+
+                      {!collapsedSections.chances && (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                          {/* Chance Removal */}
+                          <label
+                            className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-red-500/5 border-red-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
+                          >
+                            <div className="relative flex items-center mt-0.5">
+                              <input
+                                type="checkbox"
+                                checked={!!localScene.removesChanceOnEntry}
+                                onChange={(e) =>
+                                  handleToggle('removesChanceOnEntry', e.target.checked)
+                                }
+                                className="custom-checkbox"
+                                disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                              />
+                            </div>
+                            <div>
+                              <span
+                                className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-500' : 'text-muted-foreground group-hover:text-foreground'} `}
+                              >
+                                {t('sceneEditor.removesChance')}
+                              </span>
+                              <span className="block text-[10px] text-muted-foreground mt-0.5">
+                                {t('sceneEditor.removesChanceDesc')}
+                              </span>
+                            </div>
+                          </label>
+
+                          {/* Chance Restoration */}
+                          <label
+                            className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-green-500/5 border-green-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
+                          >
+                            <div className="relative flex items-center mt-0.5">
+                              <input
+                                type="checkbox"
+                                checked={!!localScene.restoresChanceOnEntry}
+                                onChange={(e) =>
+                                  handleToggle('restoresChanceOnEntry', e.target.checked)
+                                }
+                                className="custom-checkbox"
+                                disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                              />
+                            </div>
+                            <div>
+                              <span
+                                className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-500' : 'text-muted-foreground group-hover:text-foreground'} `}
+                              >
+                                {t('sceneEditor.restoresChance')}
+                              </span>
+                              <span className="block text-[10px] text-muted-foreground mt-0.5">
+                                {t('sceneEditor.restoresChanceDesc')}
+                              </span>
+                            </div>
+                          </label>
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {/* Credits Card - Only for Conclusion Vignettes */}
                   {localScene.vignetteType === 'conclusion' && (
                     <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
-                      <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
-                        <List className="w-4 h-4" />
-                        {t('sceneEditor.creditsTitle', 'Créditos')}
-                      </h3>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                            {t('sceneEditor.creditsTitle', 'Créditos')}
-                          </label>
-                          <textarea
-                            value={localScene.creditsText || ''}
-                            onChange={(e) => updateLocalScene('creditsText', e.target.value)}
-                            className="w-full min-h-[120px] bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
-                            placeholder={t('sceneEditor.creditsPlaceholder', 'Texto dos créditos...')}
+                      <div
+                        className={`flex justify-between items-center cursor-pointer select-none group ${
+                          collapsedSections.credits ? 'mb-0' : 'mb-4'
+                        }`}
+                        onClick={() => toggleSection('credits')}
+                      >
+                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
+                          <List className="w-4 h-4" />
+                          {t('sceneEditor.creditsTitle', 'Créditos')}
+                        </h3>
+                        <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                          <ChevronDown
+                            className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                              collapsedSections.credits ? '-rotate-90' : ''
+                            }`}
                           />
                         </div>
-                        <label className="flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group bg-transparent border-muted-foreground/50 hover:bg-muted/10">
-                          <div className="relative flex items-center mt-0.5">
-                            <input
-                              type="checkbox"
-                              checked={!!localScene.creditsScrollEnabled}
-                              onChange={(e) => updateLocalScene('creditsScrollEnabled', e.target.checked)}
-                              className="custom-checkbox"
+                      </div>
+
+                      {!collapsedSections.credits && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div>
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                              {t('sceneEditor.creditsTitle', 'Créditos')}
+                            </label>
+                            <textarea
+                              value={localScene.creditsText || ''}
+                              onChange={(e) => updateLocalScene('creditsText', e.target.value)}
+                              className="w-full min-h-[120px] bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                              placeholder={t('sceneEditor.creditsPlaceholder', 'Texto dos créditos...')}
                             />
                           </div>
-                          <div>
-                            <span className={`block text-xs font-bold ${localScene.creditsScrollEnabled ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
-                              {t('sceneEditor.creditsScrollLabel', 'Animação de rolagem')}
-                            </span>
-                            <span className="block text-[10px] text-muted-foreground mt-0.5">
-                              {t('sceneEditor.creditsScrollDesc', 'Habilita a subida automática do texto.')}
-                            </span>
-                          </div>
-                        </label>
-                      </div>
+                          <label className="flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group bg-transparent border-muted-foreground/50 hover:bg-muted/10">
+                            <div className="relative flex items-center mt-0.5">
+                              <input
+                                type="checkbox"
+                                checked={!!localScene.creditsScrollEnabled}
+                                onChange={(e) => updateLocalScene('creditsScrollEnabled', e.target.checked)}
+                                className="custom-checkbox"
+                              />
+                            </div>
+                            <div>
+                              <span className={`block text-xs font-bold ${localScene.creditsScrollEnabled ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                                {t('sceneEditor.creditsScrollLabel', 'Animação de rolagem')}
+                              </span>
+                              <span className="block text-[10px] text-muted-foreground mt-0.5">
+                                {t('sceneEditor.creditsScrollDesc', 'Habilita a subida automática do texto.')}
+                              </span>
+                            </div>
+                          </label>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1125,250 +1202,39 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   {/* Multimedia Card (Only when NOT side panel) */}
                   {!isSidePanel && (
                     <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                      <div className="flex justify-between items-center mb-4">
+                      <div
+                        className="flex justify-between items-center mb-4 cursor-pointer select-none group"
+                        onClick={() => toggleSection('multimedia')}
+                      >
                         <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
                           <ImageIcon className="w-4 h-4" />
                           {t('sceneEditor.multimediaTitle')}
                         </h3>
-                        <span className="text-[10px] text-muted-foreground">
-                          {layoutOrientation === 'vertical'
-                            ? t('sceneEditor.suggestedResVertical')
-                            : t('sceneEditor.suggestedResHorizontal')}
-                        </span>
-                      </div>
-
-                      {/* Image Preview Area */}
-                      <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
-                        <style>{OVERLAY_CSS}</style>
-
-                        {localScene.image ? (
-                          <>
-                            <img
-                              src={localScene.image}
-                              alt={localScene.name}
-                              className="w-full h-full object-cover"
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] text-muted-foreground">
+                            {layoutOrientation === 'vertical'
+                              ? t('sceneEditor.suggestedResVertical')
+                              : t('sceneEditor.suggestedResHorizontal')}
+                          </span>
+                          <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                            <ChevronDown
+                              className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                                collapsedSections.connections ? '-rotate-90' : ''
+                              }`}
                             />
-
-                            {/* Overlay Layer - Rendered AFTER image for correct layering */}
-                            <div
-                              className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
-                              style={{ zIndex: 10 }}
-                            ></div>
-                            {localScene.overlayEffect === 'rain' && <RainOverlay />}
-                            {localScene.overlayEffect === 'blur' && <BlurOverlay />}
-                            {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
-                            {localScene.overlayEffect === 'tv' && <TVOverlay />}
-                            {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
-                            {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
-                            {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
-                            {localScene.overlayEffect === 'wiggle' && <WiggleOverlay />}
-                            {localScene.overlayEffect === 'fog' && (
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  width: '100%',
-                                  height: '100%',
-                                  zIndex: 20,
-                                  pointerEvents: 'none',
-                                }}
-                              >
-                                <FogOverlay />
-                              </div>
-                            )}
-
-                            {/* Hover buttons - highest z-index */}
-                            <div
-                              className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm"
-                              style={{ zIndex: 20 }}
-                            >
-                              <label
-                                htmlFor="image-upload-input"
-                                className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors"
-                              >
-                                <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-                                  <Upload className="w-5 h-5" />
-                                </div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider">
-                                  {t('sceneEditor.changeBtn')}
-                                </span>
-                                <input
-                                  id="image-upload-input"
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleImageUpload}
-                                  className="hidden"
-                                />
-                              </label>
-                              <button
-                                onClick={() => updateLocalScene('image', '')}
-                                className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
-                              >
-                                <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
-                                  <Trash2 className="w-5 h-5" />
-                                </div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider">
-                                  {t('sceneEditor.removeBtn')}
-                                </span>
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <label
-                            htmlFor="image-upload-input"
-                            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group"
-                          >
-                            <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                              <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                            </div>
-                            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                              {t('sceneEditor.loadImage')}
-                            </span>
-                            <input
-                              id="image-upload-input"
-                              type="file"
-                              accept="image/*"
-                              onChange={handleImageUpload}
-                              className="hidden"
-                            />
-                          </label>
-                        )}
-                      </div>
-
-                      {/* Overlay Effect Section */}
-                      <div className="space-y-2 mb-4">
-                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                          {t('sceneEditor.overlayLabel')}
-                        </label>
-                        <select
-                          value={localScene.overlayEffect || ''}
-                          onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
-                          className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
-                        >
-                          <option value="">{t('sceneEditor.effects.none')}</option>
-                          <option value="grain">{t('sceneEditor.effects.grain')}</option>
-                          <option value="rain">{t('sceneEditor.effects.rain')}</option>
-                          <option value="blur">{t('sceneEditor.effects.blur')}</option>
-                          <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
-                          <option value="tv">{t('sceneEditor.effects.tv')}</option>
-                          <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
-                          <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
-                          <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
-                          <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
-                          <option value="fog">{t('sceneEditor.effects.fog')}</option>
-                        </select>
-                      </div>
-
-                      {/* Audio Section */}
-                      {localScene.vignetteType !== 'opening' && (
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                            {t('sceneEditor.audioLabel')}
-                          </label>
-                          <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
-                            <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
-                              <Music
-                                className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'} `}
-                              />
-                            </div>
-                            <div className="flex-grow min-w-0">
-                              {localScene.backgroundMusic ? (
-                                <div className="flex flex-col">
-                                  <span className="text-xs text-foreground truncate">
-                                    {t('sceneEditor.customAudioSet')}
-                                  </span>
-                                  <span className="text-[10px] text-green-500 truncate">
-                                    {localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}
-                                  </span>
-                                </div>
-                              ) : (
-                                <div className="flex flex-col">
-                                  <span className="text-xs text-muted-foreground italic">
-                                    {t('sceneEditor.noAudio')}
-                                  </span>
-                                  <span className="text-[9px] text-muted-foreground/60">
-                                    {t('sceneEditor.leaveEmptyAudio')}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-shrink-0">
-                              {localScene.backgroundMusic ? (
-                                <button
-                                  onClick={() =>
-                                    setLocalScene((prev) => ({
-                                      ...prev,
-                                      backgroundMusic: undefined,
-                                      backgroundMusicName: undefined,
-                                    }))
-                                  }
-                                  className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all"
-                                  title={t('sceneEditor.removeBtn')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              ) : (
-                                <label
-                                  htmlFor="music-upload"
-                                  className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary"
-                                >
-                                  {t('sceneEditor.loadBtn')}
-                                  <input
-                                    id="music-upload"
-                                    type="file"
-                                    accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac"
-                                    onChange={handleMusicUpload}
-                                    className="hidden"
-                                  />
-                                </label>
-                              )}
-                            </div>
                           </div>
-                          {/* Checkbox to stop background music on entry */}
-                          <label className="flex items-center gap-2.5 mt-3 cursor-pointer group select-none">
-                            <input
-                              type="checkbox"
-                              className="custom-checkbox"
-                              checked={!!localScene.stopBackgroundMusic}
-                              onChange={(e) =>
-                                setLocalScene((prev) => ({
-                                  ...prev,
-                                  stopBackgroundMusic: e.target.checked,
-                                }))
-                              }
-                            />
-                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                              {t('sceneEditor.stopBackgroundMusicLabel', 'Interromper trilha em andamento')}
-                            </span>
-                          </label>
+                        </div>
+                      </div>
+
+                      {!collapsedSections.connections && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                          <BranchingPreview currentScene={localScene} allScenes={allScenes} />
+
+                          <p className="text-[10px] text-zinc-500 text-center mt-3">
+                            {t('sceneEditor.connectionsDesc')}
+                          </p>
                         </div>
                       )}
-                    </div>
-                  )}
-
-                  {/* Branching Preview Card (Only when NOT side panel) */}
-                  {!isSidePanel && (
-                    <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
-                          <GitBranch className="w-4 h-4" />
-                          {t('sceneEditor.connectionsTitle')}
-                        </h3>
-                        <button
-                          onClick={() => onViewMap?.()}
-                          className="text-[10px] text-primary hover:text-primary/80 font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
-                          title={t('sceneEditor.viewFullMapTooltip')}
-                        >
-                          {t('sceneEditor.viewFullMap')}
-                        </button>
-                      </div>
-
-                      <BranchingPreview currentScene={localScene} allScenes={allScenes} />
-
-                      <p className="text-[10px] text-zinc-500 text-center mt-3">
-                        {t('sceneEditor.connectionsDesc')}
-                      </p>
                     </div>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Scene,
   HyperCard,
@@ -25,6 +25,13 @@ import {
   Hammer,
   RotateCcw,
   Save,
+  Music,
+  Eye,
+  ChevronDown,
+  Sliders,
+  SlidersHorizontal,
+  Search,
+  X,
 } from 'lucide-react';
 
 interface HyperCardStackEditorProps {
@@ -106,6 +113,22 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   );
 
   const [selectedHotspotId, setSelectedHotspotId] = useState<string | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState<{ [key: string]: boolean }>({});
+  const [activeTab, setActiveTab] = useState<'properties' | 'views'>('properties');
+  const [viewsSearchQuery, setViewsSearchQuery] = useState('');
+
+  const toggleSection = (sectionKey: string) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
+
+  const filteredCards = useMemo(() => {
+    if (!viewsSearchQuery.trim()) return cards;
+    const q = viewsSearchQuery.toLowerCase();
+    return cards.filter(card => (card.name || '').toLowerCase().includes(q));
+  }, [cards, viewsSearchQuery]);
 
   // Floating Examine Test Dialogue
   const [testExamineModal, setTestExamineModal] = useState<{
@@ -190,6 +213,23 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       handleUpdateCard({ ...currentCard, image: base64 });
     };
     reader.readAsDataURL(file);
+  };
+
+  // Upload Soundtrack for Scenario
+  const handleMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        const base64Audio = uploadEvent.target?.result as string;
+        setLocalScene((prev) => ({
+          ...prev,
+          backgroundMusic: base64Audio,
+          backgroundMusicName: file.name,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Action Handlers for Bottom Bar (Save, Undo, Test, Copy)
@@ -284,201 +324,376 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       {/* ========================================================================= */}
       {!isExpanded && (
         <div className="flex flex-col h-full overflow-hidden relative">
-          {/* FIXED TOP SECTION (From base of create button up) */}
-          <div className="p-4 pb-3 space-y-4 flex-shrink-0 border-b border-muted-foreground/30 bg-background z-10">
-            {/* DETALHES DO CENÁRIO */}
-            <div className="space-y-4 flex flex-col">
-              <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
-                <Layers className="w-4 h-4" />
-                {t('hypercard.scenarioDetails', 'Detalhes do Cenário')}
-              </h3>
+          {/* STICKY TOP HEADER WITH TABS (Exact match with SceneEditor.tsx) */}
+          <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-0 gap-3 px-4 shadow-md">
+            {/* Solid background shield to perfectly hide scrolled content */}
+            <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
-                  <label
-                    htmlFor="scenarioSceneName"
-                    className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
-                  >
-                    {t('sceneEditor.titleLabel', 'TÍTULO')}
-                  </label>
-                  <input
-                    type="text"
-                    id="scenarioSceneName"
-                    value={localScene.name}
-                    onChange={(e) => setLocalScene(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
-                    placeholder={t('sceneEditor.titlePlaceholder', 'Título do Cenário')}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label
-                    htmlFor="scenarioSceneId"
-                    className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
-                  >
-                    {t('sceneEditor.uniqueIdLabel', 'ID ÚNICO')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="scenarioSceneId"
-                      value={localScene.id}
-                      disabled
-                      className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2.5 text-xs text-muted-foreground font-mono"
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-700 text-[10px]">
-                      #
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* OVERLAY VISUAL EFFECT (Applies to all views in scenario) */}
-              <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                  {t('sceneEditor.overlayLabel', 'Efeito Visual (Overlay)')}
-                </label>
-                <select
-                  value={localScene.overlayEffect || ''}
-                  onChange={(e) =>
-                    setLocalScene(prev => ({ ...prev, overlayEffect: e.target.value }))
-                  }
-                  className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+            {/* Top Tabs */}
+            <div className="border-b border-muted-foreground/50 flex items-center justify-between -mx-4 px-4">
+              <div className="flex space-x-1 overflow-x-auto">
+                <button
+                  onClick={() => setActiveTab('properties')}
+                  className={`py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 justify-center px-4 ${
+                    activeTab === 'properties'
+                      ? 'bg-primary text-primary-foreground font-bold'
+                      : 'text-muted-foreground hover:bg-primary/25 hover:text-white'
+                  }`}
                 >
-                  <option value="">{t('sceneEditor.effects.none', 'Nenhum')}</option>
-                  <option value="grain">{t('sceneEditor.effects.grain', 'Granulado')}</option>
-                  <option value="rain">{t('sceneEditor.effects.rain', 'Chuva')}</option>
-                  <option value="blur">{t('sceneEditor.effects.blur', 'Vintage')}</option>
-                  <option value="chromatic">{t('sceneEditor.effects.chromatic', 'Fósforo verde')}</option>
-                  <option value="tv">{t('sceneEditor.effects.tv', 'Televisor CRT')}</option>
-                  <option value="confetti">{t('sceneEditor.effects.confetti', 'Confetes')}</option>
-                  <option value="glitch">{t('sceneEditor.effects.glitch', 'Glitch')}</option>
-                  <option value="nosferatu">{t('sceneEditor.effects.nosferatu', 'Nosferatu')}</option>
-                  <option value="wiggle">{t('sceneEditor.effects.wiggle', 'Tremido')}</option>
-                  <option value="fog">{t('sceneEditor.effects.fog', 'Neblina')}</option>
-                </select>
-              </div>
-            </div>
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>{t('sceneEditor.propertiesTab', 'PROPRIEDADES')}</span>
+                </button>
 
-            {/* LISTA DE VISTAS HEADER & CREATE BUTTON */}
-            <div className="space-y-3 pt-3 border-t border-muted-foreground/30">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  {t('hypercard.viewsListTitle', 'Lista de Vistas')} ({cards.length})
-                </span>
+                <button
+                  onClick={() => setActiveTab('views')}
+                  className={`py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 justify-center px-4 ${
+                    activeTab === 'views'
+                      ? 'bg-primary text-primary-foreground font-bold'
+                      : 'text-muted-foreground hover:bg-primary/25 hover:text-white'
+                  }`}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>{t('hypercard.viewsTab', 'VISTAS')}</span>
+                </button>
               </div>
-
-              {/* Standard Creation Button Pattern - Fixed above the list */}
-              <button
-                onClick={handleAddCard}
-                className="w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 flex-shrink-0 shadow-sm"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                <span>{t('hypercard.addCard', 'Criar Vista')}</span>
-              </button>
             </div>
           </div>
 
-          {/* SCROLLABLE VIEWS LIST (ONLY CARDS SCROLL) */}
-          <div className="flex-1 overflow-y-auto min-h-0 p-4 pt-3 pb-8 space-y-3">
-            {cards.map((card, idx) => {
-              const isSelected = card.id === selectedCardId;
-              const isStart = card.id === localScene.startCardId || (!localScene.startCardId && idx === 0);
-
-              return (
-                <div
-                  key={card.id}
-                  onClick={() => setSelectedCardId(card.id)}
-                  className={`group relative rounded-xl border overflow-hidden transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-card border-primary shadow-md shadow-primary/10 ring-1 ring-primary'
-                      : 'bg-card/70 hover:bg-card border-muted-foreground/30 hover:border-muted-foreground/60'
-                  }`}
-                >
-                  {/* Thumbnail Box - Height adjusted by +1/4 */}
-                  <div className="relative w-full h-[94px] bg-black/50 overflow-hidden flex items-center justify-center">
-                    {card.image ? (
-                      <img
-                        src={card.image}
-                        alt={card.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center text-muted-foreground/40 gap-1">
-                        <ImageIcon className="w-5 h-5" />
-                        <span className="text-[10px]">{t('hypercard.noImage', 'Sem imagem')}</span>
-                      </div>
-                    )}
-
-                    {/* View Name Badge Top Left */}
-                    <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-bold text-white leading-none shadow flex items-center gap-1 max-w-[70%] z-10">
-                      <span className="truncate">{card.name || `${t('hypercard.cardPrefix', 'Vista')} ${idx + 1}`}</span>
+          {/* SCROLLABLE SIDEBAR CONTAINER (Scroll starts below top tabs) */}
+          <div className="relative flex-1 flex flex-col h-full min-h-0 overflow-y-auto pt-6 px-4 pb-28">
+            {activeTab === 'properties' && (
+              <div className="flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* SEÇÃO 1: DETALHES DO CENÁRIO */}
+                <div>
+                  <div
+                    className={`flex items-center justify-between cursor-pointer select-none group ${
+                      collapsedSections.details ? 'mb-0' : 'mb-4'
+                    }`}
+                    onClick={() => toggleSection('details')}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Sliders className="w-4 h-4 text-foreground" />
+                      <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest">
+                        {t('hypercard.scenarioDetails', 'DETALHES DO CENÁRIO')}
+                      </h3>
                     </div>
-
-                    {/* Start Badge Top Right */}
-                    {isStart && (
-                      <div
-                        className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-amber-500 text-zinc-950 font-bold text-[9px] flex items-center gap-0.5 shadow z-10"
-                        title={t('hypercard.initialView', 'Vista Inicial')}
-                      >
-                        <Star className="w-2.5 h-2.5 fill-current" />
-                        <span>{t('hypercard.startCard', 'Início')}</span>
-                      </div>
-                    )}
-
-                    {/* HOVER OVERLAY: EDIT BUTTON AT EXACT CENTER */}
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center z-20">
-                      <button
-                        onClick={(e) => handleStartEditCard(card.id, e)}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md shadow-primary/30 active:scale-95 transition-all transform translate-y-1 group-hover:translate-y-0"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>{t('hypercard.edit', 'Editar')}</span>
-                      </button>
+                    <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                      <ChevronDown
+                        className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                          collapsedSections.details ? '-rotate-90' : ''
+                        }`}
+                      />
                     </div>
                   </div>
 
-                  {/* Card Footer: Hotspot Count + Quick Actions */}
-                  <div className="py-2 px-2.5 flex items-center justify-between border-t border-muted-foreground/10 bg-card">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <MousePointerClick className="w-3.5 h-3.5 text-primary" />
-                      <span className="font-medium text-[11px]">{card.hotspots?.length || 0} {card.hotspots?.length === 1 ? t('hypercard.zone', 'área') : t('hypercard.zones', 'áreas')}</span>
+                  {!collapsedSections.details && (
+                    <div className="grid grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="col-span-2">
+                        <label
+                          htmlFor="scenarioSceneName"
+                          className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
+                        >
+                          {t('sceneEditor.titleLabel', 'TÍTULO')}
+                        </label>
+                        <input
+                          type="text"
+                          id="scenarioSceneName"
+                          value={localScene.name}
+                          onChange={(e) => setLocalScene(prev => ({ ...prev, name: e.target.value }))}
+                          className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
+                          placeholder={t('sceneEditor.titlePlaceholder', 'Título do Cenário')}
+                        />
+                      </div>
+                      <div className="col-span-1">
+                        <label
+                          htmlFor="scenarioSceneId"
+                          className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
+                        >
+                          {t('sceneEditor.uniqueIdLabel', 'ID ÚNICO')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            id="scenarioSceneId"
+                            value={localScene.id}
+                            disabled
+                            className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2.5 text-xs text-muted-foreground font-mono"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-700 text-[10px]">
+                            #
+                          </span>
+                        </div>
+                      </div>
                     </div>
+                  )}
+                </div>
 
-                    {/* Quick Action Icons */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      {!isStart && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setLocalScene(prev => ({ ...prev, startCardId: card.id }));
-                          }}
-                          className="p-1 rounded text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors"
-                          title={t('hypercard.setAsStart', 'Tornar Vista Inicial')}
-                        >
-                          <Star className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                      <button
-                        onClick={(e) => handleDuplicateCard(card, e)}
-                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        title={t('hypercard.duplicateView', 'Duplicar Vista')}
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </button>
-                      {cards.length > 1 && (
-                        <button
-                          onClick={(e) => handleDeleteCard(card.id, e)}
-                          className="p-1 rounded text-muted-foreground hover:text-red-400 hover:bg-muted transition-colors"
-                          title={t('hypercard.deleteView', 'Excluir Vista')}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                {/* SEÇÃO 2: MULTIMÍDIA */}
+                <div className="pt-4 border-t border-muted-foreground/30 mt-4 -mx-4 px-4">
+                  <div
+                    className={`flex items-center justify-between cursor-pointer select-none group ${
+                      collapsedSections.multimedia ? 'mb-0' : 'mb-4'
+                    }`}
+                    onClick={() => toggleSection('multimedia')}
+                  >
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-foreground" />
+                      <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest">
+                        {t('sceneEditor.multimediaTitle', 'MULTIMÍDIA')}
+                      </h3>
                     </div>
+                    <div className="p-1 rounded hover:bg-muted/50 transition-colors">
+                      <ChevronDown
+                        className={`w-4 h-4 text-muted-foreground group-hover:text-foreground transition-transform duration-200 ${
+                          collapsedSections.multimedia ? '-rotate-90' : ''
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {!collapsedSections.multimedia && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {/* OVERLAY VISUAL EFFECT (Applies to all views in scenario) */}
+                      <div className="space-y-1.5">
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                          {t('sceneEditor.overlayLabel', 'Efeito Visual (Overlay)')}
+                        </label>
+                        <select
+                          value={localScene.overlayEffect || ''}
+                          onChange={(e) =>
+                            setLocalScene(prev => ({ ...prev, overlayEffect: e.target.value }))
+                          }
+                          className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                        >
+                          <option value="">{t('sceneEditor.effects.none', 'Nenhum')}</option>
+                          <option value="grain">{t('sceneEditor.effects.grain', 'Granulado')}</option>
+                          <option value="rain">{t('sceneEditor.effects.rain', 'Chuva')}</option>
+                          <option value="blur">{t('sceneEditor.effects.blur', 'Vintage')}</option>
+                          <option value="chromatic">{t('sceneEditor.effects.chromatic', 'Fósforo verde')}</option>
+                          <option value="tv">{t('sceneEditor.effects.tv', 'Televisor CRT')}</option>
+                          <option value="confetti">{t('sceneEditor.effects.confetti', 'Confetes')}</option>
+                          <option value="glitch">{t('sceneEditor.effects.glitch', 'Glitch')}</option>
+                          <option value="nosferatu">{t('sceneEditor.effects.nosferatu', 'Nosferatu')}</option>
+                          <option value="wiggle">{t('sceneEditor.effects.wiggle', 'Tremido')}</option>
+                          <option value="fog">{t('sceneEditor.effects.fog', 'Neblina')}</option>
+                        </select>
+                      </div>
+
+                      {/* SOUNDTRACK SECTION */}
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                          {t('sceneEditor.audioLabel', 'Trilha Sonora (.mp3)')}
+                        </label>
+                        <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
+                          <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
+                            <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'}`} />
+                          </div>
+                          <div className="flex-grow min-w-0">
+                            {localScene.backgroundMusic ? (
+                              <div className="flex flex-col">
+                                <span className="text-xs text-foreground truncate">{t('sceneEditor.customAudioSet', 'Áudio personalizado definido')}</span>
+                                <span className="text-[10px] text-green-500 truncate">{localScene.backgroundMusicName || t('sceneEditor.audioLoaded', 'Áudio carregado')}</span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col">
+                                <span className="text-xs text-muted-foreground italic">{t('sceneEditor.noAudio', 'Nenhuma trilha selecionada')}</span>
+                                <span className="text-[9px] text-muted-foreground/60">{t('sceneEditor.leaveEmptyAudio', 'Deixe vazio para continuar a música anterior')}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-shrink-0">
+                            {localScene.backgroundMusic ? (
+                              <button
+                                onClick={() => setLocalScene(prev => ({ ...prev, backgroundMusic: undefined, backgroundMusicName: undefined }))}
+                                className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all"
+                                title={t('sceneEditor.removeBtn', 'Remover')}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            ) : (
+                              <label htmlFor="music-upload-scenario" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
+                                {t('sceneEditor.loadBtn', 'Carregar')}
+                                <input id="music-upload-scenario" type="file" accept="audio/*,.mpeg,.mpg,.mp3,.wav,.ogg,.m4a,.aac,.flac" onChange={handleMusicUpload} className="hidden" />
+                              </label>
+                            )}
+                          </div>
+                        </div>
+                        {/* Checkbox to stop background music on entry */}
+                        <label className="flex items-center gap-2.5 mt-3 cursor-pointer group select-none">
+                          <input
+                            type="checkbox"
+                            className="custom-checkbox"
+                            checked={!!localScene.stopBackgroundMusic}
+                            onChange={(e) =>
+                              setLocalScene((prev) => ({
+                                ...prev,
+                                stopBackgroundMusic: e.target.checked,
+                              }))
+                            }
+                          />
+                          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                            {t('sceneEditor.stopBackgroundMusicLabel', 'Interromper trilha em andamento')}
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'views' && (
+              <div className="flex flex-col space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* LISTA DE VISTAS HEADER + SEARCH INLINE */}
+                <div className="flex items-center justify-between gap-3 min-h-[36px]">
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Eye className="w-4 h-4 text-foreground" />
+                    <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest">
+                      {t('hypercard.viewsListTitle', 'LISTA DE VISTAS')}
+                    </h3>
+                  </div>
+
+                  {/* BUSCA DE VISTAS (À direita do título) */}
+                  <div className="relative flex-1 max-w-[330px]">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary/70 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder={t('hypercard.searchViewsPlaceholder', 'Buscar vista...')}
+                      value={viewsSearchQuery}
+                      onChange={(e) => setViewsSearchQuery(e.target.value)}
+                      className="w-full pl-8 pr-7 py-1.5 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[34px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/60 hover:border-primary/90 focus:border-primary focus:bg-background shadow-sm transition-colors"
+                    />
+                    {viewsSearchQuery && (
+                      <button
+                        onClick={() => setViewsSearchQuery('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+                        title={t('common.clear', 'Limpar')}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
-              );
-            })}
+
+                {/* BOTÃO CRIAR VISTA */}
+                <button
+                  onClick={handleAddCard}
+                  className="w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 flex-shrink-0 shadow-sm"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  <span>{t('hypercard.addCard', 'Criar Vista')}</span>
+                </button>
+
+                {/* LISTA DE VISTAS FILTRADAS */}
+                <div className="space-y-3 pt-1">
+                  {filteredCards.length === 0 ? (
+                    <div className="py-8 text-center text-muted-foreground text-xs italic bg-muted/20 rounded-lg border border-dashed border-muted-foreground/30">
+                      {viewsSearchQuery ? t('hypercard.noViewsFound', 'Nenhuma vista encontrada') : t('hypercard.noViews', 'Nenhuma vista criada')}
+                    </div>
+                  ) : (
+                    filteredCards.map((card, idx) => {
+                      const isSelected = card.id === selectedCardId;
+                      const isStart = card.id === localScene.startCardId || (!localScene.startCardId && idx === 0);
+
+                      return (
+                        <div
+                          key={card.id}
+                          onClick={() => setSelectedCardId(card.id)}
+                          className={`group relative rounded-xl border overflow-hidden transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-card border-primary shadow-md shadow-primary/10 ring-1 ring-primary'
+                              : 'bg-card/70 hover:bg-card border-muted-foreground/30 hover:border-muted-foreground/60'
+                          }`}
+                        >
+                          {/* Thumbnail Box */}
+                          <div className="relative w-full h-[94px] bg-black/50 overflow-hidden flex items-center justify-center">
+                            {card.image ? (
+                              <img
+                                src={card.image}
+                                alt={card.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center text-muted-foreground/40 gap-1">
+                                <ImageIcon className="w-5 h-5" />
+                                <span className="text-[10px]">{t('hypercard.noImage', 'Sem imagem')}</span>
+                              </div>
+                            )}
+
+                            {/* View Name Badge Top Left */}
+                            <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-bold text-white leading-none shadow flex items-center gap-1 max-w-[70%] z-10">
+                              <span className="truncate">{card.name || `${t('hypercard.cardPrefix', 'Vista')} ${idx + 1}`}</span>
+                            </div>
+
+                            {/* Start Badge Top Right */}
+                            {isStart && (
+                              <div
+                                className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-amber-500 text-zinc-950 font-bold text-[9px] flex items-center gap-0.5 shadow z-10"
+                                title={t('hypercard.initialView', 'Vista Inicial')}
+                              >
+                                <Star className="w-2.5 h-2.5 fill-current" />
+                                <span>{t('hypercard.startCard', 'Início')}</span>
+                              </div>
+                            )}
+
+                            {/* HOVER OVERLAY: EDIT BUTTON AT EXACT CENTER */}
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center z-20">
+                              <button
+                                onClick={(e) => handleStartEditCard(card.id, e)}
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md shadow-primary/30 active:scale-95 transition-all transform translate-y-1 group-hover:translate-y-0"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>{t('hypercard.edit', 'Editar')}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Card Footer: Hotspot Count + Quick Actions */}
+                          <div className="py-2 px-2.5 flex items-center justify-between border-t border-muted-foreground/10 bg-card">
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <MousePointerClick className="w-3.5 h-3.5 text-primary" />
+                              <span className="font-medium text-[11px]">{card.hotspots?.length || 0} {card.hotspots?.length === 1 ? t('hypercard.interactiveArea', 'área interativa') : t('hypercard.interactiveAreas', 'áreas interativas')}</span>
+                            </div>
+
+                            {/* Quick Action Icons */}
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              {!isStart && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setLocalScene(prev => ({ ...prev, startCardId: card.id }));
+                                  }}
+                                  className="p-1 rounded text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors"
+                                  title={t('hypercard.setAsStart', 'Tornar Vista Inicial')}
+                                >
+                                  <Star className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => handleDuplicateCard(card, e)}
+                                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                title={t('hypercard.duplicateView', 'Duplicar Vista')}
+                              >
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
+                              {cards.length > 1 && (
+                                <button
+                                  onClick={(e) => handleDeleteCard(card.id, e)}
+                                  className="p-1 rounded text-muted-foreground hover:text-red-400 hover:bg-muted transition-colors"
+                                  title={t('hypercard.deleteView', 'Excluir Vista')}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* STICKY FOOTER ACTION BUTTONS (Exact match with SceneEditor.tsx) */}
