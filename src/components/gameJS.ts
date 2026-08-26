@@ -1257,45 +1257,53 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.error('ERRO: Botão de exportação (#export-pdf-button) NÃO encontrado no DOM durante init.');
         }
-        closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
+        closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay')?.classList.add('hidden'); }));
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.add('hidden'); });
         });
-        btnSaveMenu.addEventListener('click', () => renderSlots('save'));
-        btnLoadMenu.addEventListener('click', () => renderSlots('load'));
-        btnBackSystem.addEventListener('click', () => { systemSlotsContainer.classList.add('hidden'); systemMenuMain.classList.remove('hidden'); systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
+        if (btnSaveMenu) btnSaveMenu.addEventListener('click', () => renderSlots('save'));
+        if (btnLoadMenu) btnLoadMenu.addEventListener('click', () => renderSlots('load'));
+        if (btnBackSystem) btnBackSystem.addEventListener('click', () => { if (systemSlotsContainer) systemSlotsContainer.classList.add('hidden'); if (systemMenuMain) systemMenuMain.classList.remove('hidden'); if (systemModalTitle) systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
         
-        viewEndingButton.addEventListener('click', () => {
-             const isWin = isGameEnded === 'win';
-             // For defeat: check if there's a defeat scene/vignette to navigate to
-             if (!isWin) {
-                 const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
-                 if (defeatSceneId) {
-                     // Reset UI back to standard action bar for the defeat vignette
-                     standardActionBar.classList.remove('hidden');
-                     endingActionBar.classList.add('hidden');
-                     isGameEnded = false;
-                     loadScene(defeatSceneId, true);
-                     return;
+        if (viewEndingButton) {
+            viewEndingButton.addEventListener('click', () => {
+                 const isWin = isGameEnded === 'win';
+                 // For defeat: check if there's a defeat scene/vignette to navigate to
+                 if (!isWin) {
+                     const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
+                     if (defeatSceneId) {
+                         // Reset UI back to standard action bar for the defeat vignette
+                         if (standardActionBar) standardActionBar.classList.remove('hidden');
+                         if (endingActionBar) endingActionBar.classList.add('hidden');
+                         isGameEnded = false;
+                         loadScene(defeatSceneId, true);
+                         return;
+                     }
                  }
-             }
-             const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
-             const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
-             if (endMusic) playBgm(endMusic); else playBgm("");
-             endScreen.style.zIndex = '0';
-             endScreen.classList.remove('hidden');
-             gameContainer.classList.add('fade-out');
-             setTimeout(() => {
-                gameContainer.classList.add('hidden');
-                endScreen.style.zIndex = ''; 
-             }, 1000);
-        });
+                 const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
+                 const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
+                 if (endMusic) playBgm(endMusic); else playBgm("");
+                 if (endScreen) {
+                     endScreen.style.zIndex = '0';
+                     endScreen.classList.remove('hidden');
+                 }
+                 if (gameContainer) {
+                     gameContainer.classList.add('fade-out');
+                     setTimeout(() => {
+                        gameContainer.classList.add('hidden');
+                        if (endScreen) endScreen.style.zIndex = ''; 
+                     }, 1000);
+                 }
+            });
+        }
         
-        btnMainMenu.onclick = (e) => {
-            systemModal.classList.add('hidden');
-            isGameEnded = false; 
-            startGame();
-        };
+        if (btnMainMenu) {
+            btnMainMenu.onclick = (e) => {
+                if (systemModal) systemModal.classList.add('hidden');
+                isGameEnded = false; 
+                startGame();
+            };
+        }
         if (window.isSceneTest) startGame();
     };
 
@@ -2123,61 +2131,72 @@ document.addEventListener('DOMContentLoaded', () => {
         // Blur Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'blur') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Clear any existing blur container first
-                    const existing = vOverlay.querySelector('.blur-overlay-container');
+                    const existing = overlayEl.querySelector('.blur-overlay-container');
                     if (existing) existing.remove();
                     
                     const blurContainer = document.createElement('div');
                     blurContainer.className = 'blur-overlay-container';
                     blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
-                    vOverlay.appendChild(blurContainer);
+                    overlayEl.appendChild(blurContainer);
                 }
             });
+        } else {
+            if (vOverlay) {
+                const existing = vOverlay.querySelector('.blur-overlay-container');
+                if (existing) existing.remove();
+            }
         }
 
         // Chromatic Aberration Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'chromatic') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Clear any existing chromatic container first
-                    const existing = vOverlay.querySelector('.chromatic-overlay-container');
+                    const existing = overlayEl.querySelector('.chromatic-overlay-container');
                     if (existing) existing.remove();
                     
                     const chromaticContainer = document.createElement('div');
                     chromaticContainer.className = 'chromatic-overlay-container';
                     chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
-                    vOverlay.appendChild(chromaticContainer);
+                    overlayEl.appendChild(chromaticContainer);
                 }
             });
+        } else {
+            if (vOverlay) {
+                const existing = vOverlay.querySelector('.chromatic-overlay-container');
+                if (existing) existing.remove();
+            }
         }
 
         // TV Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'tv') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Use CSS class - filter is applied via ::before pseudo-element to only affect background
                     vignetteScreen.classList.add('tv-active');
 
                     // Clear any existing TV container first
-                    const existing = vOverlay.querySelector('.tv-overlay-container');
+                    const existing = overlayEl.querySelector('.tv-overlay-container');
                     if (existing) existing.remove();
                     
                     const tvContainer = document.createElement('div');
                     tvContainer.className = 'tv-overlay-container';
                     tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
-                    vOverlay.appendChild(tvContainer);
+                    overlayEl.appendChild(tvContainer);
                 }
             });
         } else {
             // Remove CSS class
             vignetteScreen.classList.remove('tv-active');
-            const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
+                const existing = vOverlay.querySelector('.tv-overlay-container');
+                if (existing) existing.remove();
             }
         }
 
@@ -2213,16 +2232,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Nosferatu Effect Logic for Vignette
         if (scene.overlayEffect === 'nosferatu') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Clear any existing nosferatu container first
-                    const existing = vOverlay.querySelector('.nosferatu-container');
+                    const existing = overlayEl.querySelector('.nosferatu-container');
                     if (existing) existing.remove();
                     
                     const nosferatuContainer = document.createElement('div');
                     nosferatuContainer.className = 'nosferatu-container';
                     nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
-                    vOverlay.appendChild(nosferatuContainer);
+                    overlayEl.appendChild(nosferatuContainer);
                 }
                 // CSS class handles the background filter via ::before pseudo-element
                 vignetteScreen.classList.add('nosferatu-active');
@@ -2252,22 +2271,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fog Effect Logic for Vignette
         if (scene.overlayEffect === 'fog') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
-                    const existing = vOverlay.querySelector('.fog-container');
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
+                    const existing = overlayEl.querySelector('.fog-container');
                     if (existing) existing.remove();
                     
                     const fogContainer = document.createElement('div');
                     fogContainer.className = 'fog-container';
                     fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
-                    vOverlay.appendChild(fogContainer);
-                    vOverlay.classList.add('overlay-fog');
+                    overlayEl.appendChild(fogContainer);
+                    overlayEl.classList.add('overlay-fog');
                     
                     updateFogSizes(fogContainer);
                 }
             });
         } else {
-            const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 vOverlay.classList.remove('overlay-fog');
                 const existing = vOverlay.querySelector('.fog-container');
@@ -2324,7 +2342,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
-        actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
+        if (scene.sceneType === 'hypercard_stack') {
+            const startCard = (scene.stackCards && scene.stackCards.length > 0)
+                ? (scene.stackCards.find(c => c.id === scene.startCardId) || scene.stackCards[0])
+                : null;
+            const cardName = startCard ? startCard.name : '';
+            const displayName = scene.name + (cardName ? ' · ' + cardName : '');
+            const displayImage = startCard ? (startCard.image || scene.image) : scene.image;
+            const displayDescription = startCard ? (startCard.description || '') : '';
+            actionLog.push({ type: 'scene', name: displayName, timestamp: new Date().toLocaleTimeString(), description: displayDescription, image: displayImage });
+        } else {
+            actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
+        }
         
         // Check if this is a vignette scene
         if (scene.vignetteType && scene.vignetteType !== 'none') {
@@ -2459,6 +2488,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const renderChancesIcons = () => {
+        const chancesContainer = document.getElementById('chances-container');
+        if (!chancesContainer) return;
+        if (!gameData.enableChances) {
+            chancesContainer.style.display = 'none';
+            return;
+        }
+        chancesContainer.innerHTML = '';
+        const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
+        const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
+        for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
+            const icon = document.createElement('div');
+            const isLost = i >= chances;
+            icon.className = 'chance-icon ' + (isLost ? 'lost' : '');
+            
+            // Aplicar animação se este ícone foi o afetado agora
+            if (lastChanceChange && lastChanceChange.index === i) {
+                icon.classList.add('animate-chance-' + lastChanceChange.type);
+            }
+            
+            icon.innerHTML = isLost ? iconOutlineSvg : iconSvg;
+            chancesContainer.appendChild(icon);
+        }
+        lastChanceChange = null;
+    };
+
     const adjustLayoutForImagesAndChances = (scene) => {
         const imagePanel = imageContainer ? imageContainer.parentElement : null;
         const textPanel = document.querySelector('.text-panel');
@@ -2473,6 +2528,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (scene.sceneType === 'hypercard_stack') {
             if (gameContainer) gameContainer.classList.add('hypercard-fullscreen');
+            if (chancesContainer && imageContainer) {
+                imageContainer.appendChild(chancesContainer);
+                chancesContainer.style.position = 'fixed';
+                chancesContainer.style.top = '20px';
+                chancesContainer.style.right = '20px';
+                chancesContainer.style.margin = '0';
+                chancesContainer.style.zIndex = '35';
+                chancesContainer.style.display = gameData.enableChances ? 'flex' : 'none';
+                chancesContainer.style.alignItems = 'center';
+                chancesContainer.style.gap = '8px';
+                chancesContainer.style.justifyContent = 'flex-end';
+                chancesContainer.style.backgroundColor = 'transparent';
+                chancesContainer.style.padding = '0';
+                chancesContainer.style.border = 'none';
+                chancesContainer.style.borderRadius = '0';
+                chancesContainer.style.backdropFilter = 'none';
+                chancesContainer.style.boxSizing = 'border-box';
+            }
+            renderChancesIcons();
             return;
         } else {
             if (gameContainer) gameContainer.classList.remove('hypercard-fullscreen');
@@ -2653,8 +2727,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lightbox.style.zIndex = '9999';
             lightbox.style.cursor = 'pointer';
             lightbox.innerHTML = 
+                '<button class="modal-close-button" id="image-lightbox-close" style="position: fixed; top: 15px; right: 20px; z-index: 10000;">&times;</button>' +
                 '<div class="image-lightbox-container" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative;">' +
-                    '<button class="modal-close-button" id="image-lightbox-close" style="position: absolute; top: -35px; right: 0; color: #fff; font-size: 2.2em; background: none; border: none; cursor: pointer; line-height: 1;">&times;</button>' +
                     '<img id="image-lightbox-img" src="" alt="Detalhe da Imagem" style="max-width: 90vw; max-height: 85vh; object-fit: contain; border: 2px solid var(--border-color); background: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.8);" />' +
                 '</div>';
             document.body.appendChild(lightbox);
@@ -2754,8 +2828,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const cards = scene.stackCards && scene.stackCards.length > 0 ? scene.stackCards : [];
         if (cards.length === 0) return;
 
+        const isCardChange = targetCardId !== null && targetCardId !== currentStackCardId;
         const card = cards.find(c => c.id === (targetCardId || currentStackCardId || scene.startCardId)) || cards[0];
         currentStackCardId = card.id;
+
+        if (isCardChange) {
+            const cardDisplayName = scene.name + (card.name ? ' · ' + card.name : '');
+            actionLog.push({
+                type: 'scene',
+                name: cardDisplayName,
+                timestamp: new Date().toLocaleTimeString(),
+                description: card.description || '',
+                image: card.image || ''
+            });
+            autoSaveGame();
+        }
 
         // Clean up previous overlay and stage
         const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
@@ -2768,6 +2855,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneNameOverlay.style.opacity = '1';
         }
 
+        renderChancesIcons();
         applySceneOverlay(scene.overlayEffect);
 
         if (imageContainer && sceneImage) {
@@ -2964,7 +3052,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (hotspot.requiresInInventory) {
                         const hasRequired = inventory.some(i => i.id === hotspot.requiresInInventory);
                         if (!hasRequired) {
+                            const dialogTitle = hotspot.title || "Bloqueado";
                             showFloatingDialogue("Bloqueado", hotspot.lockedMessage || "Você não possui o item necessário para interagir aqui.");
+                            actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                            actionLog.push({ type: 'output', text: hotspot.lockedMessage || "Você não possui o item necessário para interagir aqui." });
+                            autoSaveGame();
                             return;
                         }
                         if (hotspot.consumesItem) {
@@ -2976,7 +3068,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         const itemObj = gameData.globalObjects ? gameData.globalObjects[hotspot.addsToInventory] : null;
                         if (itemObj) {
                             addToInventory(itemObj);
+                            const dialogTitle = hotspot.title || ("Coletar " + itemObj.name);
                             showFloatingDialogue("Item Coletado", "Você obteve: " + itemObj.name);
+                            actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                            actionLog.push({ type: 'output', text: "Você obteve: " + itemObj.name });
+                            autoSaveGame();
                         }
                     }
 
@@ -2991,6 +3087,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId) {
                         const targetCard = cards.find(c => c.id === hotspot.targetCardId);
                         const targetImg = targetCard ? targetCard.image : '';
+
+                        actionLog.push({ type: 'input', text: '> ' + (hotspot.title || 'Mudar de vista') });
 
                         // Immediately hide all current icons alongside the transitioning image
                         stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => {
@@ -3016,6 +3114,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     } else if (hotspot.actionType === 'navigate_scene' && hotspot.targetSceneId) {
                         const targetScene = findScene(hotspot.targetSceneId);
+
+                        if (hotspot.title) {
+                            actionLog.push({ type: 'input', text: '> ' + hotspot.title });
+                        }
 
                         // Immediately hide all current icons alongside the transitioning image
                         stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => {
@@ -3065,6 +3167,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (hotspot.actionType === 'examine') {
                         const dialogTitle = hotspot.title || hotspot.examineTitle || "Examinar";
                         showFloatingDialogue(dialogTitle, hotspot.examineText || "", hotspot.examineImage);
+                        actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                        if (hotspot.examineText || hotspot.examineImage) {
+                            actionLog.push({ type: 'output', text: hotspot.examineText || "", image: hotspot.examineImage });
+                        }
+                        autoSaveGame();
                     }
                 });
 
@@ -3364,27 +3471,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // renderNextParagraph called immediately
         if (mySessionId === renderSessionId) renderNextParagraph();
         
-        const chancesContainer = document.getElementById('chances-container');
-        if (chancesContainer) {
-            chancesContainer.innerHTML = '';
-            const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
-            const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
-            for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
-                const icon = document.createElement('div');
-                const isLost = i >= chances;
-                icon.className = 'chance-icon ' + (isLost ? 'lost' : '');
-                
-                // Aplicar animação se este ícone foi o afetado agora
-                if (lastChanceChange && lastChanceChange.index === i) {
-                    icon.classList.add('animate-chance-' + lastChanceChange.type);
-                }
-                
-                icon.innerHTML = isLost ? iconOutlineSvg : iconSvg;
-                chancesContainer.appendChild(icon);
-            }
-            lastChanceChange = null;
-        }
-        
+        renderChancesIcons();
         adjustLayoutForImagesAndChances(scene);
         
         // CHOICE MODE HANDLING
@@ -4042,7 +4129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showDiary = (isConclusion = false) => {
         if (!diaryModal || !diaryLog) return;
-        diaryLog.innerHTML = ''; let currentInterContainer = null;
+        diaryLog.innerHTML = '';
         
         const diaryTitle = document.getElementById('diary-modal-title');
         if (diaryTitle) {
@@ -4095,11 +4182,28 @@ document.addEventListener('DOMContentLoaded', () => {
             diaryLog.appendChild(statsContainer);
         }
 
+        let currentInterContainer = null;
+        let currentImagesCol = null;
+
         for (let i = 0; i < actionLog.length; i++) {
             const entry = actionLog[i];
             if (entry.type === 'scene') {
                 const div = document.createElement('div'); div.className = 'diary-entry';
-                if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
+                
+                const imagesCol = document.createElement('div');
+                imagesCol.className = 'diary-images-column';
+                if (entry.image) {
+                    const img = document.createElement('img');
+                    img.className = 'diary-main-image';
+                    img.src = entry.image;
+                    img.style.cursor = 'zoom-in';
+                    img.title = 'Clique para ampliar';
+                    img.onclick = () => showImageLightbox(entry.image);
+                    imagesCol.appendChild(img);
+                }
+                div.appendChild(imagesCol);
+                currentImagesCol = imagesCol;
+
                 const txt = document.createElement('div'); txt.className = 'text-container'; 
                 
                 const nameSpan = document.createElement('span');
@@ -4115,18 +4219,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     i++;
                 }
 
-                const descP = document.createElement('p');
-                descP.innerHTML = window.safeHTML(formatText(entry.description || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
-                txt.appendChild(descP);
+                if (entry.description) {
+                    const descP = document.createElement('p');
+                    descP.innerHTML = window.safeHTML(formatText(entry.description || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                    txt.appendChild(descP);
+                }
 
-                div.appendChild(txt); diaryLog.appendChild(div);
+                div.appendChild(txt);
+                diaryLog.appendChild(div);
                 setupHighlights(txt);
-                currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
+                currentInterContainer = document.createElement('div');
+                currentInterContainer.className = 'diary-interactions-container';
+                txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
-                    const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
-                    if (entry.type === 'output') { p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); setupHighlights(p); } else p.textContent = entry.text;
-                    currentInterContainer.appendChild(p);
+                    if (entry.type === 'output' && entry.image && currentImagesCol) {
+                        const subImg = document.createElement('img');
+                        subImg.className = 'diary-examine-image';
+                        subImg.src = entry.image;
+                        subImg.style.cursor = 'zoom-in';
+                        subImg.title = 'Clique para ampliar';
+                        subImg.onclick = () => showImageLightbox(entry.image);
+                        currentImagesCol.appendChild(subImg);
+                    }
+                    if (entry.text) {
+                        const p = document.createElement('p');
+                        p.className = 'diary-' + entry.type; 
+                        if (entry.type === 'output') {
+                            p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                            setupHighlights(p);
+                        } else {
+                            p.textContent = entry.text;
+                        }
+                        currentInterContainer.appendChild(p);
+                    }
                 }
             }
         }

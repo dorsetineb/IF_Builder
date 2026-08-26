@@ -263,8 +263,8 @@ export const gameHTML = `
 
     <!-- Image Lightbox Modal -->
     <div id="image-lightbox-modal" class="modal-overlay hidden" style="z-index: 9999; cursor: pointer;">
+        <button class="modal-close-button" id="image-lightbox-close" style="position: fixed; top: 15px; right: 20px; z-index: 10000;">&times;</button>
         <div class="image-lightbox-container" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative;">
-            <button class="modal-close-button" id="image-lightbox-close" style="position: absolute; top: -35px; right: 0; color: #fff; font-size: 2.2em; background: none; border: none; cursor: pointer; line-height: 1;">&times;</button>
             <img id="image-lightbox-img" src="" alt="Detalhe da Imagem" style="max-width: 90vw; max-height: 85vh; object-fit: contain; border: 2px solid var(--border-color); background: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.8);" />
         </div>
     </div>
@@ -489,6 +489,25 @@ body.with-spacing .main-wrapper { height: 100%; }
 .game-container.hypercard-fullscreen .action-bar {
     display: none !important;
 }
+.game-container.hypercard-fullscreen .chances-container {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 35 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    pointer-events: none;
+}
+.game-container.hypercard-fullscreen .chances-container .chance-icon {
+    width: 24px;
+    height: 24px;
+}
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
 .scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; }
@@ -599,8 +618,11 @@ body.with-spacing .main-wrapper { height: 100%; }
 .diary-log { flex-grow: 1; overflow-y: auto; text-align: left; mask-image: linear-gradient(to bottom, transparent, black 40px, black calc(100% - 40px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 40px, black calc(100% - 40px), transparent); }
 .diary-entry { display: flex; gap: 40px; align-items: flex-start; padding: 24px 40px; border-bottom: 2px solid var(--border-color); }
 .diary-entry:last-child { border-bottom: none; }
-.diary-entry img { width: 300px; height: 300px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color); box-shadow: none; }
-.diary-entry .text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.diary-images-column { width: 300px; min-width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; align-items: stretch; }
+.diary-images-column:empty { display: none; }
+.diary-entry img, .diary-images-column .diary-main-image, .diary-images-column .diary-examine-image { width: 300px; height: 300px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color); box-shadow: none; transition: filter 0.2s ease; cursor: pointer; }
+.diary-images-column .diary-main-image:hover, .diary-images-column .diary-examine-image:hover { filter: brightness(1.1); }
+.diary-entry .text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .diary-entry .scene-name { font-weight: bold; color: var(--accent-color); margin-bottom: 4px; display: block; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
 .diary-entry p { margin: 0; white-space: pre-wrap; }
 .diary-interactions-container { margin-top: 12px; display: flex; flex-direction: column; gap: 14px; }
@@ -618,6 +640,9 @@ body.with-spacing .main-wrapper { height: 100%; }
 .diary-stat-value { font-size: 1.4em; font-weight: bold; color: var(--accent-color); }
 @media (max-width: 768px) { 
   .diary-modal-content { max-width: 85vw; }
+  .diary-entry { flex-direction: column; gap: 20px; }
+  .diary-images-column { width: 100%; min-width: 0; align-items: center; }
+  .diary-images-column .diary-main-image, .diary-images-column .diary-examine-image { width: 100%; max-width: 300px; height: auto; aspect-ratio: 1/1; }
   .diary-stats-container { padding: 15px; gap: 15px; flex-direction: column; } 
   .diary-stat-value { font-size: 1.25em; } 
 }
