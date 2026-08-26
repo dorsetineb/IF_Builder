@@ -1159,6 +1159,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     </div>
                                                 );
                                             } else {
+                                                const isFrameless = !imageFrame || imageFrame === 'none';
                                                 return (
                                                     <div
                                                         className={`
@@ -1168,12 +1169,18 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         `}
                                                         style={{ fontFamily: fontFamily, backgroundColor: gameBackgroundColor }}
                                                     >
-                                                        <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
+                                                        <div className={`flex-1 flex overflow-hidden relative ${
+                                                            isFrameless 
+                                                                ? (layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col')
+                                                                : `p-[30px] gap-[30px] ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`
+                                                        }`}>
                                                             {/* Image Area */}
                                                             <div
                                                                 className={`
                                                                     relative flex items-center justify-center flex-shrink-0 transition-all duration-300
-                                                                    ${layoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
+                                                                    ${layoutOrientation === 'vertical' 
+                                                                        ? (isFrameless ? 'w-1/2 h-full' : 'w-2/5 h-full') 
+                                                                        : 'w-full h-1/2 min-h-[50%]'}
                                                                     ${layoutOrder === 'image-first' ? 'order-first' : 'order-last'}
                                                                 `}
                                                             >
@@ -1241,7 +1248,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             </div>
 
                                                             {/* Text Area */}
-                                                            <div className="flex-1 flex flex-col overflow-hidden">
+                                                            <div className={`flex-1 flex flex-col overflow-hidden ${
+                                                                isFrameless
+                                                                    ? (layoutOrientation === 'vertical'
+                                                                        ? (layoutOrder === 'image-first' ? 'py-[30px] pr-[30px] pl-[24px]' : 'py-[30px] pl-[30px] pr-[24px]')
+                                                                        : (layoutOrder === 'image-first' ? 'pb-[30px] px-[30px] pt-[20px]' : 'pt-[30px] px-[30px] pb-[20px]'))
+                                                                    : ''
+                                                            }`}>
                                                                 <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
                                                                     <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0) }}>
                                                                         {t('UIEditor.aparencia.sampleDesc1', 'Esta é uma descrição de exemplo para a ramificação. O texto flui conforme as')}

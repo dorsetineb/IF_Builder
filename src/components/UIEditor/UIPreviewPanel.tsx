@@ -238,6 +238,8 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
         return `${baseSize * multiplier * factor}px`;
     };
 
+    const isFrameless = !localImageFrame || localImageFrame === 'none';
+
     return (
         <div className="relative h-full flex flex-col">
             <div className="space-y-6 flex flex-col">
@@ -321,83 +323,97 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                         `}
                         style={{ fontFamily: localFontFamily, maxHeight: '500px', backgroundColor: localGameBackgroundColor }}
                     >
-                        <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${localLayoutOrientation === 'vertical' && localEnableImages ? 'flex-row' : 'flex-col'}`}>
-                            {/* Image Area */}
-                            {localEnableImages && (
-                                <div
-                                    className={`
-                                        relative flex items-center justify-center flex-shrink-0 transition-all duration-300
-                                        ${localLayoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
-                                        ${localLayoutOrder === 'image-first' ? 'order-first' : 'order-last'}
-                                    `}
-                                >
-                                    {(() => {
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any, localGameBackgroundColor, localGameFrameColor);
+                            <div className={`flex-1 flex overflow-hidden relative ${
+                                isFrameless 
+                                    ? (localLayoutOrientation === 'vertical' && localEnableImages ? 'flex-row' : 'flex-col')
+                                    : `p-[30px] gap-[30px] ${localLayoutOrientation === 'vertical' && localEnableImages ? 'flex-row' : 'flex-col'}`
+                            }`}>
+                                {/* Image Area */}
+                                {localEnableImages && (
+                                    <div
+                                        className={`
+                                            relative flex items-center justify-center flex-shrink-0 transition-all duration-300
+                                            ${localLayoutOrientation === 'vertical' 
+                                                ? (isFrameless ? 'w-1/2 h-full' : 'w-2/5 h-full') 
+                                                : 'w-full h-1/2 min-h-[50%]'}
+                                            ${localLayoutOrder === 'image-first' ? 'order-first' : 'order-last'}
+                                        `}
+                                    >
+                                        {(() => {
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                            const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any, localGameBackgroundColor, localGameFrameColor);
 
-                                        return (
-                                            <div
-                                                className={`game-preview-safe-zone ${panelClass}`}
-                                                style={{
-                                                    ...panelStyles,
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                            >
+                                            return (
                                                 <div
-                                                    style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
-                                                    className={containerClass}
+                                                    className={`game-preview-safe-zone ${panelClass}`}
+                                                    style={{
+                                                        ...panelStyles,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}
                                                 >
-                                                    <div className="absolute inset-0 opacity-60">
-                                                        <DitherShader
-                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                            gridSize={2}
-                                                            ditherMode="bayer"
-                                                            colorMode="duotone"
-                                                            primaryColor={ditherColors.primary}
-                                                            secondaryColor={ditherColors.secondary}
-                                                            className="w-full h-full"
-                                                            objectFit="cover"
-                                                        />
-                                                    </div>
-                                                    <div className="absolute top-4 left-4 z-20">
-                                                        <div
-                                                            className="px-2 py-0.5 border uppercase leading-none"
-                                                            style={{ 
-                                                                backgroundColor: localGameSceneNameOverlayBg, 
-                                                                color: localGameSceneNameOverlayTextColor,
-                                                                borderColor: `color-mix(in srgb, ${localGameBackgroundColor} 80%, ${localTextColor} 20%)`,
-                                                                borderWidth: '2px',
-                                                                fontSize: getScaledFontSize(1.0)
-                                                            }}
-                                                        >
-                                                            {t('UIEditor.aparencia.sceneName')}
+                                                    <div
+                                                        style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
+                                                        className={containerClass}
+                                                    >
+                                                        <div className="absolute inset-0 opacity-60">
+                                                            <DitherShader
+                                                                src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                                gridSize={2}
+                                                                ditherMode="bayer"
+                                                                colorMode="duotone"
+                                                                primaryColor={ditherColors.primary}
+                                                                secondaryColor={ditherColors.secondary}
+                                                                className="w-full h-full"
+                                                                objectFit="cover"
+                                                            />
                                                         </div>
-                                                    </div>
-                                                    {localEnableChances && (
-                                                        <div className="absolute top-4 right-4 z-20 flex gap-1">
-                                                            {Array.from({ length: localMaxChances }).map((_, i) => (
-                                                                <ChanceIcon 
-                                                                    key={i} 
-                                                                    type={localChanceIcon} 
-                                                                    color={localChanceIconColor} 
-                                                                    className="w-4 h-4 animate-pulse" 
-                                                                />
-                                                            ))}
+                                                        <div className="absolute top-4 left-4 z-20">
+                                                            <div
+                                                                className="px-2 py-0.5 border uppercase leading-none"
+                                                                style={{ 
+                                                                    backgroundColor: localGameSceneNameOverlayBg, 
+                                                                    color: localGameSceneNameOverlayTextColor,
+                                                                    borderColor: `color-mix(in srgb, ${localGameBackgroundColor} 80%, ${localTextColor} 20%)`,
+                                                                    borderWidth: '2px',
+                                                                    fontSize: getScaledFontSize(1.0)
+                                                                }}
+                                                            >
+                                                                {t('UIEditor.aparencia.sceneName')}
+                                                            </div>
                                                         </div>
-                                                    )}
+                                                        {localEnableChances && (
+                                                            <div className="absolute top-4 right-4 z-20 flex gap-1">
+                                                                {Array.from({ length: localMaxChances }).map((_, i) => (
+                                                                    <ChanceIcon 
+                                                                        key={i} 
+                                                                        type={localChanceIcon} 
+                                                                        color={localChanceIconColor} 
+                                                                        className="w-4 h-4 animate-pulse" 
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })()}
-                                </div>
-                            )}
+                                            );
+                                        })()}
+                                    </div>
+                                )}
 
-                            {/* Text Area */}
-                            <div className="flex-1 flex flex-col overflow-hidden">
+                                {/* Text Area */}
+                                <div className={`flex-1 flex flex-col overflow-hidden ${
+                                    isFrameless
+                                        ? (!localEnableImages 
+                                            ? 'p-[30px]' 
+                                            : localLayoutOrientation === 'vertical'
+                                                ? (localLayoutOrder === 'image-first' ? 'py-[30px] pr-[30px] pl-[24px]' : 'py-[30px] pl-[30px] pr-[24px]')
+                                                : (localLayoutOrder === 'image-first' ? 'pb-[30px] px-[30px] pt-[20px]' : 'pt-[30px] px-[30px] pb-[20px]'))
+                                        : ''
+                                }`}>
                                 <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
                                     {!localEnableImages && (
                                          <div className="flex justify-between items-center mb-4 pb-2 border-b-2" style={{ borderColor: `color-mix(in srgb, ${localGameBackgroundColor} 80%, ${localTextColor} 20%)` }}>
