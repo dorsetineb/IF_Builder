@@ -217,10 +217,9 @@ export const gameHTML = `
     <div id="item-modal" class="modal-overlay hidden">
         <div class="modal-content item-modal-content">
             <button class="modal-close-button">&times;</button>
-            <h2 id="item-modal-title">__INVENTORY_BUTTON_TEXT__</h2>
             <div class="item-modal-body">
-                <div id="item-modal-image-container" class="item-modal-image-container hidden">
-                    <img id="item-modal-image" src="" alt="Item Image">
+                <div id="item-modal-image-container" class="item-modal-image-container hidden" title="Clique para ampliar">
+                    <img id="item-modal-image" src="" alt="Imagem do Item">
                 </div>
                 <div id="item-modal-text-container" class="item-modal-text-container">
                     <h3 id="item-modal-name" class="item-modal-name"></h3>
@@ -236,7 +235,7 @@ export const gameHTML = `
             <button class="modal-close-button">&times;</button>
             <h2 id="acquisition-modal-title"></h2>
             <div class="acquisition-modal-body">
-                <div id="acquisition-modal-image-container" class="acquisition-modal-image-container hidden">
+                <div id="acquisition-modal-image-container" class="acquisition-modal-image-container hidden" title="Clique para ampliar">
                     <img id="acquisition-modal-image" src="" alt="Item Image">
                 </div>
                 <div id="acquisition-modal-text-container" class="acquisition-modal-text-container text-center">
@@ -248,10 +247,10 @@ export const gameHTML = `
     
     <!-- Scenario Examine / Floating Dialogue Modal -->
     <div id="hypercard-floating-dialogue" class="modal-overlay hidden">
-        <div class="modal-content hypercard-dialogue-content">
+        <div class="modal-content item-modal-content hypercard-dialogue-content">
             <button class="modal-close-button" id="hypercard-dialogue-close">&times;</button>
             <div class="item-modal-body">
-                <div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden">
+                <div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden" title="Clique para ampliar">
                     <img id="hypercard-dialogue-image" src="" alt="Imagem">
                 </div>
                 <div id="hypercard-dialogue-text-container" class="item-modal-text-container">
@@ -259,6 +258,14 @@ export const gameHTML = `
                     <p id="hypercard-dialogue-description"></p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="image-lightbox-modal" class="modal-overlay hidden" style="z-index: 9999; cursor: pointer;">
+        <div class="image-lightbox-container" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative;">
+            <button class="modal-close-button" id="image-lightbox-close" style="position: absolute; top: -35px; right: 0; color: #fff; font-size: 2.2em; background: none; border: none; cursor: pointer; line-height: 1;">&times;</button>
+            <img id="image-lightbox-img" src="" alt="Detalhe da Imagem" style="max-width: 90vw; max-height: 85vh; object-fit: contain; border: 2px solid var(--border-color); background: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.8);" />
         </div>
     </div>
   <svg style="display: none;">
@@ -378,7 +385,7 @@ body.is-demo .action-buttons button { padding: calc(6px * var(--scale-factor)) c
 body.is-demo .text-panel { padding: calc(30px * var(--scale-factor)); }
 body.is-demo .diary-entry { padding: calc(20px * var(--scale-factor)); gap: calc(20px * var(--scale-factor)); }
 body.is-demo .diary-entry img { width: calc(200px * var(--scale-factor)); height: calc(200px * var(--scale-factor)); }
-body.is-demo .item-modal-image-container { width: calc(300px * var(--scale-factor)); min-width: calc(300px * var(--scale-factor)); height: calc(300px * var(--scale-factor)); }
+body.is-demo .item-modal-image-container { width: calc(250px * var(--scale-factor)); min-width: calc(250px * var(--scale-factor)); }
 * { box-sizing: border-box; }
 button, input, select, textarea, .action-popup button, .action-popup-list button, .action-popup-row button, .action-popup-list p { border-radius: 0 !important; }
 body { font-family: var(--font-family); font-size: var(--font-size); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; }
@@ -615,35 +622,112 @@ body.with-spacing .main-wrapper { height: 100%; }
   .diary-stat-value { font-size: 1.25em; } 
 }
 
-.item-modal-content { max-width: 80vw; width: 90%; }
-.item-modal-body { display: flex; flex-direction: row; gap: 30px; align-items: flex-start; }
-@media (max-width: 768px) { .item-modal-body { flex-direction: column; align-items: center; } }
-.item-modal-image-container { width: 300px; min-width: 300px; height: 300px; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); }
-@media (max-width: 768px) { .item-modal-image-container { width: 100%; min-width: 0; max-width: 300px; height: auto; aspect-ratio: 1; } }
-.item-modal-image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.item-modal-text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; text-align: left; }
-.item-modal-name { margin: 0; font-size: 1.3em; color: var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-#item-modal-description { color: var(--text-color); line-height: 1.6; font-size: 1em; }
+/* Unified Item & Scenario Dialogue Popups */
+.item-modal-content, .hypercard-dialogue-content {
+    max-width: 540px;
+    width: 90%;
+    padding: 0 !important;
+    overflow: hidden;
+    background-color: var(--panel-bg);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    position: relative;
+}
+.item-modal-content.has-image, .hypercard-dialogue-content.has-image {
+    max-width: 680px;
+}
+.item-modal-body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    min-height: 220px;
+}
+.item-modal-image-container {
+    width: 250px;
+    min-width: 250px;
+    height: auto;
+    overflow: hidden;
+    border: none;
+    border-right: 2px solid var(--border-color);
+    border-radius: 0 !important;
+    background-color: #000;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: zoom-in;
+}
+.item-modal-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 0 !important;
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+.item-modal-image-container:hover img {
+    transform: scale(1.04);
+    filter: brightness(1.1);
+}
+.item-modal-text-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    padding: 24px 28px 24px 24px;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+.item-modal-name {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    font-family: var(--font-family);
+    font-weight: bold;
+    padding-right: 24px;
+}
+#item-modal-description, #hypercard-dialogue-description {
+    color: var(--text-color);
+    line-height: 1.6;
+    font-size: 1em;
+    font-family: var(--font-family);
+    white-space: pre-wrap;
+    margin: 0;
+}
 .acquisition-modal-content { max-width: 600px; text-align: center; }
 .acquisition-modal-body { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
-.acquisition-modal-image-container { width: 500px; height: 500px; overflow: hidden; border: 2px solid var(--border-color); background-color: var(--input-bg); flex-shrink: 0; }
+.acquisition-modal-image-container { width: 500px; height: 500px; overflow: hidden; border: 2px solid var(--border-color); background-color: var(--input-bg); flex-shrink: 0; cursor: zoom-in; }
 .acquisition-modal-image-container img { width: 100%; height: 100%; object-fit: cover; }
 .acquisition-modal-text-container { width: 100%; padding-bottom: 10px; }
 #acquisition-modal-description { color: var(--text-color); line-height: 1.6; font-size: 1em; margin: 0; }
 .text-center { text-align: center; }
 
-.hypercard-dialogue-content { max-width: 540px; width: 90%; }
-.hypercard-dialogue-content.has-image { max-width: 620px; }
-.hypercard-dialogue-content .item-modal-body { display: flex; flex-direction: row; gap: 24px; align-items: flex-start; }
-.hypercard-dialogue-content .item-modal-image-container { width: 220px; min-width: 220px; height: 220px; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); flex-shrink: 0; }
-.hypercard-dialogue-content .item-modal-image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.hypercard-dialogue-content .item-modal-text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; text-align: left; }
-.hypercard-dialogue-content .item-modal-name { margin: 0; font-size: 1.3em; color: var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; font-family: var(--font-family); font-weight: bold; }
-.hypercard-dialogue-content #hypercard-dialogue-description { color: var(--text-color); line-height: 1.6; font-size: 1em; font-family: var(--font-family); white-space: pre-wrap; margin: 0; }
 @media (max-width: 768px) {
-  .hypercard-dialogue-content { max-width: 90vw; }
-  .hypercard-dialogue-content .item-modal-body { flex-direction: column; align-items: center; }
-  .hypercard-dialogue-content .item-modal-image-container { width: 100%; max-width: 220px; height: auto; aspect-ratio: 1; }
+    .item-modal-content, .hypercard-dialogue-content {
+        max-width: 92vw;
+        max-height: 85vh;
+    }
+    .item-modal-body {
+        flex-direction: column;
+        min-height: auto;
+        align-items: stretch;
+    }
+    .item-modal-image-container {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        height: 200px;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+    }
+    .item-modal-text-container {
+        padding: 16px 20px;
+    }
 }
 
 .system-modal-content { max-width: 400px; text-align: center; }
@@ -1107,12 +1191,16 @@ body.font-adjust-gothic { font-size: 1.1em; }
         height: 100vh !important;
         border-right: none !important;
         padding: 0 !important;
+        flex: 0 0 50% !important;
+        width: 50% !important;
+        max-width: 50% !important;
     }
     /* Manteve borda apenas se layout for Horizontal */
     body.frame-none .game-container.layout-horizontal .image-panel {
         width: 100% !important;
         flex-basis: auto !important;
-        height: 45vh !important; /* Ajuste para horizontal */
+        max-width: 100% !important;
+        height: 50vh !important; /* Ajuste para horizontal */
     }
     /* Ajuste para Image-Last (Imagem na direita) */
     body.frame-none .game-container.layout-image-last .image-panel {
@@ -1120,7 +1208,13 @@ body.font-adjust-gothic { font-size: 1.1em; }
     }
     /* No padding horizontal separator for full-bleed */
     body.frame-none .text-panel {
-        padding: 30px !important;
+        padding: 30px max(60px, 8vw) 30px 40px !important;
+    }
+    body.frame-none .game-container.layout-image-last .text-panel {
+        padding: 30px 40px 30px max(60px, 8vw) !important;
+    }
+    body.frame-none .game-container.layout-horizontal .text-panel {
+        padding: 30px max(60px, 8vw) !important;
     }
 }
 

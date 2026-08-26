@@ -113,7 +113,7 @@ export function Auth() {
 
     // Sidebar Component (Left)
     const renderSidebar = () => (
-        <div className={`${isMobile ? 'w-full pointer-events-none' : 'w-96'} flex flex-col h-full relative z-20 transition-all duration-300`}>
+        <div className={`${isMobile ? 'w-full pointer-events-none' : 'w-[30rem]'} flex flex-col h-full relative z-20 transition-all duration-300`}>
             <div className={`flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-8 ${isMobile ? '' : ''}`}>
                 {/* Tagline */}
                 <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-base text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>

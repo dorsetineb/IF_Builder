@@ -2643,6 +2643,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentStackCardId = null;
 
+    const showImageLightbox = (imgSrc) => {
+        if (!imgSrc) return;
+        let lightbox = document.getElementById('image-lightbox-modal');
+        if (!lightbox) {
+            lightbox = document.createElement('div');
+            lightbox.id = 'image-lightbox-modal';
+            lightbox.className = 'modal-overlay hidden';
+            lightbox.style.zIndex = '9999';
+            lightbox.style.cursor = 'pointer';
+            lightbox.innerHTML = 
+                '<div class="image-lightbox-container" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative;">' +
+                    '<button class="modal-close-button" id="image-lightbox-close" style="position: absolute; top: -35px; right: 0; color: #fff; font-size: 2.2em; background: none; border: none; cursor: pointer; line-height: 1;">&times;</button>' +
+                    '<img id="image-lightbox-img" src="" alt="Detalhe da Imagem" style="max-width: 90vw; max-height: 85vh; object-fit: contain; border: 2px solid var(--border-color); background: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.8);" />' +
+                '</div>';
+            document.body.appendChild(lightbox);
+
+            const closeLightbox = () => lightbox.classList.add('hidden');
+            const closeBtn = lightbox.querySelector('.modal-close-button');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeLightbox();
+                });
+            }
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox || e.target.id === 'image-lightbox-img' || e.target.closest('.image-lightbox-container')) {
+                    closeLightbox();
+                }
+            });
+        }
+        const lightboxImg = lightbox.querySelector('#image-lightbox-img');
+        if (lightboxImg) lightboxImg.src = imgSrc;
+        lightbox.classList.remove('hidden');
+    };
+
     const showFloatingDialogue = (title, text, image) => {
         let modal = document.getElementById('hypercard-floating-dialogue');
         if (!modal) {
@@ -2650,10 +2685,10 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.id = 'hypercard-floating-dialogue';
             modal.className = 'modal-overlay hidden';
             modal.innerHTML = 
-                '<div class="modal-content hypercard-dialogue-content">' +
+                '<div class="modal-content item-modal-content hypercard-dialogue-content">' +
                     '<button class="modal-close-button" id="hypercard-dialogue-close">&times;</button>' +
                     '<div class="item-modal-body">' +
-                        '<div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden">' +
+                        '<div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden" title="Clique para ampliar">' +
                             '<img id="hypercard-dialogue-image" src="" alt="Imagem" />' +
                         '</div>' +
                         '<div id="hypercard-dialogue-text-container" class="item-modal-text-container">' +
@@ -2701,10 +2736,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgEl.src = image;
                 imgContainer.classList.remove('hidden');
                 if (modalContent) modalContent.classList.add('has-image');
+                imgContainer.onclick = (e) => {
+                    e.stopPropagation();
+                    showImageLightbox(image);
+                };
             } else {
                 imgEl.src = '';
                 imgContainer.classList.add('hidden');
                 if (modalContent) modalContent.classList.remove('has-image');
+                imgContainer.onclick = null;
             }
         }
         modal.classList.remove('hidden');
@@ -3944,19 +3984,47 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name; itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
-        setupHighlights(itemModalDescription);
-        if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
-        else itemModalImageContainer.classList.add('hidden');
+        if (!itemModal) return;
+        const modalContent = itemModal.querySelector('.modal-content') || itemModal;
+        if (itemModalName) itemModalName.textContent = item.name;
+        if (itemModalDescription) {
+            itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+            setupHighlights(itemModalDescription);
+        }
+        if (itemModalImageContainer && itemModalImage) {
+            if (item.image) {
+                itemModalImage.src = item.image;
+                itemModalImageContainer.classList.remove('hidden');
+                modalContent.classList.add('has-image');
+                itemModalImageContainer.onclick = (e) => {
+                    e.stopPropagation();
+                    showImageLightbox(item.image);
+                };
+            } else {
+                itemModalImage.src = '';
+                itemModalImageContainer.classList.add('hidden');
+                modalContent.classList.remove('has-image');
+                itemModalImageContainer.onclick = null;
+            }
+        }
         itemModal.classList.remove('hidden');
     };
     const openAcquisitionModal = (item, customDescription) => {
         if (!acquisitionModal) return;
         acquisitionModalTitle.textContent = item.name;
-        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(acquisitionModalDescription);
-        if (item.image) { acquisitionModalImage.src = item.image; acquisitionModalImageContainer.classList.remove('hidden'); }
-        else acquisitionModalImageContainer.classList.add('hidden');
+        if (item.image && acquisitionModalImageContainer && acquisitionModalImage) {
+            acquisitionModalImage.src = item.image;
+            acquisitionModalImageContainer.classList.remove('hidden');
+            acquisitionModalImageContainer.onclick = (e) => {
+                e.stopPropagation();
+                showImageLightbox(item.image);
+            };
+        } else if (acquisitionModalImageContainer) {
+            acquisitionModalImageContainer.classList.add('hidden');
+            acquisitionModalImageContainer.onclick = null;
+        }
         acquisitionModal.classList.remove('hidden');
     };
 
