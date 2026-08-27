@@ -1,7 +1,8 @@
-🚀 Atualizações e Melhorias da Versão v0.10.1
+🚀 Atualizações e Melhorias da Versão v0.10.2
 
-• Objetos e Interações em Cenários: Suporte completo à integração de objetos globais nas áreas interativas (hotspots) dos cenários, permitindo coletar itens e exigir itens no inventário para desbloqueio ou interação.
-• Padronização e Lightbox nos Pop-ups de Visualização: Unificação visual e estrutural dos pop-ups de itens do inventário e de exame de áreas interativas em cenários, com imagem lateral alinhada de ponta a ponta (full-bleed) e suporte a clique para ampliação da imagem em detalhe (lightbox).
-• Layout Full-Bleed para Ramificações Sem Moldura: Ajuste no modo sem moldura para que a imagem ocupe 50% da largura da tela, com espaçamento lateral na coluna descritiva garantindo leitura confortável e alinhamento visual preciso.
-• Fidelidade nas Telas de Pré-visualização: Sincronização do preview de ramificações no painel de Configurações (Estilo Visual) e no modal de Nova Ficção para refletir com exatidão a opção "Sem moldura".
-• Ajustes Visuais e de Layout: Otimização da largura dos campos de texto na tela inicial/autenticação para evitar quebras de linhas desnecessárias e melhorias nos botões de interação.
+• Barra de Ações Integrada nos Cenários: Os botões interativos (Inventário, Diário, Anotações, Rastreadores/Status e Sistema/Opções) agora estão disponíveis no topo dos cenários, perfeitamente centralizados e alinhados na mesma linha horizontal que o título da vista e os ícones de chances/vidas.
+• Menu Suspenso de Inventário sem Sombras: O pop-up de itens e aviso de inventário vazio foi posicionado com precisão diretamente abaixo do botão de Inventário, com design clean e sem sombras indesejadas.
+• Nova Ação "Alterar Rastreador" em Áreas Interativas: Suporte completo à alteração e vinculação de rastreadores nas áreas interativas (hotspots) de cenários, com seletor de rastreadores com ícones, valor numérico de impacto, texto de feedback opcional e atalho para criar novos rastreadores.
+• Padronização Visual do Botão "+ Vincular": Atualização do botão de vínculo de rastreadores para "+ Vincular", aplicando a cor de destaque da aparência selecionada tanto nas ramificações quanto nos cenários.
+• Feedback de Diálogo na Coleta de Objetos em Cenários: Suporte a feedback com texto e imagem personalizados em pop-up estilo exame ao coletar objetos em hotspots de cenários.
+• Melhorias nas Telas Iniciais e Editor: Sincronização do efeito de varredura dither e lanterna, troca dinâmica de imagem da vista sem perda de hotspots e aprimoramentos de responsividade nos botões de ação.
