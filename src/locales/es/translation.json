@@ -754,7 +754,7 @@
     "suggestedResHorizontal": "Recomendado 1280x720",
     "changeBtn": "Cambiar",
     "removeBtn": "Eliminar",
-    "loadImage": "Cargar Imagen de Fondo",
+    "loadImage": "Cargar imagen",
     "overlayLabel": "Efecto Visual (Overlay)",
     "effects": {
       "none": "Ninguno",
@@ -1367,8 +1367,9 @@
     "noImage": "Sin imagen",
     "back": "Volver",
     "changeImage": "Cambiar Imagen",
+    "changeViewImage": "Cambiar imagen de la vista",
     "finishEditing": "Terminar Edición",
-    "deleteHotspotBtn": "Eliminar Área Interactiva",
+    "deleteHotspotBtn": "Eliminar Área",
     "backToViewsList": "Volver a la lista de vistas",
     "cardTransition": "Transición",
     "tools": {
@@ -1400,7 +1401,7 @@
       "none": "Ninguna (Corte)"
     },
     "editMode": "Modo Edición",
-    "testMode": "Probar Hotspots",
+    "testMode": "Probar Áreas Interactivas",
     "hideZones": "Ocultar Zonas",
     "revealZones": "Revelar Zonas (Espacio)",
     "emptyImageTitle": "Añadir Imagen de Fondo de Vista",
@@ -1421,7 +1422,7 @@
     },
     "fields": {
       "title": "Etiqueta / Tooltip",
-      "transition": "Transición",
+      "transition": "Transición de la vista",
       "highlightStyle": "Estilo de Resalte",
       "hotspotIcon": "Icono de Resalte",
       "iconColor": "Color del Icono",

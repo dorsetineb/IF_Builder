@@ -10,9 +10,10 @@ import {
 } from '../../types';
 import { useTranslation } from 'react-i18next';
 import { ColorInput } from '../UIEditor/ColorInput';
+import ImageUploadField from '../ui/ImageUploadField';
 import {
   Sliders,
-  MousePointer,
+  MousePointerClick,
   Trash2,
   Volume2,
   Lock,
@@ -50,6 +51,8 @@ import {
   Search,
   Upload,
   Image as ImageIcon,
+  RotateCcw,
+  Save,
 } from 'lucide-react';
 
 export const HOTSPOT_ICONS = [
@@ -97,6 +100,10 @@ interface HotspotInspectorProps {
   onUpdateHotspot: (updatedHotspot: CardHotspot) => void;
   onDeleteHotspot: (hotspotId: string) => void;
   onUploadSound?: (file: File) => void;
+  onSave?: () => void;
+  onUndo?: () => void;
+  isDirty?: boolean;
+  onBack?: () => void;
 }
 
 export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
@@ -110,6 +117,10 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   consequenceTrackers,
   onUpdateHotspot,
   onDeleteHotspot,
+  onSave,
+  onUndo,
+  isDirty = false,
+  onBack,
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'visual' | 'action' | 'conditions'>('visual');
@@ -163,6 +174,25 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
     >
       {/* SECTION 1: DETALHES DA VISTA (SEMPRE NO TOPO) */}
       <div className="p-4 space-y-4 flex flex-col flex-shrink-0 border-b border-muted-foreground/30 bg-card">
+        {onBack && (
+          <>
+            <div className="flex items-center justify-start">
+              <button
+                type="button"
+                onClick={onBack}
+                className="flex items-center gap-1.5 py-0.5 text-zinc-400 hover:text-white transition-colors group"
+                title={t('hypercard.backToViewsList', 'Voltar à lista de vistas')}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span className="text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-current/30">
+                  {t('hypercard.backToViewsList', 'Voltar à lista de vistas')}
+                </span>
+              </button>
+            </div>
+            <div className="h-px bg-muted-foreground/30 -mx-4" />
+          </>
+        )}
+
         <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
           <Layers className="w-4 h-4" />
           {t('hypercard.viewDetails', 'Detalhes da Vista')}
@@ -187,33 +217,50 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
             />
           </div>
 
-          {/* NOME DA ÁREA INTERATIVA (SELECIONADA) - DENTRO DA MESMA SEÇÃO, SEM SEPARADOR */}
-          {hotspot && (
-            <div>
-              <label
-                htmlFor="hypercardHotspotTitle"
-                className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
-              >
-                {t('hypercard.hotspotName', 'NOME DA ÁREA INTERATIVA')}
-              </label>
+          {/* TROCAR IMAGEM DA VISTA */}
+          <div>
+            <label
+              htmlFor="hypercardViewImageUpload"
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-semibold border border-muted-foreground/30 cursor-pointer transition-colors"
+              title={t('hypercard.changeViewImage', 'Trocar imagem da vista')}
+            >
+              <Upload className="w-3.5 h-3.5 text-primary" />
+              <span>{t('hypercard.changeViewImage', 'Trocar imagem da vista')}</span>
               <input
-                type="text"
-                id="hypercardHotspotTitle"
-                value={hotspot.title}
-                onChange={(e) => handleFieldChange('title', e.target.value)}
-                placeholder={t('hypercard.hotspotDefault', 'Área Interativa')}
-                className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
+                id="hypercardViewImageUpload"
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const { compressImageToWebP } = await import('../../utils/imageOptimizer');
+                      const compressed = await compressImageToWebP(file);
+                      onUpdateCard?.({ ...card, image: compressed });
+                    } catch {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        if (typeof ev.target?.result === 'string') {
+                          onUpdateCard?.({ ...card, image: ev.target.result });
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }
+                  if (e.target) e.target.value = '';
+                }}
+                className="hidden"
               />
-            </div>
-          )}
+            </label>
+          </div>
         </div>
       </div>
 
       {!hotspot ? (
         /* Empty State when no Hotspot is selected */
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground select-none bg-card">
-          <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-4 text-muted-foreground">
-            <MousePointer className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-4 text-primary">
+            <MousePointerClick className="w-6 h-6" />
           </div>
           <h4 className="font-bold text-foreground mb-1 text-sm">
             {t('hypercard.noHotspotSelected', 'Nenhuma Área Selecionada')}
@@ -224,7 +271,7 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
         </div>
       ) : (
         /* Hotspot Configuration when selected */
-        <>
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Tabs */}
           <div className="grid grid-cols-3 border-b border-muted-foreground/30 p-1.5 bg-background/50 flex-shrink-0 gap-1">
             <button
@@ -269,10 +316,28 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
         {/* TAB 1: VISUAL & APPEARANCE */}
         {activeTab === 'visual' && (
           <div className="space-y-4">
-            {/* Transição ao Interagir */}
+            {/* NOME DA ÁREA INTERATIVA */}
+            <div>
+              <label
+                htmlFor="hypercardHotspotTitle"
+                className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2"
+              >
+                {t('hypercard.hotspotName', 'NOME DA ÁREA INTERATIVA')}
+              </label>
+              <input
+                type="text"
+                id="hypercardHotspotTitle"
+                value={hotspot.title}
+                onChange={(e) => handleFieldChange('title', e.target.value)}
+                placeholder={t('hypercard.hotspotDefault', 'Área Interativa')}
+                className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
+              />
+            </div>
+
+            {/* Transição da vista */}
             <div>
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                {t('hypercard.fields.transition', 'Transição')}
+                {t('hypercard.fields.transition', 'Transição da vista')}
               </label>
               <select
                 value={hotspot.transition || 'fade'}
@@ -539,72 +604,11 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
                     {t('hypercard.fields.examineImage', 'Imagem do Diálogo (Opcional)')}
                   </label>
-                  <div className="relative border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 rounded-xl p-2 transition-all group bg-background/40">
-                    {hotspot.examineImage ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="relative w-full h-36 rounded-lg overflow-hidden border border-muted-foreground/30 bg-black/40">
-                          <img
-                            src={hotspot.examineImage}
-                            alt="Examine Preview"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2 w-full">
-                          <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-bold border border-muted-foreground/30 cursor-pointer transition-colors">
-                            <Upload className="w-3.5 h-3.5 text-primary" />
-                            <span>{t('sceneEditor.changeBtn', 'Trocar')}</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = (uploadEvent) => {
-                                    handleFieldChange('examineImage', uploadEvent.target?.result as string);
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                              className="hidden"
-                            />
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => handleFieldChange('examineImage', '')}
-                            className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/30 transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>{t('sceneEditor.removeBtn', 'Remover')}</span>
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center py-6 cursor-pointer group">
-                        <div className="w-10 h-10 rounded-full bg-background border border-muted-foreground/30 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                          <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                        </div>
-                        <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground">
-                          {t('sceneEditor.loadImage', 'Carregar Imagem')}
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (uploadEvent) => {
-                                handleFieldChange('examineImage', uploadEvent.target?.result as string);
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                          className="hidden"
-                        />
-                      </label>
-                    )}
-                  </div>
+                  <ImageUploadField
+                    value={hotspot.examineImage}
+                    onChange={(img) => handleFieldChange('examineImage', img)}
+                    className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group"
+                  />
                   <p className="text-[10px] text-muted-foreground text-center mt-1.5 italic">
                     {t('hypercard.examineImageHint', 'Esta imagem será exibida ao examinar a área interativa, ao lado do texto descritivo.')}
                   </p>
@@ -753,19 +757,56 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
           </div>
         )}
       </div>
+    </div>
+  )}
 
-          {/* Footer: Prominent Delete Hotspot Button */}
-          <div className="p-3 border-t border-muted-foreground/30 bg-background/50 flex-shrink-0">
+      {/* Sticky Footer: Action Bar (Desfazer + Salvar Alterações + Excluir Área on left) */}
+      <div className="@container sticky bottom-0 left-0 right-0 bg-background px-4 pb-4 pt-2 flex flex-col gap-3 z-50">
+        {/* Gradient transition below footer */}
+        <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+
+        <div className="flex w-full items-center justify-between gap-2">
+          {/* Left Side: Excluir Área (if hotspot is selected, aligned to left) */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {hotspot && (
+              <button
+                type="button"
+                onClick={() => onDeleteHotspot(hotspot.id)}
+                className="flex items-center justify-center gap-1.5 px-3 h-[56px] text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/30 rounded-lg whitespace-nowrap transition-colors flex-initial min-w-0 shrink-0"
+                title={t('hypercard.deleteHotspotBtn', 'Excluir Área')}
+              >
+                <Trash2 className="w-4 h-4 shrink-0" />
+                <span className="hidden @[340px]:inline-block truncate">{t('hypercard.deleteHotspotBtn', 'Excluir Área')}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Right Side: Desfazer + Salvar Alterações */}
+          <div className="flex items-center gap-2 flex-none">
             <button
-              onClick={() => onDeleteHotspot(hotspot.id)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 text-sm font-bold text-red-400 hover:text-red-300 transition-all shadow-sm active:scale-98"
+              type="button"
+              onClick={onUndo}
+              disabled={!isDirty}
+              className="flex items-center justify-center gap-1.5 px-3 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none shrink-0"
+              title={t('sceneEditor.undoBtn', 'Desfazer')}
             >
-              <Trash2 className="w-4 h-4" />
-              <span>{t('hypercard.deleteHotspotBtn', 'Excluir Área Interativa')}</span>
+              <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+              <span className="hidden @[340px]:inline-block truncate">{t('sceneEditor.undoBtn', 'Desfazer')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={!isDirty}
+              className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shrink-0 shadow-lg"
+              title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
+            >
+              <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+              <span className="hidden @[260px]:inline-block truncate">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
             </button>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -10,7 +10,7 @@ import {
     Check, BookOpen, TextCursorInput, CopyCheck, FileText, Dices
 } from 'lucide-react';
 import { GameData, DiceType } from '../../types';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import ImageUploadField from '../ui/ImageUploadField';
 import { UIPreviewPanel } from './UIPreviewPanel';
 
 // Helper component for the life icons
@@ -274,29 +274,6 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            import('../../utils/imageOptimizer').then(({ compressImageToWebP }) => {
-                compressImageToWebP(file)
-                    .then((optimizedBase64) => {
-                        setLocalStartScreenBgImage(optimizedBase64);
-                    })
-                    .catch((err) => {
-                        console.error('Failed to compress image:', err);
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            if (event.target && typeof event.target.result === 'string') {
-                                setLocalStartScreenBgImage(event.target.result);
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    });
-            });
-        }
-        if (e.target) e.target.value = '';
-    };
-
     const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -308,10 +285,6 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
             reader.readAsDataURL(e.target.files[0]);
         }
         if (e.target) e.target.value = '';
-    };
-
-    const handleRemoveImage = () => {
-        setLocalStartScreenBgImage('');
     };
 
     return (
@@ -573,50 +546,11 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                     </span>
                                                 </div>
                                                 
-                                                <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group">
-                                                    {localStartScreenBgImage ? (
-                                                        <>
-                                                            <img 
-                                                                src={localStartScreenBgImage} 
-                                                                alt="Background Preview" 
-                                                                className="w-full h-full object-cover" 
-                                                            />
-                                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
-                                                                <label htmlFor="start-screen-bg-upload" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors">
-                                                                    <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-                                                                        <Upload className="w-5 h-5" />
-                                                                    </div>
-                                                                    <span className="text-[10px] font-bold uppercase tracking-wider">
-                                                                        {t('sceneEditor.changeBtn', 'Alterar')}
-                                                                    </span>
-                                                                    <input id="start-screen-bg-upload" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                                </label>
-                                                                <button 
-                                                                    type="button"
-                                                                    onClick={handleRemoveImage} 
-                                                                    className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
-                                                                >
-                                                                    <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
-                                                                        <Trash2 className="w-5 h-5" />
-                                                                    </div>
-                                                                    <span className="text-[10px] font-bold uppercase tracking-wider">
-                                                                        {t('sceneEditor.removeBtn', 'Remover')}
-                                                                    </span>
-                                                                </button>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <label htmlFor="start-screen-bg-upload" className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
-                                                            <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                                                                <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                                                            </div>
-                                                            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                                                                {t('sceneEditor.loadImage', 'Carregar Imagem de Fundo')}
-                                                            </span>
-                                                            <input id="start-screen-bg-upload" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                        </label>
-                                                    )}
-                                                </div>
+                                                <ImageUploadField
+                                                    value={localStartScreenBgImage}
+                                                    onChange={setLocalStartScreenBgImage}
+                                                    id="start-screen-bg-upload"
+                                                />
                                             </div>
 
                                             {/* Right Column: Transição & Som */}

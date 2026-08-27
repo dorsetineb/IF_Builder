@@ -26,7 +26,6 @@ import {
   Copy,
   Eye,
   Upload,
-  Image as ImageIcon,
 } from 'lucide-react';
 
 interface HotspotCanvasProps {
@@ -506,7 +505,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           }`}
         >
           {isTestMode ? <Edit3 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-          <span>{isTestMode ? t('hypercard.editMode', 'Modo Edição') : t('hypercard.testMode', 'Testar Hotspots')}</span>
+          <span>{isTestMode ? t('hypercard.editMode', 'Modo Edição') : t('hypercard.testMode', 'Testar Áreas Interativas')}</span>
         </button>
       </div>
 
@@ -928,16 +927,7 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
           </div>
         ) : (
           /* Empty Card State: Upload Image */
-          <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-muted-foreground/40 rounded-3xl max-w-lg bg-card/40 backdrop-blur-sm">
-            <div className="w-20 h-20 rounded-3xl bg-primary/10 border border-primary/30 flex items-center justify-center mb-6 text-primary">
-              <ImageIcon className="w-10 h-10" />
-            </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">
-              {t('hypercard.emptyImageTitle', 'Adicione a Imagem deste Cenário')}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-              {t('hypercard.emptyImageDesc', 'Faça upload do cenário visual para desenhar as áreas clicáveis e criar a cena interativa.')}
-            </p>
+          <div className="flex items-center justify-center">
             <label className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold cursor-pointer transition-all shadow-lg shadow-primary/20">
               <Upload className="w-4 h-4" />
               <span>{t('hypercard.uploadImageBtn', 'Escolher Imagem')}</span>

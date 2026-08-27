@@ -18,7 +18,6 @@ import {
   Trash2,
   Copy,
   Star,
-  Upload,
   Image as ImageIcon,
   MousePointerClick,
   ArrowLeft,
@@ -78,7 +77,6 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Local scene state (independent from parent until saved)
   const [localScene, setLocalScene] = useState<Scene>(scene);
@@ -117,7 +115,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
         name: t('hypercard.defaultCardName', 'Vista 1'),
         image: localScene.image || '',
         hotspots: [],
-        transition: 'fade',
+        transition: 'dissolve',
       }];
 
   const [selectedCardId, setSelectedCardId] = useState<string>(
@@ -232,7 +230,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       name: `${t('hypercard.cardPrefix', 'Vista')} ${cards.length + 1}`,
       image: '',
       hotspots: [],
-      transition: 'fade',
+      transition: 'dissolve',
     };
     const newCards = [...cards, newCard];
     updateCards(newCards);
@@ -387,18 +385,6 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
 
   return (
     <div className="flex-1 flex flex-col h-full bg-background overflow-hidden relative select-none">
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleUploadImage(file);
-        }}
-        accept="image/*"
-        className="hidden"
-      />
-
       {/* ========================================================================= */}
       {/* CASE 1: UNEXPANDED COMPACT SIDE PANEL (VERTICAL SLIDES / LAYERS LIST)     */}
       {/* ========================================================================= */}
@@ -811,22 +797,22 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreview}
-                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                  className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none shrink-0"
                   title={t('sceneEditor.testTooltip', 'Testar este cenário')}
                 >
                   <Hammer className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                  <span className="hidden min-[450px]:inline-block">
+                  <span className="hidden sm:inline-block">
                     {t('sceneEditor.testBtn', 'Testar')}
                   </span>
                 </button>
 
                 <button
                   onClick={() => onCopyScene?.(localScene)}
-                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                  className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none shrink-0"
                   title={t('sceneEditor.copyTooltip', 'Copiar Cenário')}
                 >
                   <Copy className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                  <span className="hidden min-[450px]:inline-block">
+                  <span className="hidden sm:inline-block">
                     {t('sceneEditor.copyBranch', 'Copiar')}
                   </span>
                 </button>
@@ -836,19 +822,21 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                 <button
                   onClick={handleUndo}
                   disabled={!isSceneDirty}
-                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none"
+                  className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none shrink-0"
+                  title={t('sceneEditor.undoBtn', 'Desfazer')}
                 >
                   <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                  <span className="hidden min-[450px]:inline-block">{t('sceneEditor.undoBtn', 'Desfazer')}</span>
+                  <span className="hidden sm:inline-block">{t('sceneEditor.undoBtn', 'Desfazer')}</span>
                 </button>
 
                 <button
                   onClick={handleSave}
                   disabled={!isSceneDirty}
-                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shadow-lg"
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shrink-0 shadow-lg"
+                  title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
                 >
                   <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                  <span className="hidden min-[450px]:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                  <span className="hidden sm:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
                 </button>
               </div>
             </div>
@@ -861,42 +849,6 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
       {/* ========================================================================= */}
       {isExpanded && (
         <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-150">
-          {/* Expanded Top Bar: Clean left side with only Back button */}
-          <div className="h-14 bg-card border-b border-muted-foreground/30 px-4 flex items-center justify-between flex-shrink-0 z-30">
-            <div className="flex items-center">
-              <button
-                onClick={() => onToggleExpand?.(false)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-bold border border-muted-foreground/30 transition-colors"
-                title={t('hypercard.backToViewsList', 'Voltar à lista de vistas')}
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>{t('hypercard.back', 'Voltar')}</span>
-              </button>
-            </div>
-
-            {/* Top Bar Actions */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted hover:bg-muted-foreground/20 text-foreground text-xs font-semibold border border-muted-foreground/30 transition-colors"
-                title={t('hypercard.uploadImageBtn', 'Escolher Imagem')}
-              >
-                <Upload className="w-3.5 h-3.5 text-primary" />
-                <span>{currentCard.image ? t('hypercard.changeImage', 'Trocar Imagem') : t('hypercard.uploadImageBtn', 'Escolher Imagem')}</span>
-              </button>
-
-              <button
-                onClick={handleSave}
-                disabled={!isSceneDirty}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-zinc-950 text-xs font-bold shadow-md shadow-yellow-500/20 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-all active:scale-95"
-                title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
-              >
-                <Save className="w-3.5 h-3.5 shrink-0" />
-                <span>{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
-              </button>
-            </div>
-          </div>
-
           {/* Expanded 2-Panel Layout: Canvas (Full) + Inspector (Clean Single Right Border) */}
           <div className="flex-1 flex overflow-hidden bg-background">
             {/* Left/Center: Large Hotspot Canvas with floating toolbars */}
@@ -916,7 +868,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
             </div>
 
             {/* Right: Hotspot Properties Inspector with clean single border */}
-            <div className="w-[320px] md:w-[360px] flex flex-col h-full overflow-hidden flex-shrink-0 border-l border-muted-foreground/30 bg-card">
+            <div className="w-[440px] lg:w-[480px] xl:w-[500px] flex flex-col h-full overflow-hidden flex-shrink-0 border-l border-muted-foreground/30 bg-card">
               <HotspotInspector
                 hotspot={selectedHotspot}
                 card={currentCard}
@@ -928,6 +880,10 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                 consequenceTrackers={consequenceTrackers}
                 onUpdateHotspot={handleUpdateHotspot}
                 onDeleteHotspot={handleDeleteHotspot}
+                onSave={handleSave}
+                onUndo={handleUndo}
+                isDirty={isSceneDirty}
+                onBack={() => onToggleExpand?.(false)}
               />
             </div>
           </div>

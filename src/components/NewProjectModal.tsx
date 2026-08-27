@@ -9,6 +9,7 @@ import { useTheme } from './ThemeProvider';
 import { DitherShader } from './ui/dither-shader';
 import { getDitherColors } from '../utils/themeStyles';
 import { ChanceIcon } from './UIEditor/SystemsTab';
+import ImageUploadField from './ui/ImageUploadField';
 import { useNewProjectForm } from '../hooks/useNewProjectForm';
 
 interface NewProjectModalProps {
@@ -398,37 +399,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <div className="space-y-2">
                                                         <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('UIEditor.startScreen.bgImage', 'Imagem de Fundo')}</label>
                                                         <div className="flex gap-4 items-start">
-                                                            <div className="relative w-20 h-20 bg-zinc-950 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-primary/50 transition-colors">
-                                                                {startScreenBgImage ? (
-                                                                    <>
-                                                                        <img src={startScreenBgImage} alt="" className="w-full h-full object-cover" />
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => setStartScreenBgImage('')}
-                                                                            className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                                                                        >
-                                                                            <Trash2 className="w-4 h-4 text-red-500" />
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <div className="w-full h-full flex items-center justify-center">
-                                                                        <ImageIcon className="w-6 h-6 text-zinc-700" />
-                                                                    </div>
-                                                                )}
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    onChange={(e) => {
-                                                                        if (e.target.files && e.target.files[0]) {
-                                                                            const file = e.target.files[0];
-                                                                            import('../utils/imageOptimizer').then(({ compressImageToWebP }) => {
-                                                                                compressImageToWebP(file).then(setStartScreenBgImage);
-                                                                            });
-                                                                        }
-                                                                    }}
-                                                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                                                />
-                                                            </div>
+                                                            <ImageUploadField
+                                                                value={startScreenBgImage}
+                                                                onChange={setStartScreenBgImage}
+                                                                className="relative w-20 h-20 bg-zinc-950 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-primary/50 transition-colors"
+                                                            />
                                                             <span className="text-[9px] text-zinc-500 leading-normal">{t('UIEditor.startScreen.suggestedRes', '1920x1080 sugerido')}</span>
                                                         </div>
                                                     </div>
@@ -775,24 +750,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.coverImageLabel', 'Imagem de Fundo')}</h3>
                                         </div>
                                         <div className="flex gap-6 items-start">
-                                            <div className="relative w-24 h-24 bg-black/50 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-muted-foreground/50 transition-colors shadow-inner">
-                                                {splashImage ? (
-                                                    <>
-                                                        <img src={splashImage} alt="Capa" className="w-full h-full object-cover" />
-                                                        <button
-                                                            onClick={() => setSplashImage('')}
-                                                            className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                                                        >
-                                                            <Trash2 className="w-5 h-5 text-red-500" />
-                                                        </button>
-                                                    </>
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center">
-                                                        <ImageIcon className="w-8 h-8 text-zinc-700" />
-                                                    </div>
-                                                )}
-                                                <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-                                            </div>
+                                            <ImageUploadField
+                                                value={splashImage}
+                                                onChange={setSplashImage}
+                                                className="relative w-24 h-24 bg-black/50 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-muted-foreground/50 transition-colors shadow-inner"
+                                            />
                                             <div className="flex-1 space-y-2 pt-1">
                                                 <p className="text-[11px] text-zinc-400 leading-relaxed">
                                                     {t('newProject.info.coverImageDesc', 'Esta imagem será usada como fundo da tela inicial e do capítulo de abertura caso não seja definida outra.')}

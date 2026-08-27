@@ -835,7 +835,7 @@
     "suggestedResHorizontal": "1280x720 suggested",
     "changeBtn": "Change",
     "removeBtn": "Remove",
-    "loadImage": "Load Background Image",
+    "loadImage": "Upload Image",
     "overlayLabel": "Visual Effect (Overlay)",
     "effects": {
       "none": "None",
@@ -1408,8 +1408,9 @@
     "noImage": "No image",
     "back": "Back",
     "changeImage": "Change Image",
+    "changeViewImage": "Change view image",
     "finishEditing": "Finish Editing",
-    "deleteHotspotBtn": "Delete Interactive Area",
+    "deleteHotspotBtn": "Delete Area",
     "backToViewsList": "Back to views list",
     "cardTransition": "Transition",
     "tools": {
@@ -1441,7 +1442,7 @@
       "none": "None (Cut)"
     },
     "editMode": "Edit Mode",
-    "testMode": "Test Hotspots",
+    "testMode": "Test Interactive Areas",
     "hideZones": "Hide Zones",
     "revealZones": "Reveal Zones (Space)",
     "emptyImageTitle": "Add View Background Image",
@@ -1462,7 +1463,7 @@
     },
     "fields": {
       "title": "Label / Tooltip",
-      "transition": "Transition",
+      "transition": "View Transition",
       "highlightStyle": "Highlight Style",
       "hotspotIcon": "Highlight Icon",
       "iconColor": "Icon Color",

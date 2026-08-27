@@ -159,7 +159,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
 
                 {/* Coluna Direita: Botões */}
                 <div className="w-full lg:w-[400px] flex flex-col justify-center flex-shrink-0">
-                    <p className="text-white text-lg font-bold uppercase tracking-wide mb-6">
+                    <p className="text-white text-lg font-bold tracking-wide mb-6">
                         {t('welcome.subtitle', 'O que você quer fazer?')}
                     </p>
                     <div className="grid grid-cols-2 gap-3 w-full">

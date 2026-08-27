@@ -1577,7 +1577,7 @@ const Editor: React.FC = () => {
               {currentView === 'three_panels' && (
                 <div className="flex h-full w-full overflow-hidden relative">
                   {/* Painel Esquerdo: Mapa Narrativo (Área de trabalho visível) */}
-                  <div className="flex-1 h-full min-w-0 overflow-hidden relative transition-all duration-300">
+                  <div className={`${selectedScene?.sceneType === 'hypercard_stack' && isScenarioEditing ? 'hidden' : 'flex-1'} h-full min-w-0 overflow-hidden relative transition-all duration-300`}>
                     <Suspense fallback={<LoadingOverlay message="Carregando Mapa..." />}>
                       <SceneMap
                         key="three-panels-map"
@@ -1609,7 +1609,7 @@ const Editor: React.FC = () => {
                         ? 'w-1/3'
                         : selectedScene
                           ? selectedScene.sceneType === 'hypercard_stack' && isScenarioEditing
-                            ? 'w-full'
+                            ? 'w-full border-l-0'
                             : isSidePanelExpanded ? 'w-1/2 min-w-[550px]' : 'w-1/3'
                           : 'w-0 border-l-0'
                     }`}

@@ -3,6 +3,7 @@ import { GameData, GameObject, Scene } from '../types';
 import { Plus, Trash2, Upload, Search, Box, Link, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Image as ImageIcon, Sword, Key, Map as MapIcon, Eye, FlaskConical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmationModal } from './ConfirmationModal';
+import ImageUploadField from './ui/ImageUploadField';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -191,28 +192,6 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         if (!obj) return;
 
         setDeleteModal({ isOpen: true, objectId: id });
-    };
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0] && selectedObjectId) {
-            const file = e.target.files[0];
-            import('../utils/imageOptimizer').then(({ compressImageToWebP }) => {
-                compressImageToWebP(file)
-                    .then((optimizedBase64) => {
-                        handleObjectChange(selectedObjectId, 'image', optimizedBase64);
-                    })
-                    .catch((err) => {
-                        console.error('Failed to compress image:', err);
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            if (event.target && typeof event.target.result === 'string') {
-                                handleObjectChange(selectedObjectId, 'image', event.target.result);
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    });
-            });
-        }
     };
 
     const filteredObjects = useMemo(() => {
@@ -491,42 +470,11 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                     </div>
                                     
                                     <div className="space-y-4">
-                                        <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
-                                            {selectedObject.image ? (
-                                                <>
-                                                    <img src={selectedObject.image} alt={selectedObject.name} className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
-                                                        <label className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors">
-                                                            <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-                                                                <Upload className="w-5 h-5" />
-                                                            </div>
-                                                            <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.changeBtn', 'Trocar')}</span>
-                                                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                        </label>
-                                                        <button
-                                                            onClick={(e) => { e.preventDefault(); handleObjectChange(selectedObject.id, 'image', ''); }}
-                                                            className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
-                                                            title={t('common.delete', 'Excluir')}
-                                                        >
-                                                            <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
-                                                                <Trash2 className="w-5 h-5" />
-                                                            </div>
-                                                            <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.removeBtn', 'Remover')}</span>
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
-                                                    <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                                                        <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                                                    </div>
-                                                    <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                                                        {t('sceneEditor.loadImage', 'Carregar Imagem')}
-                                                    </span>
-                                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                </label>
-                                            )}
-                                        </div>
+                                        <ImageUploadField
+                                            value={selectedObject.image}
+                                            onChange={(img) => handleObjectChange(selectedObject.id, 'image', img)}
+                                            className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6"
+                                        />
                                         <p className="text-[10px] text-muted-foreground italic leading-relaxed text-center opacity-70 px-4 pt-2">
                                             {t('globalObjectsEditor.imageHint', 'Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.')}
                                         </p>

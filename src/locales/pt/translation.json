@@ -843,9 +843,10 @@
     "multimediaTitle": "MULTIMÍDIA",
     "suggestedResVertical": "720x1280 sugerido",
     "suggestedResHorizontal": "1280x720 sugerido",
+    "changeBtn": "Trocar",
     "removeBtn": "Remover",
     "alreadyHasOpening": "Já existe um capítulo de abertura.",
-    "loadImage": "Carregar Imagem de Fundo",
+    "loadImage": "Carregar imagem",
     "overlayLabel": "Efeito Visual (Overlay)",
     "effects": {
       "none": "Nenhum",
@@ -1393,8 +1394,9 @@
     "noImage": "Sem imagem",
     "back": "Voltar",
     "changeImage": "Trocar Imagem",
+    "changeViewImage": "Trocar imagem da vista",
     "finishEditing": "Concluir Edição",
-    "deleteHotspotBtn": "Excluir Área Interativa",
+    "deleteHotspotBtn": "Excluir Área",
     "backToViewsList": "Voltar à lista de vistas",
     "cardTransition": "Transição",
     "tools": {
@@ -1426,7 +1428,7 @@
       "none": "Nenhuma (Corte Seco)"
     },
     "editMode": "Modo Edição",
-    "testMode": "Testar Hotspots",
+    "testMode": "Testar Áreas Interativas",
     "hideZones": "Ocultar Zonas",
     "revealZones": "Revelar Zonas (Espaço)",
     "emptyImageTitle": "Adicione a Imagem desta Vista",
@@ -1447,7 +1449,7 @@
     },
     "fields": {
       "title": "Rótulo / Tooltip",
-      "transition": "Transição",
+      "transition": "Transição da vista",
       "highlightStyle": "Estilo de Realce",
       "hotspotIcon": "Ícone de Realce",
       "iconColor": "Cor do Ícone",

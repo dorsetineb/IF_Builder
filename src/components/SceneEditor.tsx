@@ -18,6 +18,7 @@ import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import { ErrorBoundary } from './ErrorBoundary';
 import BranchingPreview from './BranchingPreview';
+import ImageUploadField from './ui/ImageUploadField';
 import {
   Upload,
   Trash2,
@@ -924,58 +925,29 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                           <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
                             <style>{OVERLAY_CSS}</style>
-
-                            {localScene.image ? (
-                              <>
-                                <img
-                                  src={localScene.image}
-                                  alt={localScene.name}
-                                  className="w-full h-full object-cover"
-                                />
-
-                                <div
-                                  className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
-                                  style={{ zIndex: 10 }}
-                                ></div>
-                                {localScene.overlayEffect === 'rain' && <RainOverlay />}
-                                {localScene.overlayEffect === 'blur' && <BlurOverlay />}
-                                {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
-                                {localScene.overlayEffect === 'tv' && <TVOverlay />}
-                                {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
-                                {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
-                                {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
-                                {localScene.overlayEffect === 'wiggate' && <WiggleOverlay />}
-                                {localScene.overlayEffect === 'fog' && (
-                                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
-                                    <FogOverlay />
-                                  </div>
-                                )}
-
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
-                                  <label htmlFor="image-upload-input-side" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors">
-                                    <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-                                      <Upload className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.changeBtn')}</span>
-                                    <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                  </label>
-                                  <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
-                                    <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
-                                      <Trash2 className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.removeBtn')}</span>
-                                  </button>
+                            <ImageUploadField
+                              value={localScene.image}
+                              onChange={(img) => updateLocalScene('image', img)}
+                              id="image-upload-input-side"
+                            >
+                              <div
+                                className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
+                                style={{ zIndex: 10 }}
+                              ></div>
+                              {localScene.overlayEffect === 'rain' && <RainOverlay />}
+                              {localScene.overlayEffect === 'blur' && <BlurOverlay />}
+                              {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                              {localScene.overlayEffect === 'tv' && <TVOverlay />}
+                              {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
+                              {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
+                              {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
+                              {localScene.overlayEffect === 'wiggate' && <WiggleOverlay />}
+                              {localScene.overlayEffect === 'fog' && (
+                                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
+                                  <FogOverlay />
                                 </div>
-                              </>
-                            ) : (
-                              <label htmlFor="image-upload-input-side" className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
-                                <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                                  <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                                </div>
-                                <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">{t('sceneEditor.loadImage')}</span>
-                                <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                              </label>
-                            )}
+                              )}
+                            </ImageUploadField>
                           </div>
 
                           <div className="space-y-2 mb-4">
@@ -1563,22 +1535,22 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePreview}
-                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                    className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none shrink-0"
                     title={t('sceneEditor.testTooltip')}
                   >
                     <Hammer className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                    <span className="hidden min-[450px]:inline-block">
+                    <span className="hidden sm:inline-block">
                       {t('sceneEditor.testBtn', 'Testar')}
                     </span>
                   </button>
 
                   <button
                     onClick={() => onCopyScene(localScene)}
-                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                    className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none shrink-0"
                     title={t('sceneEditor.copyTooltip')}
                   >
                     <Copy className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                    <span className="hidden min-[450px]:inline-block">
+                    <span className="hidden sm:inline-block">
                       {copyLabel}
                     </span>
                   </button>
@@ -1588,19 +1560,21 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none"
+                    className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none shrink-0"
+                    title={t('sceneEditor.undoBtn')}
                   >
                     <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                    <span className="hidden min-[450px]:inline-block">{t('sceneEditor.undoBtn')}</span>
+                    <span className="hidden sm:inline-block">{t('sceneEditor.undoBtn')}</span>
                   </button>
 
                   <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shadow-lg"
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shrink-0 shadow-lg"
+                    title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
                   >
                     <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                    <span className="hidden min-[450px]:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                    <span className="hidden sm:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
                   </button>
                 </div>
               </div>
@@ -1610,19 +1584,21 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none"
+                    className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none shrink-0"
+                    title={t('sceneEditor.undoBtn')}
                   >
                     <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                    <span className="hidden min-[450px]:inline-block">{t('sceneEditor.undoBtn')}</span>
+                    <span className="hidden sm:inline-block">{t('sceneEditor.undoBtn')}</span>
                   </button>
 
                   <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shadow-lg"
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shrink-0 shadow-lg"
+                    title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
                   >
                     <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-                    <span className="hidden min-[450px]:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                    <span className="hidden sm:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
                   </button>
                 </div>
               )}
