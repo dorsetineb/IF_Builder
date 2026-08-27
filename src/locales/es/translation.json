@@ -683,6 +683,7 @@
     "audioLoaded": "Audio cargado",
     "trackersLabel": "Rastreadores",
     "addBtn": "Añadir",
+    "linkBtn": "Vincular",
     "selectTracker": "Selecciona un rastreador...",
     "valueLabel": "Valor:",
     "noTrackerEffects": "Ningún efecto en rastreadores configurado.",
@@ -1438,7 +1439,10 @@
       "examineText": "Texto del Mensaje",
       "examineImage": "Imagen del Diálogo (Opcional)",
       "examineTextPlaceholder": "Describe lo que el jugador lee, siente u observa...",
-      "collectItem": "Objeto a Recoger",
+      "collectItem": "Objeto a recoger",
+      "actionText": "Texto de la acción",
+      "actionTextPlaceholder": "Describe el resultado de la acción (ej: Has recogido la llave y la guardaste en el inventario...)",
+      "actionTextHint": "Mensaje que se muestra en la ventana emergente al recoger el objeto. Si el objeto tiene una imagen, se mostrará en la ventana.",
       "requiresInInventory": "Requiere Objeto en Inventario",
       "consumesItem": "Consumir/eliminar objeto al usar",
       "lockedMessage": "Mensaje de Bloqueo",
@@ -1503,13 +1507,19 @@
       "examine": "Examinar (Diálogo flotante)",
       "navigateCard": "Navegar a otra Vista del Escenario",
       "navigateScene": "Salir a otra Escena del Mapa",
-      "collectItem": "Recoger Objeto al Inventario",
-      "toggleTracker": "Modificar Contador / Rastreador"
+      "collectItem": "Recoger objeto para inventario",
+      "toggleTracker": "Modificar Rastreador"
     },
     "selectCardPlaceholder": "-- Seleccionar Vista --",
     "selectScenePlaceholder": "-- Seleccionar Escena en el Mapa --",
     "selectItemPlaceholder": "-- Seleccionar Objeto --",
+    "collectItemTitleDefault": "Objeto Recogido",
+    "collectedFeedbackDefault": "Has obtenido:",
+    "collectItemDefaultText": "Objeto añadido al inventario.",
     "noRequirement": "Sin requisitos",
-    "uploadSound": "Añadir Sonido (.mp3, .wav)"
+    "uploadSound": "Añadir Sonido (.mp3, .wav)",
+    "noTrackersConfigured": "No hay rastreadores configurados en el proyecto.",
+    "configureTrackers": "Configurar Rastreadores",
+    "noLinkedTrackers": "Haz clic en \"+ Vincular\" para asociar un rastreador a esta acción."
   }
 }

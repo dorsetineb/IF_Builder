@@ -40,6 +40,7 @@ interface HyperCardStackEditorProps {
   allScenes: Scene[];
   globalObjects: { [id: string]: GameObject };
   consequenceTrackers: ConsequenceTracker[];
+  onNavigateToTrackers?: () => void;
   onUpdateScene: (updatedScene: Scene) => void;
   onCopyScene?: (scene: Scene) => void;
   onPreviewScene?: (scene: Scene) => void;
@@ -61,6 +62,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
   allScenes,
   globalObjects,
   consequenceTrackers,
+  onNavigateToTrackers,
   onUpdateScene,
   onCopyScene,
   onPreviewScene,
@@ -856,6 +858,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
               <HotspotCanvas
                 card={currentCard}
                 allCards={cards}
+                globalObjects={mergedGlobalObjects}
                 overlayEffect={localScene.overlayEffect}
                 onUpdateCard={handleUpdateCard}
                 selectedHotspotId={selectedHotspotId}
@@ -878,6 +881,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                 allScenes={allScenes}
                 globalObjects={mergedGlobalObjects}
                 consequenceTrackers={consequenceTrackers}
+                onNavigateToTrackers={onNavigateToTrackers}
                 onUpdateHotspot={handleUpdateHotspot}
                 onDeleteHotspot={handleDeleteHotspot}
                 onSave={handleSave}

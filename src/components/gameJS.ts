@@ -2518,6 +2518,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const imagePanel = imageContainer ? imageContainer.parentElement : null;
         const textPanel = document.querySelector('.text-panel');
         const chancesContainer = document.getElementById('chances-container');
+        const actionButtons = document.querySelector('.action-buttons');
+        const actionPopup = document.getElementById('action-popup');
+        const standardActionBar = document.getElementById('standard-action-bar');
+        const suggestionsButton = document.getElementById('suggestions-button');
+        const inventoryButton = document.getElementById('inventory-button');
+        const diaryButton = document.getElementById('diary-button');
+        const notesButton = document.getElementById('notes-button');
+        const trackersButton = document.getElementById('trackers-button');
+        const systemButton = document.getElementById('system-button');
         const isImagesEnabled = gameData.enableImages !== false;
         
         if (sceneNameOverlay) {
@@ -2528,13 +2537,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (scene.sceneType === 'hypercard_stack') {
             if (gameContainer) gameContainer.classList.add('hypercard-fullscreen');
+
+            // Scene Title (Left)
+            if (sceneNameOverlay && imageContainer) {
+                if (sceneNameOverlay.parentElement !== imageContainer) {
+                    imageContainer.appendChild(sceneNameOverlay);
+                }
+                sceneNameOverlay.style.position = 'fixed';
+                sceneNameOverlay.style.top = '20px';
+                sceneNameOverlay.style.left = '20px';
+                sceneNameOverlay.style.margin = '0';
+                sceneNameOverlay.style.height = '36px';
+                sceneNameOverlay.style.minHeight = '36px';
+                sceneNameOverlay.style.display = 'flex';
+                sceneNameOverlay.style.alignItems = 'center';
+                sceneNameOverlay.style.zIndex = '40';
+            }
+
+            // Interactive Buttons (Center)
+            let centerBar = document.getElementById('hypercard-center-bar');
+            if (!centerBar) {
+                centerBar = document.createElement('div');
+                centerBar.id = 'hypercard-center-bar';
+                centerBar.className = 'hypercard-center-bar';
+                if (imageContainer) {
+                    imageContainer.appendChild(centerBar);
+                } else if (gameContainer) {
+                    gameContainer.appendChild(centerBar);
+                }
+            }
+
+            if (actionButtons && centerBar) {
+                if (actionButtons.parentElement !== centerBar) {
+                    centerBar.appendChild(actionButtons);
+                }
+                actionButtons.style.display = 'flex';
+                actionButtons.style.margin = '0';
+                actionButtons.style.position = 'relative';
+            }
+
+            if (actionPopup && actionButtons && actionPopup.parentElement !== actionButtons) {
+                actionButtons.appendChild(actionPopup);
+            }
+
+            // Chances Icons (Right)
             if (chancesContainer && imageContainer) {
-                imageContainer.appendChild(chancesContainer);
+                if (chancesContainer.parentElement !== imageContainer) {
+                    imageContainer.appendChild(chancesContainer);
+                }
                 chancesContainer.style.position = 'fixed';
                 chancesContainer.style.top = '20px';
                 chancesContainer.style.right = '20px';
                 chancesContainer.style.margin = '0';
-                chancesContainer.style.zIndex = '35';
+                chancesContainer.style.height = '36px';
+                chancesContainer.style.zIndex = '40';
                 chancesContainer.style.display = gameData.enableChances ? 'flex' : 'none';
                 chancesContainer.style.alignItems = 'center';
                 chancesContainer.style.gap = '8px';
@@ -2546,10 +2602,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 chancesContainer.style.backdropFilter = 'none';
                 chancesContainer.style.boxSizing = 'border-box';
             }
+
+            // Suggestions button is strictly and unconditionally hidden in scenario
+            if (suggestionsButton) {
+                suggestionsButton.classList.add('hidden');
+                suggestionsButton.style.setProperty('display', 'none', 'important');
+            }
+
+            // Manage visibility of interactive buttons in scenario
+            if (inventoryButton) {
+                const isInvEnabled = gameData.enableInventory !== false;
+                inventoryButton.classList.toggle('hidden', !isInvEnabled);
+                inventoryButton.style.display = isInvEnabled ? '' : 'none';
+            }
+            if (diaryButton) {
+                const isDiaryEnabled = gameData.enableDiary !== false;
+                diaryButton.classList.toggle('hidden', !isDiaryEnabled);
+                diaryButton.style.display = isDiaryEnabled ? '' : 'none';
+            }
+            if (notesButton) {
+                const isNotesEnabled = !!gameData.enableNotes;
+                notesButton.classList.toggle('hidden', !isNotesEnabled);
+                notesButton.style.display = isNotesEnabled ? '' : 'none';
+            }
+            if (trackersButton) {
+                const hasTrackers = (gameData.consequenceTrackers || []).length > 0;
+                trackersButton.classList.toggle('hidden', !hasTrackers);
+                trackersButton.style.display = hasTrackers ? '' : 'none';
+            }
+            if (systemButton) {
+                const isSysBtn = !gameData.enableSystemMenu && (gameData.gameShowSystemButton ?? true);
+                systemButton.classList.toggle('hidden', !isSysBtn);
+                systemButton.style.display = isSysBtn ? '' : 'none';
+            }
+
             renderChancesIcons();
             return;
         } else {
             if (gameContainer) gameContainer.classList.remove('hypercard-fullscreen');
+
+            const centerBar = document.getElementById('hypercard-center-bar');
+            if (centerBar) {
+                if (standardActionBar) {
+                    if (actionPopup) {
+                        standardActionBar.insertBefore(actionPopup, standardActionBar.firstChild);
+                    }
+                    if (actionButtons) {
+                        const inputArea = standardActionBar.querySelector('.input-area') || standardActionBar.querySelector('.choices-container');
+                        if (inputArea) {
+                            standardActionBar.insertBefore(actionButtons, inputArea);
+                        } else {
+                            standardActionBar.appendChild(actionButtons);
+                        }
+                    }
+                }
+                centerBar.remove();
+            }
+
+            const topBar = document.getElementById('hypercard-top-bar');
+            if (topBar) topBar.remove();
+
+            if (suggestionsButton) {
+                const isChoice = gameData.gameInteractionType === 'choice';
+                const isSuggEnabled = (gameData.enableSuggestions ?? true) && !isChoice;
+                suggestionsButton.classList.toggle('hidden', !isSuggEnabled);
+                suggestionsButton.style.display = isSuggEnabled ? '' : 'none';
+            }
+            if (inventoryButton) {
+                const isChoice = gameData.gameInteractionType === 'choice';
+                const isInvEnabled = (gameData.enableInventory ?? true) && !isChoice;
+                inventoryButton.classList.toggle('hidden', !isInvEnabled);
+                inventoryButton.style.display = isInvEnabled ? '' : 'none';
+            }
         }
         
         if (!isImagesEnabled) {
@@ -2864,6 +2988,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 stage = document.createElement('div');
                 stage.id = 'hypercard-stage';
                 imageContainer.appendChild(stage);
+                stage.addEventListener('click', () => {
+                    const p = document.getElementById('action-popup');
+                    if (p && !p.classList.contains('hidden')) {
+                        p.classList.add('hidden');
+                        activePopupType = null;
+                    }
+                });
             }
 
             if (sceneOverlay && sceneOverlay.parentElement !== imageContainer) {
@@ -3068,18 +3199,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         const itemObj = gameData.globalObjects ? gameData.globalObjects[hotspot.addsToInventory] : null;
                         if (itemObj) {
                             addToInventory(itemObj);
-                            const dialogTitle = hotspot.title || ("Coletar " + itemObj.name);
-                            showFloatingDialogue("Item Coletado", "Você obteve: " + itemObj.name);
+                            const dialogTitle = hotspot.title || hotspot.examineTitle || itemObj.name || "Objeto Coletado";
+                            const dialogText = hotspot.examineText || ("Você obteve: " + itemObj.name);
+                            const dialogImg = itemObj.image || hotspot.examineImage || '';
+                            showFloatingDialogue(dialogTitle, dialogText, dialogImg);
                             actionLog.push({ type: 'input', text: '> ' + dialogTitle });
-                            actionLog.push({ type: 'output', text: "Você obteve: " + itemObj.name });
+                            actionLog.push({ type: 'output', text: dialogText, image: dialogImg });
                             autoSaveGame();
                         }
                     }
 
                     if (hotspot.trackerEffects && hotspot.trackerEffects.length > 0) {
-                        hotspot.trackerEffects.forEach(eff => {
-                            updateTracker(eff.trackerId, eff.valueChange);
-                        });
+                        updateTrackers(hotspot.trackerEffects);
                     }
 
                     const effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
@@ -3170,6 +3301,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         actionLog.push({ type: 'input', text: '> ' + dialogTitle });
                         if (hotspot.examineText || hotspot.examineImage) {
                             actionLog.push({ type: 'output', text: hotspot.examineText || "", image: hotspot.examineImage });
+                        }
+                        autoSaveGame();
+                    } else if (hotspot.actionType === 'toggle_tracker') {
+                        const dialogTitle = hotspot.title || "Rastreador";
+                        if (hotspot.examineText) {
+                            showFloatingDialogue(dialogTitle, hotspot.examineText, hotspot.examineImage);
+                            actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                            actionLog.push({ type: 'output', text: hotspot.examineText, image: hotspot.examineImage });
                         }
                         autoSaveGame();
                     }
@@ -4015,7 +4154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div'); container.className = 'action-popup-container';
         if (inventory.length === 0) { 
             const msg = document.createElement('div'); 
-            msg.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.className = 'empty-inventory-msg';
             msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
             container.appendChild(msg); 
         }
@@ -4035,6 +4174,19 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(list);
         }
         actionPopup.appendChild(container);
+
+        const invBtn = document.getElementById('inventory-button');
+        const actionBtns = document.querySelector('.action-buttons');
+        if (invBtn && actionBtns && document.getElementById('hypercard-center-bar')) {
+            const centerOffset = invBtn.offsetLeft + (invBtn.offsetWidth / 2);
+            actionPopup.style.setProperty('left', centerOffset + 'px', 'important');
+            actionPopup.style.setProperty('transform', 'translateX(-50%)', 'important');
+            actionPopup.style.setProperty('top', 'calc(100% + 8px)', 'important');
+        } else {
+            actionPopup.style.removeProperty('left');
+            actionPopup.style.removeProperty('transform');
+            actionPopup.style.removeProperty('top');
+        }
     };
 
 

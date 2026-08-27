@@ -489,20 +489,113 @@ body.with-spacing .main-wrapper { height: 100%; }
 .game-container.hypercard-fullscreen .action-bar {
     display: none !important;
 }
+
+/* HyperCard Scenario Top Elements */
+.game-container.hypercard-fullscreen .scene-name-overlay {
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    z-index: 40 !important;
+    margin: 0 !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    border: 2px solid var(--border-color) !important;
+    background-color: var(--scene-name-overlay-bg) !important;
+    color: var(--scene-name-overlay-text-color) !important;
+    border-radius: 0 !important;
+    pointer-events: none !important;
+    box-shadow: none !important;
+}
+.hypercard-center-bar {
+    position: fixed !important;
+    top: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 40 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    pointer-events: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+.hypercard-center-bar .action-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    flex-wrap: nowrap !important;
+}
+.hypercard-center-bar .action-buttons button {
+    font-family: var(--font-family) !important;
+    padding: 6px 14px !important;
+    height: 36px !important;
+    border: 2px solid var(--system-button-border) !important;
+    background-color: var(--system-button-bg) !important;
+    color: var(--system-button-text) !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    font-size: 0.95em !important;
+    white-space: nowrap !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+}
+.hypercard-center-bar .action-buttons button:hover {
+    background-color: var(--system-button-hover-bg) !important;
+    color: var(--system-button-hover-text, var(--system-button-text)) !important;
+    transform: translateY(-2px) !important;
+}
+/* Suggestions button is strictly forbidden in scenarios */
+.game-container.hypercard-fullscreen #suggestions-button,
+.hypercard-center-bar #suggestions-button {
+    display: none !important;
+}
+
+.hypercard-center-bar .action-popup,
+.hypercard-center-bar .action-buttons .action-popup {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    min-width: 180px !important;
+    max-width: 380px !important;
+    width: max-content !important;
+    z-index: 100 !important;
+    background-color: var(--panel-bg) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    padding: 8px 14px !important;
+    pointer-events: auto !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+}
 .game-container.hypercard-fullscreen .chances-container {
     position: fixed !important;
     top: 20px !important;
     right: 20px !important;
-    z-index: 35 !important;
+    z-index: 40 !important;
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
     justify-content: flex-end !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: 36px !important;
     background: transparent !important;
     border: none !important;
-    pointer-events: none;
+    pointer-events: none !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
 }
 .game-container.hypercard-fullscreen .chances-container .chance-icon {
     width: 24px;
@@ -510,7 +603,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 }
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
-.scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; }
+.scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; box-shadow: none !important; }
 .text-panel { flex: 1; display: flex; flex-direction: column; padding: 0 0 0 30px; position: relative; }
 .game-container.layout-horizontal { flex-direction: column; }
 .game-container.layout-horizontal .image-panel { flex-basis: 45%; max-width: none; width: 100%; border-right: none; border-bottom: 2px solid var(--border-color); }
@@ -533,28 +626,41 @@ body.with-spacing .main-wrapper { height: 100%; }
 .action-bar { border-top: none; padding-top: 15px; margin-top: auto; flex-shrink: 0; display: flex; flex-direction: column; }
 .action-popup { 
     margin-bottom: 12px; 
-    background-color: rgba(0, 0, 0, 0.4); 
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2)); 
+    background-color: var(--panel-bg); 
+    border: 2px solid var(--border-color); 
     padding: 10px; 
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-radius: 0;
+    box-shadow: none !important;
+    filter: none !important;
 }
 .action-popup.hidden { display: none !important; }
 .action-popup-container { display: flex; flex-direction: column; gap: 10px; }
 .action-popup-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.empty-inventory-msg {
+    color: var(--text-color) !important;
+    font-family: var(--font-family) !important;
+    padding: 8px 12px !important;
+    text-transform: uppercase !important;
+    font-size: 0.85em !important;
+    letter-spacing: 0.05em !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
 .action-popup-list button, .action-popup-row button { 
     display: inline-block; 
     padding: 6px 12px; 
     margin: 0; 
     text-align: left; 
     background-color: var(--action-button-bg, #ffffff); 
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2)); 
+    border: 2px solid var(--border-color, rgba(255, 255, 255, 0.2)); 
     color: var(--action-button-text-color, #0d1117); 
     font-family: var(--font-family); 
     font-size: 0.9em; 
     font-weight: bold; 
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 0;
+    box-shadow: none !important;
     transition: all 0.2s;
 }
 .action-popup-list p { 

@@ -1706,6 +1706,10 @@ const Editor: React.FC = () => {
                               }}
                               isExpanded={isScenarioEditing}
                               onToggleExpand={setIsScenarioEditing}
+                              onNavigateToTrackers={() => {
+                                setIsScenarioEditing(false);
+                                attemptNavigation({ type: 'view', view: 'trackers' });
+                              }}
                               onViewMap={() => {
                                 setIsScenarioEditing(false);
                                 attemptNavigation({ type: 'view', view: 'map' });

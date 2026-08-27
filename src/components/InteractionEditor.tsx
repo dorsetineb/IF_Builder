@@ -617,10 +617,10 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors ${
                                         (consequenceTrackers || []).length === 0
                                             ? 'bg-zinc-500/10 text-zinc-500 cursor-not-allowed opacity-50'
-                                            : 'bg-green-500/10 text-green-500 hover:bg-green-500/20 hover:text-green-400'
+                                            : 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
                                     }`}
                                 >
-                                    <Plus className="w-3 h-3" /> {t('interactionEditor.addBtn', 'Adicionar')}
+                                    <Plus className="w-3 h-3" /> {t('interactionEditor.linkBtn', 'Vincular')}
                                 </button>
                             </div>
                             <div className="space-y-2">

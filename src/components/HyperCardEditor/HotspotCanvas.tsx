@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { CardHotspot, HotspotShape, HyperCard } from '../../types';
+import { CardHotspot, HotspotShape, HyperCard, GameObject } from '../../types';
 import { generateUniqueId } from '../../utils/helpers';
 import { useTranslation } from 'react-i18next';
 import { HOTSPOT_ICONS } from './HotspotInspector';
@@ -31,6 +31,7 @@ import {
 interface HotspotCanvasProps {
   card: HyperCard;
   allCards?: HyperCard[];
+  globalObjects?: Record<string, GameObject>;
   overlayEffect?: string;
   onUpdateCard: (updatedCard: HyperCard) => void;
   selectedHotspotId: string | null;
@@ -47,6 +48,7 @@ type DrawTool = 'select' | 'rect' | 'circle' | 'polygon';
 export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
   card,
   allCards,
+  globalObjects,
   overlayEffect,
   onUpdateCard,
   selectedHotspotId,
@@ -402,6 +404,12 @@ export const HotspotCanvas: React.FC<HotspotCanvasProps> = ({
       }
     } else if (hotspot.actionType === 'examine' && onTestExamine) {
       onTestExamine(hotspot.examineTitle, hotspot.examineText, hotspot.examineImage);
+    } else if (hotspot.actionType === 'collect_item' && onTestExamine) {
+      const itemObj = globalObjects && hotspot.addsToInventory ? globalObjects[hotspot.addsToInventory] : null;
+      const title = hotspot.title || hotspot.examineTitle || itemObj?.name || t('hypercard.collectItemTitleDefault', 'Objeto Coletado');
+      const text = hotspot.examineText || (itemObj ? `${t('hypercard.collectedFeedbackDefault', 'Você obteve:')} ${itemObj.name}` : t('hypercard.collectItemDefaultText', 'Objeto adicionado ao inventário.'));
+      const image = itemObj?.image || hotspot.examineImage;
+      onTestExamine(title, text, image);
     }
   };
 

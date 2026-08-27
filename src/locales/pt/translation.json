@@ -768,6 +768,7 @@
     "audioLoaded": "Áudio carregado",
     "trackersLabel": "Rastreadores",
     "addBtn": "Adicionar",
+    "linkBtn": "Vincular",
     "selectTracker": "Selecione um rastreador...",
     "valueLabel": "Valor:",
     "noTrackerEffects": "Em Rastreadores, crie um rastreador que verifique esta interação",
@@ -1465,7 +1466,10 @@
       "examineText": "Texto da Mensagem",
       "examineImage": "Imagem do Diálogo (Opcional)",
       "examineTextPlaceholder": "Descreva o que o jogador lê, sente ou observa...",
-      "collectItem": "Item a Coletar",
+      "collectItem": "Objeto a coletar",
+      "actionText": "Texto da ação",
+      "actionTextPlaceholder": "Descreva o feedback da coleta (ex: Você pegou a chave e guardou no inventário...)",
+      "actionTextHint": "Mensagem exibida no modal pop-up ao coletar o objeto. Caso o objeto tenha imagem cadastrada, ela será exibida no modal.",
       "requiresInInventory": "Requer Item no Inventário",
       "consumesItem": "Consumir/remover item ao usar",
       "lockedMessage": "Mensagem de Bloqueio",
@@ -1530,13 +1534,19 @@
       "examine": "Examinar (Diálogo flutuante)",
       "navigateCard": "Navegar para outro Cartão da Pilha",
       "navigateScene": "Sair para outra Cena/Ramificação do Mapa",
-      "collectItem": "Coletar Item para Inventário",
-      "toggleTracker": "Alterar Contador / Tracker"
+      "collectItem": "Coletar objeto para inventário",
+      "toggleTracker": "Alterar Rastreador"
     },
     "selectCardPlaceholder": "-- Selecione o Cartão --",
     "selectScenePlaceholder": "-- Selecione a Cena no Mapa --",
-    "selectItemPlaceholder": "-- Selecione o Item --",
+    "selectItemPlaceholder": "-- Selecione o Objeto --",
+    "collectItemTitleDefault": "Objeto Coletado",
+    "collectedFeedbackDefault": "Você obteve:",
+    "collectItemDefaultText": "Objeto adicionado ao inventário.",
     "noRequirement": "Nenhum requisito",
-    "uploadSound": "Adicionar Som (.mp3, .wav)"
+    "uploadSound": "Adicionar Som (.mp3, .wav)",
+    "noTrackersConfigured": "Nenhum rastreador configurado no projeto.",
+    "configureTrackers": "Configurar Rastreadores",
+    "noLinkedTrackers": "Clique em \"+ Vincular\" para associar um rastreador a esta ação."
   }
 }

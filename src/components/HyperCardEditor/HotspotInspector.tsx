@@ -53,7 +53,34 @@ import {
   Image as ImageIcon,
   RotateCcw,
   Save,
+  Plus,
+  Settings,
 } from 'lucide-react';
+
+const TRACKER_ICONS = [
+  { name: 'activity', component: Activity },
+  { name: 'heart', component: Heart },
+  { name: 'zap', component: Zap },
+  { name: 'shield', component: Shield },
+  { name: 'coins', component: Coins },
+  { name: 'clock', component: Clock },
+  { name: 'skull', component: Skull },
+  { name: 'star', component: Star },
+  { name: 'user', component: User },
+  { name: 'trophy', component: Trophy },
+  { name: 'alert', component: AlertTriangle },
+  { name: 'book', component: Book },
+  { name: 'crown', component: Crown },
+  { name: 'flame', component: Flame },
+  { name: 'droplet', component: Droplet },
+  { name: 'sun', component: Sun },
+  { name: 'moon', component: Moon },
+  { name: 'sword', component: Sword },
+  { name: 'key', component: Key },
+  { name: 'map', component: MapIcon },
+  { name: 'eye', component: Eye },
+  { name: 'flask', component: FlaskConical },
+];
 
 export const HOTSPOT_ICONS = [
   { name: 'eye', component: Eye, labelKey: 'hypercard.icons.eye', defaultLabel: 'Olho (Observar)' },
@@ -97,6 +124,7 @@ interface HotspotInspectorProps {
   allScenes: Scene[];
   globalObjects: { [id: string]: GameObject };
   consequenceTrackers: ConsequenceTracker[];
+  onNavigateToTrackers?: () => void;
   onUpdateHotspot: (updatedHotspot: CardHotspot) => void;
   onDeleteHotspot: (hotspotId: string) => void;
   onUploadSound?: (file: File) => void;
@@ -115,6 +143,7 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   allScenes,
   globalObjects,
   consequenceTrackers,
+  onNavigateToTrackers,
   onUpdateHotspot,
   onDeleteHotspot,
   onSave,
@@ -139,6 +168,28 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
   const handleFieldChange = <K extends keyof CardHotspot>(field: K, value: CardHotspot[K]) => {
     if (!hotspot) return;
     onUpdateHotspot({ ...hotspot, [field]: value });
+  };
+
+  const handleAddTrackerEffect = () => {
+    if (!hotspot) return;
+    const defaultTrackerId = consequenceTrackers[0]?.id || '';
+    const currentEffects = hotspot.trackerEffects || [];
+    handleFieldChange('trackerEffects', [...currentEffects, { trackerId: defaultTrackerId, valueChange: 1 }]);
+  };
+
+  const handleRemoveTrackerEffect = (index: number) => {
+    if (!hotspot) return;
+    const currentEffects = [...(hotspot.trackerEffects || [])];
+    currentEffects.splice(index, 1);
+    handleFieldChange('trackerEffects', currentEffects);
+  };
+
+  const handleTrackerEffectChange = (index: number, field: 'trackerId' | 'valueChange', value: any) => {
+    if (!hotspot) return;
+    const currentEffects = [...(hotspot.trackerEffects || [])];
+    if (!currentEffects[index]) return;
+    currentEffects[index] = { ...currentEffects[index], [field]: value };
+    handleFieldChange('trackerEffects', currentEffects);
   };
 
   const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -536,8 +587,8 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                 <option value="examine">{t('hypercard.actions.examine', 'Examinar (Diálogo flutuante)')}</option>
                 <option value="navigate_card">{t('hypercard.actions.navigateCard', 'Navegar para outro Cartão da Pilha')}</option>
                 <option value="navigate_scene">{t('hypercard.actions.navigateScene', 'Sair para outra Cena/Ramificação do Mapa')}</option>
-                <option value="collect_item">{t('hypercard.actions.collectItem', 'Coletar Item para Inventário')}</option>
-                <option value="toggle_tracker">{t('hypercard.actions.toggleTracker', 'Alterar Contador / Tracker')}</option>
+                <option value="collect_item">{t('hypercard.actions.collectItem', 'Coletar objeto para inventário')}</option>
+                <option value="toggle_tracker">{t('hypercard.actions.toggleTracker', 'Alterar Rastreador')}</option>
               </select>
             </div>
 
@@ -616,37 +667,167 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
               </div>
             )}
 
-            {/* ACTION: COLLECT ITEM */}
+            {/* ACTION: COLLECT OBJECT */}
             {hotspot.actionType === 'collect_item' && (
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                  {t('hypercard.fields.collectItem', 'Item a Coletar')}
-                </label>
-                <select
-                  value={hotspot.addsToInventory || ''}
-                  onChange={(e) => handleFieldChange('addsToInventory', e.target.value)}
-                  className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
-                >
-                  <option value="">{t('hypercard.selectItemPlaceholder', '-- Selecione o Item --')}</option>
-                  {sceneObjects.length > 0 && (
-                    <optgroup label={t('hypercard.sceneObjectsGroup', 'Objetos do Cenário')}>
-                      {sceneObjects.map((obj) => (
-                        <option key={obj.id} value={obj.id}>
-                          {obj.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                  {otherObjects.length > 0 && (
-                    <optgroup label={t('hypercard.otherObjectsGroup', 'Outros Objetos do Projeto')}>
-                      {otherObjects.map((obj) => (
-                        <option key={obj.id} value={obj.id}>
-                          {obj.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                </select>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                    {t('hypercard.fields.collectItem', 'Objeto a coletar')}
+                  </label>
+                  <select
+                    value={hotspot.addsToInventory || ''}
+                    onChange={(e) => handleFieldChange('addsToInventory', e.target.value)}
+                    className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
+                  >
+                    <option value="">{t('hypercard.selectItemPlaceholder', '-- Selecione o Objeto --')}</option>
+                    {sceneObjects.length > 0 && (
+                      <optgroup label={t('hypercard.sceneObjectsGroup', 'Objetos do Cenário')}>
+                        {sceneObjects.map((obj) => (
+                          <option key={obj.id} value={obj.id}>
+                            {obj.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    {otherObjects.length > 0 && (
+                      <optgroup label={t('hypercard.otherObjectsGroup', 'Outros Objetos do Projeto')}>
+                        {otherObjects.map((obj) => (
+                          <option key={obj.id} value={obj.id}>
+                            {obj.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                    {t('hypercard.fields.actionText', 'Texto da ação')}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={hotspot.examineText || ''}
+                    onChange={(e) => handleFieldChange('examineText', e.target.value)}
+                    placeholder={t('hypercard.fields.actionTextPlaceholder', 'Descreva o feedback da coleta (ex: Você pegou a chave e guardou no inventário...)')}
+                    className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1.5 italic">
+                    {t('hypercard.fields.actionTextHint', 'Mensagem exibida no modal pop-up ao coletar o objeto. Caso o objeto tenha imagem cadastrada, ela será exibida no modal.')}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ACTION: TOGGLE TRACKER */}
+            {hotspot.actionType === 'toggle_tracker' && (
+              <div className="space-y-4">
+                {consequenceTrackers.length === 0 ? (
+                  <div className="p-4 border border-dashed border-muted-foreground/40 rounded-2xl bg-muted/20 text-center space-y-3">
+                    <p className="text-xs text-muted-foreground">
+                      {t('hypercard.noTrackersConfigured', 'Nenhum rastreador configurado no projeto.')}
+                    </p>
+                    {onNavigateToTrackers && (
+                      <button
+                        type="button"
+                        onClick={onNavigateToTrackers}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
+                      >
+                        <Settings className="w-3.5 h-3.5" />
+                        {t('hypercard.configureTrackers', 'Configurar Rastreadores')}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                        {t('hypercard.fields.trackers', 'Rastreadores')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddTrackerEffect}
+                        disabled={(consequenceTrackers || []).length === 0}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold uppercase transition-colors ${
+                          (consequenceTrackers || []).length === 0
+                            ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-50'
+                            : 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
+                        }`}
+                      >
+                        <Plus className="w-3.5 h-3.5" /> {t('interactionEditor.linkBtn', 'Vincular')}
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      {(hotspot.trackerEffects || []).map((effect, i) => {
+                        const tracker = (consequenceTrackers || []).find(t => t && t.id === effect.trackerId);
+                        const TrackerIcon = TRACKER_ICONS.find(icon => icon.name === tracker?.icon)?.component || Activity;
+
+                        return (
+                          <div key={i} className="flex items-center gap-2 bg-background p-2.5 rounded-xl border border-muted-foreground/30">
+                            <TrackerIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <select
+                              value={effect.trackerId || ''}
+                              onChange={(e) => handleTrackerEffectChange(i, 'trackerId', e.target.value)}
+                              className="flex-1 bg-transparent border-none text-xs font-semibold text-foreground focus:ring-0 p-0"
+                            >
+                              <option value="" className="bg-popover text-foreground">
+                                {t('interactionEditor.selectTracker', 'Selecione um rastreador...')}
+                              </option>
+                              {(consequenceTrackers || []).map((tOption) => tOption && (
+                                <option key={tOption.id} value={tOption.id} className="bg-popover text-foreground">
+                                  {tOption.name}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded-lg border border-muted-foreground/30">
+                              <span className="text-[10px] text-muted-foreground font-bold">{t('interactionEditor.valueLabel', 'Valor:')}</span>
+                              <input
+                                type="number"
+                                value={effect.valueChange}
+                                onChange={(e) => handleTrackerEffectChange(i, 'valueChange', e.target.value === '' ? '' : Number(e.target.value))}
+                                className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono font-bold focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTrackerEffect(i)}
+                              className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                              title="Remover"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+
+                      {(hotspot.trackerEffects || []).length === 0 && (
+                        <div className="text-center py-4 border border-dashed border-muted-foreground/40 rounded-xl bg-muted/10">
+                          <p className="text-xs text-muted-foreground italic">
+                            {t('hypercard.noLinkedTrackers', 'Clique em "+ Vincular" para associar um rastreador a esta ação.')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Feedback Text */}
+                    <div className="mt-3">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
+                        {t('hypercard.fields.actionText', 'Texto da ação')}
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={hotspot.examineText || ''}
+                        onChange={(e) => handleFieldChange('examineText', e.target.value)}
+                        placeholder={t('hypercard.fields.actionTextPlaceholder', 'Descreva o feedback ao alterar o rastreador...')}
+                        className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+                      />
+                      <p className="text-[10px] text-muted-foreground mt-1.5 italic">
+                        {t('hypercard.fields.actionTextHint', 'Mensagem exibida no modal pop-up ao executar a ação.')}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -703,55 +884,6 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                   placeholder="Ex: A porta está trancada. Você precisa de uma chave."
                   className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
                 />
-              </div>
-            )}
-
-            {/* Tracker Effects */}
-            {consequenceTrackers.length > 0 && (
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                  {t('hypercard.fields.trackers', 'Efeito em Contadores')}
-                </label>
-                <div className="space-y-2">
-                  {consequenceTrackers.map((tracker) => {
-                    const existing = hotspot.trackerEffects?.find(t => t.trackerId === tracker.id);
-                    const val = existing ? existing.valueChange : 0;
-                    return (
-                      <div key={tracker.id} className="flex items-center justify-between p-2.5 rounded-xl bg-background border border-muted-foreground/30 text-sm">
-                        <span className="font-semibold text-foreground truncate max-w-[130px]">
-                          {tracker.name}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              const newVal = val - 1;
-                              const filtered = (hotspot.trackerEffects || []).filter(t => t.trackerId !== tracker.id);
-                              if (newVal !== 0) filtered.push({ trackerId: tracker.id, valueChange: newVal });
-                              handleFieldChange('trackerEffects', filtered);
-                            }}
-                            className="w-7 h-7 rounded-lg bg-muted hover:bg-muted-foreground/20 font-bold flex items-center justify-center text-foreground transition-colors"
-                          >
-                            -
-                          </button>
-                          <span className={`w-7 text-center font-mono font-bold ${val > 0 ? 'text-green-400' : val < 0 ? 'text-red-400' : 'text-muted-foreground'}`}>
-                            {val > 0 ? `+${val}` : val}
-                          </span>
-                          <button
-                            onClick={() => {
-                              const newVal = val + 1;
-                              const filtered = (hotspot.trackerEffects || []).filter(t => t.trackerId !== tracker.id);
-                              if (newVal !== 0) filtered.push({ trackerId: tracker.id, valueChange: newVal });
-                              handleFieldChange('trackerEffects', filtered);
-                            }}
-                            className="w-7 h-7 rounded-lg bg-muted hover:bg-muted-foreground/20 font-bold flex items-center justify-center text-foreground transition-colors"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
             )}
           </div>

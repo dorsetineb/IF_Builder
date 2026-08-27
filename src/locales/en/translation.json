@@ -760,6 +760,7 @@
     "audioLoaded": "Audio loaded",
     "trackersLabel": "Trackers",
     "addBtn": "Add",
+    "linkBtn": "Link",
     "selectTracker": "Select a tracker...",
     "valueLabel": "Value:",
     "noTrackerEffects": "No tracker effects configured.",
@@ -1479,7 +1480,10 @@
       "examineText": "Message Text",
       "examineImage": "Dialogue Image (Optional)",
       "examineTextPlaceholder": "Describe what the player reads, feels or observes...",
-      "collectItem": "Item to Collect",
+      "collectItem": "Object to collect",
+      "actionText": "Action text",
+      "actionTextPlaceholder": "Describe the collection feedback (e.g. You picked up the key and kept it in your inventory...)",
+      "actionTextHint": "Message displayed in the pop-up modal when collecting the object. If the object has an image, it will be displayed in the modal.",
       "requiresInInventory": "Requires Item in Inventory",
       "consumesItem": "Consume/remove item upon use",
       "lockedMessage": "Locked Message",
@@ -1544,13 +1548,19 @@
       "examine": "Examine (Floating dialogue)",
       "navigateCard": "Navigate to another Scenario View",
       "navigateScene": "Exit to another Scene/Branch on Map",
-      "collectItem": "Collect Item to Inventory",
-      "toggleTracker": "Modify Tracker"
+      "collectItem": "Collect object to inventory",
+      "toggleTracker": "Change Tracker"
     },
     "selectCardPlaceholder": "-- Select View --",
     "selectScenePlaceholder": "-- Select Scene on Map --",
-    "selectItemPlaceholder": "-- Select Item --",
+    "selectItemPlaceholder": "-- Select Object --",
+    "collectItemTitleDefault": "Object Collected",
+    "collectedFeedbackDefault": "You obtained:",
+    "collectItemDefaultText": "Object added to inventory.",
     "noRequirement": "No requirement",
-    "uploadSound": "Add Sound (.mp3, .wav)"
+    "uploadSound": "Add Sound (.mp3, .wav)",
+    "noTrackersConfigured": "No trackers configured in the project.",
+    "configureTrackers": "Configure Trackers",
+    "noLinkedTrackers": "Click \"+ Link\" to associate a tracker with this action."
   }
 }

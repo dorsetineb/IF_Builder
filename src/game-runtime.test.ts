@@ -190,7 +190,11 @@ describe('Game Runtime evaluation in JSDOM', () => {
 
         const gameContainer = document.getElementById('game-container');
         expect(gameContainer?.classList.contains('hypercard-fullscreen')).toBe(true);
+        const centerBar = document.getElementById('hypercard-center-bar');
+        expect(centerBar).not.toBeNull();
+        const actionButtons = centerBar?.querySelector('.action-buttons');
+        expect(actionButtons).not.toBeNull();
         const chancesContainer = document.getElementById('chances-container');
-        expect(chancesContainer?.style.position).toBe('fixed');
+        expect(chancesContainer).not.toBeNull();
     });
 });
