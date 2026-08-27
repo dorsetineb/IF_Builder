@@ -95,6 +95,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     objectFit="cover"
                     enableHover={true}
                     hoverRadius={433}
+                    isScanMode={true}
+                    scanDuration={6.0}
                 />
             </div>
 

@@ -310,8 +310,9 @@ export function Auth() {
                     className="w-full h-full"
                     objectFit="cover"
                     enableHover={!isMobile}
-                    isScanMode={isMobile}
+                    isScanMode={true}
                     hoverRadius={433}
+                    scanDuration={6.0}
                 />
             </div>
 

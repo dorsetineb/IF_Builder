@@ -42,8 +42,10 @@ interface DitherShaderProps {
     hoverRadius?: number;
     /** Additional CSS classes for the container */
     className?: string;
-    /** Enable automatic horizontal scan mode (replaces circular mask) */
+    /** Enable automatic horizontal scan mode (replaces circular mask or blends with hover) */
     isScanMode?: boolean;
+    /** Duration in seconds for one full scan wave cycle (default: 6.0s) */
+    scanDuration?: number;
 }
 
 // 4x4 Bayer matrix
@@ -110,6 +112,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     hoverRadius = 100,
     className,
     isScanMode = false,
+    scanDuration = 6.0,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -185,68 +188,47 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         };
     }, [enableHover]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleMouseLeave = useCallback(() => {
-        mouseRef.current = null;
-    }, []);
-
-    // Remove old event handlers from local variables if they exist in previous renders (not needed, just cleaning up)
-
     const renderLoop = useCallback(
-        (
-            ctx: CanvasRenderingContext2D,
-            width: number,
-            height: number,
-            time: number
-        ) => {
+        (ctx: CanvasRenderingContext2D, width: number, height: number, time: number, elapsedSeconds: number) => {
             if (!sourceDataRef.current) return;
 
+            const bayerMatrix = gridSize <= 4 ? BAYER_MATRIX_4x4 : BAYER_MATRIX_8x8;
+            const matrixSize = bayerMatrix.length;
+            const matrixScale = matrixSize * matrixSize;
+
+            const sourceData = sourceDataRef.current.data;
             const outputImage = ctx.createImageData(width, height);
             const outputData = outputImage.data;
-            const sourceData = sourceDataRef.current.data;
-            const sourceW = sourceDataRef.current.width;
-            const sourceH = sourceDataRef.current.height;
 
-            // Smooth animation for hover scale
-            if (hoverScaleRef.current < targetScaleRef.current) {
-                hoverScaleRef.current = Math.min(targetScaleRef.current, hoverScaleRef.current + 0.08);
-            } else if (hoverScaleRef.current > targetScaleRef.current) {
-                hoverScaleRef.current = Math.max(targetScaleRef.current, hoverScaleRef.current - 0.05);
+            const mouse = mouseRef.current;
+            if (mouse) {
+                targetScaleRef.current = 1.0;
+                lastMousePosRef.current = { ...mouse };
+            } else {
+                targetScaleRef.current = 0.0;
             }
 
-            const currentScale = hoverScaleRef.current;
-            const internalHoverRadius = (hoverRadius * currentScale) / Math.max(1, gridSize);
+            hoverScaleRef.current += (targetScaleRef.current - hoverScaleRef.current) * 0.15;
+
+            const currentPos = mouse || lastMousePosRef.current;
+            const internalMouseX = currentPos ? Math.floor(currentPos.x / Math.max(1, gridSize)) : -9999;
+            const internalMouseY = currentPos ? Math.floor(currentPos.y / Math.max(1, gridSize)) : -9999;
+            const internalHoverRadius = (hoverRadius / Math.max(1, gridSize)) * hoverScaleRef.current;
             const hoverRadiusSq = internalHoverRadius * internalHoverRadius;
-
-            let internalMouseX = -9999;
-            let internalMouseY = -9999;
-
-            const activePos = targetScaleRef.current > 0 ? mouseRef.current : lastMousePosRef.current;
-            if (activePos && currentScale > 0) {
-                internalMouseX = activePos.x / Math.max(1, gridSize);
-                internalMouseY = activePos.y / Math.max(1, gridSize);
-            }
-
-            const matrixSize = gridSize <= 4 ? 4 : 8;
-            const bayerMatrix = gridSize <= 4 ? BAYER_MATRIX_4x4 : BAYER_MATRIX_8x8;
-            const matrixScale = matrixSize === 4 ? 16 : 64;
 
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
                     const idx = (y * width + x) * 4;
-
-                    const srcX = Math.floor((x / width) * sourceW);
-                    const srcY = Math.floor((y / height) * sourceH);
-                    const srcIdx = (srcY * sourceW + srcX) * 4;
+                    const srcX = Math.floor((x / width) * sourceDataRef.current.width);
+                    const srcY = Math.floor((y / height) * sourceDataRef.current.height);
+                    const srcIdx = (srcY * sourceDataRef.current.width + srcX) * 4;
 
                     let r = sourceData[srcIdx];
                     let g = sourceData[srcIdx + 1];
                     let b = sourceData[srcIdx + 2];
+                    const a = sourceData[srcIdx + 3];
 
-                    if (sourceData[srcIdx + 3] < 10) {
-                        outputData[idx] = 0;
-                        outputData[idx + 1] = 0;
-                        outputData[idx + 2] = 0;
+                    if (a === 0) {
                         outputData[idx + 3] = 0;
                         continue;
                     }
@@ -259,38 +241,39 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
 
                     let luminance = getLuminance(r, g, b) / 255;
 
-                    // --- SPOTLIGHT / SCAN REVEAL LOGIC ---
                     if (isScanMode || enableHover) {
-                        let mask = 0.0;
+                        let scanMask = 0.0;
+                        let hoverMask = 0.0;
                         
                         if (isScanMode) {
-                            // Automatic scan logic - Faster, thicker and slanted
-                            const scanCycle = height * 1.8; // More space for slanted start/end
-                            const currentScanY = (time * 450) % scanCycle; // Faster speed
-                            const scanY = currentScanY - (height * 0.4); 
+                            // Wall-clock synchronized sweep (identical speed and period regardless of screen size/FPS)
+                            const cycleDuration = scanDuration || 6.0;
+                            const cycleProgress = (elapsedSeconds % cycleDuration) / cycleDuration;
+                            const totalTravel = height * 2.0;
+                            const currentScanY = (cycleProgress * totalTravel) - (height * 0.5);
                             
-                            // Inclination using x-offset: dist is vertical distance to slanted line
-                            const slantFactor = 0.2; // Angle of slant
-                            const dist = Math.abs(y + (x * slantFactor) - scanY);
-                            const thickness = height * 0.45; // Much thicker reveal area
+                            const slantFactor = 0.2;
+                            const dist = Math.abs(y + (x * slantFactor) - currentScanY);
+                            const thickness = height * 0.4;
                             
-                            mask = 1.0 - (dist / thickness);
-                            if (mask < 0) mask = 0;
-                        } else if (enableHover && internalMouseX !== -9999) {
-                            // Circular flashlight logic
+                            scanMask = 1.0 - (dist / thickness);
+                            if (scanMask < 0) scanMask = 0;
+                        }
+
+                        if (enableHover && internalMouseX !== -9999) {
                             const dx = x - internalMouseX;
                             const dy = y - internalMouseY;
                             const distSq = dx * dx + dy * dy;
                             if (distSq < hoverRadiusSq) {
                                 const dist = Math.sqrt(distSq);
-                                mask = 1.0 - (dist / internalHoverRadius);
-                                if (mask < 0) mask = 0;
+                                hoverMask = 1.0 - (dist / internalHoverRadius);
+                                if (hoverMask < 0) hoverMask = 0;
                             }
                         }
                         
-                        luminance = luminance * mask;
+                        const combinedMask = Math.min(1.0, Math.max(scanMask, hoverMask));
+                        luminance = luminance * combinedMask;
                     }
-                    // -----------------------------
 
                     let ditherThreshold = 0;
                     const matrixX = x % matrixSize;
@@ -349,7 +332,8 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             gridSize, ditherMode, colorMode, invert,
             parsedPrimaryColor, parsedSecondaryColor,
             brightness, contrast, threshold,
-            enableHover, hoverRadius, isScanMode
+            enableHover, hoverRadius, isScanMode,
+            scanDuration
         ]
     );
 
@@ -412,18 +396,19 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
 
         const startLoop = () => {
             let cancel = false;
-            const loop = () => {
+            const loop = (timestamp: number) => {
                 if (cancel) return;
                 timeRef.current += animationSpeed;
+                const elapsedSeconds = (timestamp || performance.now()) / 1000;
                 if (sourceDataRef.current) {
-                    renderLoop(ctx, internalWidth, internalHeight, timeRef.current);
+                    renderLoop(ctx, internalWidth, internalHeight, timeRef.current, elapsedSeconds);
                 }
                 if (animated || enableHover || isScanMode) {
                     animationRef.current = requestAnimationFrame(loop);
                 }
             };
             prepareSource();
-            loop();
+            loop(performance.now());
             return () => { cancel = true; if (animationRef.current) cancelAnimationFrame(animationRef.current); };
         };
 
@@ -448,7 +433,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             return startLoop();
         }
 
-    }, [src, dimensions, gridSize, renderLoop, animated, animationSpeed, enableHover, objectFit]);
+    }, [src, dimensions, gridSize, renderLoop, animated, animationSpeed, enableHover, objectFit, isScanMode]);
 
     return (
         <div
