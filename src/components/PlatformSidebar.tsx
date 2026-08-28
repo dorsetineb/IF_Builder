@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { LayoutDashboard, Users, Gamepad2, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { IFBuilderText, IFBuilderIcon } from './IFBuilderLogo';
 
 const PlatformSidebar: React.FC = () => {
     const { t } = useTranslation();
@@ -33,16 +34,18 @@ const PlatformSidebar: React.FC = () => {
     );
 
     return (
-        <aside className={`${isCollapsed ? 'w-20' : 'w-52'} bg-card border-r border-muted-foreground/50 flex flex-col h-full transition-all duration-300 relative`}>
+        <aside className={`${isCollapsed ? 'w-20' : 'w-48'} bg-card border-r border-muted-foreground/50 flex flex-col h-full transition-all duration-300 relative`}>
 
 
             {/* Logo aligned with Header - EXACT MATCH with Header.tsx */}
             <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-muted-foreground/50 relative h-[61px] ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                 <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
                 {isCollapsed ? (
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-foreground text-xs notranslate" translate="no">IF</div>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-foreground notranslate">
+                        <IFBuilderIcon className="w-5 h-5 text-foreground" />
+                    </div>
                 ) : (
-                    <h1 className="text-xl font-bold text-foreground truncate notranslate" translate="no">IF Builder</h1>
+                    <IFBuilderText className="h-3.5 w-auto max-w-[130px] text-foreground notranslate" />
                 )}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}

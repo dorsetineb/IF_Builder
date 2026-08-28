@@ -602,7 +602,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                                 className="w-full h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                             />
                                                             <span className="text-xs font-bold w-20 text-left whitespace-nowrap">
-                                                                {localMenuTransitionSpeed === 200 ? "Rápido" : (localMenuTransitionSpeed === 500 ? "Normal" : (localMenuTransitionSpeed === 1000 ? "Lento" : (localMenuTransitionSpeed === 2000 ? "Muito Lento" : "Normal")))}
+                                                                {localMenuTransitionSpeed === 200 ? t('UIEditor.sistemas.speedFast', "Rápido") : (localMenuTransitionSpeed === 500 ? t('UIEditor.sistemas.speedNormal', "Normal") : (localMenuTransitionSpeed === 1000 ? t('UIEditor.sistemas.speedSlow', "Lento") : (localMenuTransitionSpeed === 2000 ? t('UIEditor.sistemas.speedVerySlow', "Muito Lento") : t('UIEditor.sistemas.speedNormal', "Normal"))))}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -740,8 +740,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                     onChange={(e) => setLocalDiceType?.(e.target.value as DiceType)}
                                                     className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground font-bold focus:ring-1 focus:ring-primary/30"
                                                 >
-                                                    <option value="d6">D6 (Dado de 6 Lados)</option>
-                                                    <option value="d20">D20 (Dado de 20 Lados)</option>
+                                                    <option value="d6">{t('UIEditor.sistemas.diceD6', 'D6 (Dado de 6 Lados)')}</option>
+                                                    <option value="d20">{t('UIEditor.sistemas.diceD20', 'D20 (Dado de 20 Lados)')}</option>
                                                 </select>
                                             </div>
                                         </div>

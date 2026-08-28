@@ -330,7 +330,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
         const file = e.target.files[0];
         if (file.size > MAX_IMAGE_SIZE) {
           toast(
-            t('editor.uploadErrorTitle', 'Erro no Upload'),
             t('editor.imageLimitExceeded', {
               limit: MAX_IMAGE_SIZE / 1024 / 1024,
               defaultValue: `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`,
@@ -368,7 +367,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
         const file = e.target.files[0];
         if (file.size > MAX_AUDIO_SIZE) {
           toast(
-            t('editor.uploadErrorTitle', 'Erro no Upload'),
             t('editor.audioLimitExceeded', {
               limit: MAX_AUDIO_SIZE / 1024 / 1024,
               defaultValue: `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024} MB.`,
@@ -405,7 +403,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
         const file = e.dataTransfer.files[0];
         if (file.size > MAX_IMAGE_SIZE) {
           toast(
-            t('editor.uploadErrorTitle', 'Erro no Upload'),
             t('editor.imageLimitExceeded', {
               limit: MAX_IMAGE_SIZE / 1024 / 1024,
               defaultValue: `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`,

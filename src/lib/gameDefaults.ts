@@ -677,7 +677,7 @@ body.with-spacing .main-wrapper { height: 100%; }
     transform: translateY(-1px);
 }
 
-.action-buttons { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.action-buttons { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 .action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--system-button-border); background-color: var(--system-button-bg); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-size: 1em; }
 .action-buttons button:hover { background-color: var(--system-button-hover-bg); color: var(--system-button-hover-text, var(--system-button-text)); transform: translateY(-2px); }
 .dice-roll-btn-parser, .dice-roll-btn {

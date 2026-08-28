@@ -9,6 +9,7 @@ import { GameData } from '../types';
 import Preview from './Preview';
 import { getDitherColors } from '../utils/themeStyles';
 import { APP_VERSION } from '../version';
+import { IFBuilderLogo } from './IFBuilderLogo';
 
 type LandingView = 'landing' | 'about' | 'play';
 
@@ -347,19 +348,12 @@ export function Auth() {
             {currentView === 'play' && renderGamePopup()}
 
             {/* IF Logo - Bottom Right Group */}
-            <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-45 flex flex-col items-start">
-                <pre className="font-mono leading-none text-primary text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
-{`           ██████   █████████
-          ░░████  ░░█████████
-         ░████   ░██         
-        ░████   ░█████████   
-       ░████   ░█████████   
-      ░████   ░██           
-     ██████  ░██            
-    ░░░░░░   ░░             `}
-                </pre>
-                <div className="text-xs sm:text-sm font-mono text-foreground font-semibold mt-1 pl-[25px] sm:pl-[35px]">
-                    v.{APP_VERSION}
+            <div className="fixed bottom-10 right-10 z-10 select-none pointer-events-none opacity-45 text-primary">
+                <div className="relative w-80 sm:w-[420px]">
+                    <div className="absolute top-0 right-0 text-[10px] sm:text-xs font-mono text-foreground font-semibold leading-none tracking-wider notranslate" translate="no">
+                        v.{APP_VERSION}
+                    </div>
+                    <IFBuilderLogo className="w-full h-auto notranslate" />
                 </div>
             </div>
         </div>

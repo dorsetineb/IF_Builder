@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   return (
     <aside
-      className={`${isCollapsed ? 'w-20' : 'w-56'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
+      className={`${isCollapsed ? 'w-20' : 'w-48'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
     >
       <nav
         className={`flex flex-col flex-grow pl-3 pr-0 py-4 overflow-y-auto overflow-x-hidden`}
@@ -250,14 +250,14 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button
           onClick={() => onSetView('editor_interface')}
           className={getButtonClass('editor_interface')}
-          title={isCollapsed ? t('sidebar.editorInterface', 'Interface do Editor') : undefined}
+          title={isCollapsed ? t('sidebar.editorInterface', 'Interface') : undefined}
         >
           <div
             className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'editor_interface' ? 'translate-x-0' : ''}`}
           />
           <Monitor className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.editorInterface', 'Interface do Editor')}</span>
+            <span className="truncate relative z-10">{t('sidebar.editorInterface', 'Interface')}</span>
           )}
         </button>
       </div>

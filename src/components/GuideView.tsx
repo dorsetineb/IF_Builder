@@ -154,9 +154,17 @@ export const GuideView: React.FC = () => {
                                 <Sparkles className="w-3.5 h-3.5" />
                                 <span>{t('guide.sections.scenes.exampleTitle', 'Exemplo de Texto Clicável:')}</span>
                             </div>
-                            <div className="bg-background/80 border border-muted-foreground/40 rounded-lg p-3 font-mono text-xs text-foreground/90 leading-relaxed">
-                                Você se aproxima de um <span className="text-indigo-400 font-bold bg-indigo-500/10 px-1 py-0.5 rounded cursor-pointer">&lt;baú&gt;</span> de ferro trancado.
-                            </div>
+                            <div 
+                                className="bg-background/80 border border-muted-foreground/40 rounded-lg p-3 font-mono text-xs text-foreground/90 leading-relaxed"
+                                dangerouslySetInnerHTML={{
+                                    __html: DOMPurify.sanitize(
+                                        t(
+                                            'guide.sections.scenes.exampleHtml',
+                                            'Você se aproxima de um <span class="text-indigo-400 font-bold bg-indigo-500/10 px-1 py-0.5 rounded cursor-pointer">&lt;baú&gt;</span> de ferro trancado.'
+                                        )
+                                    )
+                                }}
+                            />
                             <div className="flex items-start gap-2 text-xs text-muted-foreground leading-snug">
                                 <Lightbulb className="w-3.5 h-3.5 text-yellow-500 shrink-0 mt-0.5" />
                                 <span>{t('guide.sections.scenes.exampleTip', 'Clicar na palavra em destaque envia o comando diretamente ao jogo.')}</span>
@@ -631,7 +639,7 @@ export const GuideView: React.FC = () => {
                                 <div className="space-y-1.5">
                                     {/* Theme 1: Meia-Noite */}
                                     <div className="flex items-center justify-between p-2 bg-background/60 rounded-lg border border-muted-foreground/20">
-                                        <span className="font-medium text-foreground">Meia-Noite</span>
+                                        <span className="font-medium text-foreground">{t('guide.sections.appearance.themeMidnight', 'Meia-Noite')}</span>
                                         <div className="flex items-center gap-1">
                                             <span className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: '#0d1117' }} />
                                             <span className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: '#c9d1d9' }} />
@@ -641,7 +649,7 @@ export const GuideView: React.FC = () => {
                                     </div>
                                     {/* Theme 2: Sépia */}
                                     <div className="flex items-center justify-between p-2 bg-background/60 rounded-lg border border-muted-foreground/20">
-                                        <span className="font-medium text-foreground">Sépia</span>
+                                        <span className="font-medium text-foreground">{t('guide.sections.appearance.themeSepia', 'Sépia')}</span>
                                         <div className="flex items-center gap-1">
                                             <span className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: '#292524' }} />
                                             <span className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: '#e7e5e4' }} />
@@ -651,7 +659,7 @@ export const GuideView: React.FC = () => {
                                     </div>
                                     {/* Theme 3: Vampiro */}
                                     <div className="flex items-center justify-between p-2 bg-background/60 rounded-lg border border-muted-foreground/20">
-                                        <span className="font-medium text-foreground">Vampiro</span>
+                                        <span className="font-medium text-foreground">{t('guide.sections.appearance.themeVampire', 'Vampiro')}</span>
                                         <div className="flex items-center gap-1">
                                             <span className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: '#450a0a' }} />
                                             <span className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: '#fecaca' }} />
@@ -667,10 +675,10 @@ export const GuideView: React.FC = () => {
                                     {t('guide.sections.appearance.effectsTitle', 'Efeitos')}
                                 </span>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">🌧️ Chuva</span>
-                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">❄️ Neve</span>
-                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">📺 CRT Scanlines</span>
-                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">🎬 Ruído</span>
+                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">🌧️ {t('guide.sections.appearance.effectRain', 'Chuva')}</span>
+                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">❄️ {t('guide.sections.appearance.effectSnow', 'Neve')}</span>
+                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">📺 {t('guide.sections.appearance.effectCrt', 'CRT Scanlines')}</span>
+                                    <span className="px-2.5 py-1.5 bg-background/60 rounded border border-muted-foreground/20 font-medium text-foreground/90 text-center">🎬 {t('guide.sections.appearance.effectNoise', 'Ruído')}</span>
                                 </div>
                             </div>
                         </div>
@@ -770,23 +778,23 @@ export const GuideView: React.FC = () => {
                         {/* Visual mini flowchart illustrating branching narrative with 2 conclusions */}
                         <div className="lg:col-span-5 bg-card/60 border border-muted-foreground/30 rounded-xl p-4 space-y-3 h-fit shadow-sm text-xs">
                             <span className="font-semibold uppercase tracking-wider text-teal-400 block text-center mb-1">
-                                Estrutura da Narrativa
+                                {t('guide.sections.map.narrativeStructure', 'Estrutura da Narrativa')}
                             </span>
                             <div className="flex flex-col items-center gap-1.5 py-1">
                                 <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-md text-purple-300 font-bold text-center text-[11px] shadow-sm">
-                                    Abertura
+                                    {t('guide.sections.map.nodeOpening', 'Abertura')}
                                 </div>
                                 <div className="w-0.5 h-3 bg-teal-500/40" />
                                 <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-md text-indigo-300 font-bold text-center text-[11px] shadow-sm">
-                                    Ramificação
+                                    {t('guide.sections.map.nodeBranch', 'Ramificação')}
                                 </div>
                                 <div className="w-40 h-3 border-t-2 border-l-2 border-r-2 border-teal-500/40 rounded-t-sm mt-0.5" />
                                 <div className="flex items-center justify-between w-48">
                                     <div className="px-2.5 py-1 bg-background border border-teal-500/30 rounded text-foreground text-[10px] font-semibold text-center w-20">
-                                        Escolha A
+                                        {t('guide.sections.map.nodeChoiceA', 'Escolha A')}
                                     </div>
                                     <div className="px-2.5 py-1 bg-background border border-teal-500/30 rounded text-foreground text-[10px] font-semibold text-center w-20">
-                                        Escolha B
+                                        {t('guide.sections.map.nodeChoiceB', 'Escolha B')}
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between w-48 px-9">
@@ -795,10 +803,10 @@ export const GuideView: React.FC = () => {
                                 </div>
                                 <div className="flex items-center justify-between w-48">
                                     <div className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-300 text-[10px] font-bold text-center w-20 shadow-sm">
-                                        Conclusão X
+                                        {t('guide.sections.map.nodeConclusionX', 'Conclusão X')}
                                     </div>
                                     <div className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-300 text-[10px] font-bold text-center w-20 shadow-sm">
-                                        Conclusão Y
+                                        {t('guide.sections.map.nodeConclusionY', 'Conclusão Y')}
                                     </div>
                                 </div>
                             </div>
@@ -909,7 +917,7 @@ export const GuideView: React.FC = () => {
                 <Lightbulb className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-foreground/90 leading-relaxed space-y-1">
                     <span className="font-bold text-amber-400 uppercase tracking-wider block">
-                        IMPORTANTE
+                        {t('guide.important', 'IMPORTANTE')}
                     </span>
                     <p className="opacity-90">
                         {t('guide.disclaimer', 'O IF Builder roda no seu navegador e não armazena dados em nuvem. Salve sempre seu arquivo .zip para guardar seu trabalho com segurança!')}

@@ -408,7 +408,7 @@
     "openEditor": "Abrir Editor",
     "showNarrative": "Ver lista de narrativas",
     "hideNarrative": "Ocultar lista de narrativas",
-    "editorInterface": "Interface do Editor"
+    "editorInterface": "Interface"
   },
   "newProject": {
     "title": "Nova Ficção",
@@ -528,6 +528,7 @@
   },
   "guide": {
     "title": "Guia Rápido",
+    "important": "IMPORTANTE",
     "intro": "O IF Builder permite criar ficções interativas com facilidade. Uma história é construída através de <strong>Ramificações</strong>, <strong>Cenários e Vistas</strong> e <strong>Capítulos</strong>, onde quem joga lê descrições, observa ilustrações, explora detalhes interativos e toma decisões usando escolhas na tela ou comandos em linguagem natural.",
     "toc": "Índice do Guia",
     "tocSelect": "Selecione um capítulo...",
@@ -541,6 +542,7 @@
         "item4": "<strong>Ponto de Partida e Finais:</strong> Defina qual nó inicia a história e marque ramificações conclusivas como finais narrativos.",
         "exampleTitle": "Exemplo de Texto Clicável:",
         "exampleText": "Você se aproxima de um <baú> de ferro trancado.",
+        "exampleHtml": "Você se aproxima de um <span class=\"text-indigo-400 font-bold bg-indigo-500/10 px-1 py-0.5 rounded cursor-pointer\">&lt;baú&gt;</span> de ferro trancado.",
         "exampleTip": "Clicar na palavra em destaque envia o comando diretamente ao jogo."
       },
       "scenarios": {
@@ -660,8 +662,15 @@
         "item2": "<strong>Cores e Tipografia:</strong> Ajuste cores de fundo, texto, títulos, destaques e fontes serifadas, modernas ou monoespaçadas.",
         "item3": "<strong>Layout e Molduras:</strong> Orientação Vertical ou Horizontal e molduras de imagem (Limpo, Arredondado, Vinheta suave e Vidro translúcido).",
         "item4": "<strong>Efeitos de Tela:</strong> Camadas dinâmicas como Chuva, Neve, Poeira/Partículas, Linhas CRT Scanlines, Ruído de película e Dither Retrô.",
-        "themesTitle": "Temas",
-        "effectsTitle": "Efeitos",
+        "themesTitle": "TEMAS",
+        "themeMidnight": "Meia-Noite",
+        "themeSepia": "Sépia",
+        "themeVampire": "Vampiro",
+        "effectsTitle": "EFEITOS",
+        "effectRain": "Chuva",
+        "effectSnow": "Neve",
+        "effectCrt": "CRT Scanlines",
+        "effectNoise": "Ruído",
         "effectsList": "🌧️ Chuva • ❄️ Neve • 📺 CRT Scanlines • 🎬 Ruído"
       },
       "labels": {
@@ -686,6 +695,13 @@
         "title": "11. Mapa de Conexões",
         "new": "NOVO",
         "desc": "Visão panorâmica e gráfica de toda a estrutura da história, exibindo conexões entre ramificações, cenários e capítulos.",
+        "narrativeStructure": "Estrutura da Narrativa",
+        "nodeOpening": "Abertura",
+        "nodeBranch": "Ramificação",
+        "nodeChoiceA": "Escolha A",
+        "nodeChoiceB": "Escolha B",
+        "nodeConclusionX": "Conclusão X",
+        "nodeConclusionY": "Conclusão Y",
         "item1": "<strong>Visão Geral da História:</strong> Veja o fluxo narrativo, decisões e bifurcações em um único painel gráfico.",
         "item2": "<strong>Navegação Instantânea:</strong> Dê um duplo clique em qualquer nó para abrir sua edição imediata.",
         "item3": "<strong>Organização Espacial:</strong> Arraste e posicione os nós para organizar atos, capítulos e linhas do tempo.",
@@ -1030,6 +1046,14 @@
       "previewText": "TEXTO",
       "recommendedRes": "Recomendado: Full HD (1920x1080), proporção 16:9."
     },
+    "tabs": {
+      "sistemasDesc": "Personalize as mecânicas, sistemas e controles de decisão da sua ficção.",
+      "aparenciaDesc": "Personalize a paleta de cores, tipografia, molduras e layout visual da sua ficção.",
+      "textosDesc": "Configure os rótulos de botões, mensagens do sistema e campos de ação.",
+      "scenes": "Ramificações",
+      "chapters": "Capítulos",
+      "menu_principal": "Menu Principal"
+    },
     "sistemas": {
       "activeSystems": "Sistemas Ativos",
       "activeSystemsDesc": "Habilite e configure os sistemas que estarão disponíveis no sua ficção. Você pode combinar múltiplos sistemas.",
@@ -1090,7 +1114,18 @@
       "alignTop": "Superior",
       "colorPicker": "Seletor de cor",
       "startMenuTitle": "Menu Principal",
-      "systemMenuDesc": "Habilita o Menu Principal, salvamento manual e o botão/tecla ESC de sistema."
+      "systemMenuDesc": "Habilita o Menu Principal, salvamento manual e o botão/tecla ESC de sistema.",
+      "diceRollTitle": "Rolagem de Dados",
+      "diceRollDesc": "Habilita testes de sorte utilizando dados para resolver interações.",
+      "diceType": "Tipo de Dado",
+      "diceD6": "D6 (Dado de 6 Lados)",
+      "diceD20": "D20 (Dado de 20 Lados)",
+      "speedFast": "Rápido",
+      "speedNormal": "Normal",
+      "speedSlow": "Lento",
+      "speedVerySlow": "Muito Lento",
+      "suggestions": "Sugestões",
+      "suggestionsDesc": "Ativa o botão de sugestões de ações."
     },
     "textos": {
       "interfaceTexts": "Navegação",
@@ -1113,6 +1148,10 @@
       "retrospectiveButtonText": "Retrospectiva",
       "retrospectiveButton": "Botão Retrospectiva",
       "retrospectivePlaceholder": "Retrospectiva",
+      "diceRollTextPrefix": "Prefixo da Rolagem de Dados",
+      "diceRollTextPrefixPlaceholder": "Você tirou",
+      "diceRollButtonText": "Texto do Botão de Rolagem de Dados",
+      "diceRollButtonTextPlaceholder": "Rolar D6",
       "navigationButtons": "Ferramentas",
       "suggestionsButton": "Botão Sugestões",
       "suggestionsPlaceholder": "Sugestões",

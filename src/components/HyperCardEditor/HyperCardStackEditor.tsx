@@ -409,7 +409,7 @@ export const HyperCardStackEditor: React.FC<HyperCardStackEditorProps> = ({
                   }`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>{t('sceneEditor.propertiesTab', 'PROPRIEDADES')}</span>
+                  <span>{t('sceneEditor.tabs.properties', 'PROPRIEDADES')}</span>
                 </button>
 
                 <button

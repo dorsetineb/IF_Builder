@@ -125,7 +125,6 @@ export const useSceneManagement = ({
     const handleDeleteScene = useCallback((sceneId: string) => {
         if (sceneId === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
             toast(
-                t('editor.actionNotAllowed', 'Ação não permitida'),
                 t('editor.deleteStartSceneError', 'Você não pode deletar a ramificação inicial. Defina outra ramificação como inicial antes de excluir esta.'),
                 "error"
             );
@@ -188,8 +187,7 @@ export const useSceneManagement = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const type = (scene as any).vignetteType && (scene as any).vignetteType !== 'none' ? 'vignette' : 'scene';
             toast(
-                t(`editor.${type}DeletedTitle`),
-                t(`editor.${type}DeletedDesc`),
+                t(`editor.${type}DeletedDesc`, type === 'vignette' ? 'O capítulo foi removido com sucesso.' : 'A ramificação foi removida com sucesso.'),
                 "success"
             );
             closeConfirmationModal();
@@ -269,8 +267,7 @@ export const useSceneManagement = ({
         }));
         setIsDirty(true);
         toast(
-            t('editor.vignetteCreatedTitle', 'Cena Criada'),
-            t('editor.vignetteCreatedDesc', 'Nova cena criada com sucesso.'),
+            t('editor.vignetteCreatedDesc', 'Novo capítulo criado com sucesso.'),
             "success"
         );
     }, [setGameData, setIsDirty, toast, t]);

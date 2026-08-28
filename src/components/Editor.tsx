@@ -59,6 +59,7 @@ const HyperCardStackEditor = lazy(() =>
 import { ConfirmationModal } from './ConfirmationModal';
 import { NewProjectModal } from './NewProjectModal';
 import { TransitionScreen } from './TransitionScreen';
+import { IFBuilderLogo } from './IFBuilderLogo';
 import UserManualModal from './UserManualModal';
 import NodeTypeModal from './NodeTypeModal';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1179,7 +1180,6 @@ const Editor: React.FC = () => {
     setImportKey((prev) => prev + 1);
     setCurrentView('three_panels');
     toast(
-      t('editor.newProjectSuccessTitle', 'Nova Ficção Criada'),
       t('editor.newProjectSuccessDesc', 'Projeto iniciado com sucesso!'),
       'success'
     );
@@ -1281,19 +1281,10 @@ const Editor: React.FC = () => {
                     }
                 `}</style>
           <div className="space-y-1 max-w-3xl">
-            {/* Logo ASCII - Denser Version */}
-            <pre className="text-primary mb-10 font-mono leading-none opacity-90 scale-[0.65] origin-left sm:scale-90">
-{`
-           ██████   █████████ ████████ ██      ██  ██  ██        ██████    ████████  ███████
-          ░░████  ░░█████████░████████░██     ░██ ░██ ░██       ░███████  ░████████ ░███████
-         ░████   ░██        ░██    ░██ ░██     ░██ ░██ ░██     ░██    ░██░██       ░██    ░██
-        ░████   ░█████████ ░████████  ░██     ░██ ░██ ░██     ░██    ░██░████████ ░███████
-       ░████   ░█████████ ░████████  ░██     ░██ ░██ ░██     ░██    ░██░████████ ░███████
-      ░████   ░██        ░██    ░██ ░██     ░██ ░██ ░██     ░██    ░██░██       ░██  ░██
-     ██████   ██         █████████  ██████████  ██  ████████ ███████   ████████  ██   ░██
-    ░░░░░░   ░░         ░░░░░░░░   ░░░░░░░░░░  ░░  ░░░░░░░░ ░░░░░░    ░░░░░░░░  ░░     ░░
-`}
-            </pre>
+            {/* Logo IFBUILDER */}
+            <div className="text-primary mb-8 pt-2">
+              <IFBuilderLogo className="w-full max-w-[630px] h-auto" />
+            </div>
             <p>IF-BUILDER v.{APP_VERSION}</p>
             <p className="mb-4">Copyright (C) 2026 @DORSETINEB</p>
 

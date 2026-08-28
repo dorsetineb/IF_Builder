@@ -37,7 +37,6 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 
     if (maxSize && file.size > maxSize) {
       toast(
-        t('UIEditor.errors.uploadError', 'Erro ao carregar imagem'),
         t('sceneEditor.imageLimitExceeded', {
           size: Math.round(maxSize / 1024 / 1024),
           defaultValue: `A imagem excede o limite de ${Math.round(maxSize / 1024 / 1024)}MB.`,

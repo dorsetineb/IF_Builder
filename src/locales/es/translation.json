@@ -268,8 +268,10 @@
     }
   },
   "header": {
+    "guideDesc": "Aprende a crear tus propias ficciones interactivas.",
     "settingsDesc": "Gestiona tus preferencias y cuenta.",
     "aboutDesc": "Conoce la misión y valores detrás de IF Builder.",
+    "editorInterfaceDesc": "Configura el idioma del sistema y personaliza el tema visual del editor.",
     "expandSidebar": "Expandir barra lateral",
     "collapseSidebar": "Contraer barra lateral",
     "closePreview": "Cerrar Vista Previa",
@@ -297,7 +299,7 @@
     "openEditor": "Abrir Editor",
     "showNarrative": "Ver lista de narrativas",
     "hideNarrative": "Ocultar lista de narrativas",
-    "editorInterface": "Interfaz del Editor"
+    "editorInterface": "Interfaz"
   },
   "sceneList": {
     "search": "Buscar narrativa...",
@@ -454,6 +456,7 @@
   },
   "guide": {
     "title": "Guía Rápida",
+    "important": "IMPORTANTE",
     "intro": "IF Builder permite crear ficciones interactivas con facilidad. Una historia se construye mediante <strong>Ramificaciones</strong>, <strong>Escenarios y Vistas</strong> y <strong>Capítulos</strong>, donde el jugador lee descripciones, observa ilustraciones, explora detalles interactivos y toma decisiones usando elecciones en pantalla o comandos en lenguaje natural.",
     "toc": "Índice de la Guía",
     "tocSelect": "Selecciona un capítulo...",
@@ -467,6 +470,7 @@
         "item4": "<strong>Punto de Partida y Finales:</strong> Define qué nodo inicia la historia y marca las ramificaciones conclusivas como finales narrativos.",
         "exampleTitle": "Ejemplo de Texto Clicable:",
         "exampleText": "Te aproximas a un <cofre> de hierro cerrado con llave.",
+        "exampleHtml": "Te aproximas a un <span class=\"text-indigo-400 font-bold bg-indigo-500/10 px-1 py-0.5 rounded cursor-pointer\">&lt;cofre&gt;</span> de hierro cerrado con llave.",
         "exampleTip": "Al hacer clic en la palabra resaltada se envía la orden directamente al juego."
       },
       "scenarios": {
@@ -586,8 +590,15 @@
         "item2": "<strong>Colores y Tipografía:</strong> Ajusta colores de fondo, texto, títulos, destacados y fuentes con serifa, modernas o monoespaciadas.",
         "item3": "<strong>Diseño y Marcos:</strong> Orientación Vertical u Horizontal y marcos de imagen (Limpio, Redondeado, Viñeta suave y Cristal translúcido).",
         "item4": "<strong>Efectos de Pantalla:</strong> Capas dinámicas como Lluvia, Nieve, Polvo/Partículas, Líneas CRT Scanlines, Ruido de película y Dither Retro.",
-        "themesTitle": "Temas",
-        "effectsTitle": "Efectos",
+        "themesTitle": "TEMAS",
+        "themeMidnight": "Medianoche",
+        "themeSepia": "Sepia",
+        "themeVampire": "Vampiro",
+        "effectsTitle": "EFECTOS",
+        "effectRain": "Lluvia",
+        "effectSnow": "Nieve",
+        "effectCrt": "CRT Scanlines",
+        "effectNoise": "Ruido",
         "effectsList": "🌧️ Lluvia • ❄️ Nieve • 📺 CRT Scanlines • 🎬 Ruido"
       },
       "labels": {
@@ -606,12 +617,22 @@
         "row1Custom": "Introduce tu siguiente acción, detective...",
         "row2Field": "Comando Desconocido",
         "row2Default": "No puedes hacer eso.",
-        "row2Custom": "El silencio ancestral no responde."
+        "row2Custom": "El silencio ancestral no responde.",
+        "row3Field": "Resultado Tirada Dados",
+        "row3Default": "Has sacado un",
+        "row3Custom": "El dado muestra un"
       },
       "map": {
         "title": "11. Mapa de Conexiones",
         "new": "NUEVO",
         "desc": "Visión panorámica y gráfica de toda la estructura de la historia, mostrando conexiones entre ramificaciones, escenarios y capítulos.",
+        "narrativeStructure": "Estructura de la Narrativa",
+        "nodeOpening": "Apertura",
+        "nodeBranch": "Ramificación",
+        "nodeChoiceA": "Elección A",
+        "nodeChoiceB": "Elección B",
+        "nodeConclusionX": "Conclusión X",
+        "nodeConclusionY": "Conclusión Y",
         "item1": "<strong>Visión General de la Historia:</strong> Observa el flujo narrativo, decisiones y bifurcaciones en un solo lienzo gráfico.",
         "item2": "<strong>Navegación Instantánea:</strong> Haz doble clic en cualquier nodo para abrir su edición de inmediato.",
         "item3": "<strong>Organización Espacial:</strong> Arrastra y posiciona los nodos para estructurar actos, capítulos y líneas temporales.",
@@ -966,6 +987,14 @@
       "previewText": "TEXTO",
       "recommendedRes": "Recomendado: Full HD (1920x1080), proporción 16:9."
     },
+    "tabs": {
+      "sistemasDesc": "Personaliza las mecánicas, sistemas y controles de decisión de tu ficción.",
+      "aparenciaDesc": "Personaliza la paleta de colores, tipografía, marcos y diseño visual de tu ficción.",
+      "textosDesc": "Configura las etiquetas de botones, mensajes del sistema y campos de acción.",
+      "scenes": "Ramificaciones",
+      "chapters": "Capítulos",
+      "menu_principal": "Menú Principal"
+    },
     "sistemas": {
       "activeSystems": "Sistemas Activos",
       "activeSystemsDesc": "Habilita y configura los sistemas que estarán disponibles en tu juego. Puedes combinar múltiples sistemas.",
@@ -1024,7 +1053,20 @@
       "contentVerticalAlignment": "Alineación Vertical",
       "alignBottom": "Inferior",
       "alignTop": "Superior",
-      "colorPicker": "Selector de color"
+      "colorPicker": "Selector de color",
+      "startMenuTitle": "Menú Principal",
+      "systemMenuDesc": "Habilita el Menú Principal, guardado manual y el botón/tecla ESC de sistema.",
+      "diceRollTitle": "Tirada de Dados",
+      "diceRollDesc": "Habilita pruebas de suerte usando dados para resolver interacciones.",
+      "diceType": "Tipo de Dado",
+      "diceD6": "D6 (Dado de 6 Caras)",
+      "diceD20": "D20 (Dado de 20 Caras)",
+      "speedFast": "Rápido",
+      "speedNormal": "Normal",
+      "speedSlow": "Lento",
+      "speedVerySlow": "Muy Lento",
+      "suggestions": "Sugerencias",
+      "suggestionsDesc": "Activa el botón de sugerencias de acciones."
     },
     "textos": {
       "interfaceTexts": "Textos de la Interfaz",
@@ -1047,6 +1089,10 @@
       "retrospectiveButtonText": "Retrospectiva",
       "retrospectiveButton": "Botón Retrospectiva",
       "retrospectivePlaceholder": "Retrospectiva",
+      "diceRollTextPrefix": "Prefijo de Tirada de Dados",
+      "diceRollTextPrefixPlaceholder": "Obtuviste",
+      "diceRollButtonText": "Texto del Botón de Tirada de Dados",
+      "diceRollButtonTextPlaceholder": "Tirar D6",
       "navigationButtons": "Botones de Navegación",
       "suggestionsButton": "Botón de Sugerencias",
       "suggestionsPlaceholder": "Sugerencias",

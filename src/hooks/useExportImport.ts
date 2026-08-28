@@ -179,6 +179,9 @@ DATE:        ${exportDate.toLocaleString()}
       ['body.frame-none.image-panel', 'body.frame-none .image-panel'],
       ['body.frame-none.game-container.layout-horizontal.image-panel', 'body.frame-none .game-container.layout-horizontal .image-panel'],
       ['body.frame-none.game-container.layout-image-last.image-panel', 'body.frame-none .game-container.layout-image-last .image-panel'],
+      ['.action-buttons { display: flex; gap: 8px; margin-bottom: 12px;', '.action-buttons { display: flex; gap: 8px; margin-bottom: 8px;'],
+      ['.action-buttons { display: flex; gap: 8px; margin-bottom: 0px;', '.action-buttons { display: flex; gap: 8px; margin-bottom: 8px;'],
+      ['.action-buttons { display: flex; gap: 8px; margin-bottom: 0;', '.action-buttons { display: flex; gap: 8px; margin-bottom: 8px;'],
     ];
     for (const [from, to] of frameCssFixes) {
       finalCss = finalCss.replaceAll(from, to);
@@ -551,6 +554,9 @@ DATE:        ${exportDate.toLocaleString()}
       ['body.frame-none.image-panel', 'body.frame-none .image-panel'],
       ['body.frame-none.game-container.layout-horizontal.image-panel', 'body.frame-none .game-container.layout-horizontal .image-panel'],
       ['body.frame-none.game-container.layout-image-last.image-panel', 'body.frame-none .game-container.layout-image-last .image-panel'],
+      ['.action-buttons { display: flex; gap: 8px; margin-bottom: 12px;', '.action-buttons { display: flex; gap: 8px; margin-bottom: 8px;'],
+      ['.action-buttons { display: flex; gap: 8px; margin-bottom: 0px;', '.action-buttons { display: flex; gap: 8px; margin-bottom: 8px;'],
+      ['.action-buttons { display: flex; gap: 8px; margin-bottom: 0;', '.action-buttons { display: flex; gap: 8px; margin-bottom: 8px;'],
     ];
     for (const [from, to] of frameCssFixes) {
       finalCss = finalCss.replaceAll(from, to);
@@ -1072,7 +1078,6 @@ DATE:        ${exportDate.toLocaleString()}
       setIsDirty(false);
       setImportKey((prev) => prev + 1);
       toast(
-        t('editor.projectImportedTitle', 'Projeto Importado'),
         t('editor.projectImportedDesc', 'Projeto carregado e migrado com sucesso.'),
         'success'
       );
@@ -1182,14 +1187,12 @@ DATE:        ${exportDate.toLocaleString()}
           : `${Math.round(savedBytes / 1024)} KB`;
           
         toast(
-          t('editor.projectOptimizedTitle', 'Otimização Concluída'),
           `Otimizamos ${optimizedCount} imagem(ns) legada(s) para WebP, economizando ${savedStr}!`,
           'success'
         );
       } else if (skippedCount > 0) {
         toast(
-          t('editor.projectAlreadyOptimizedTitle', 'Imagens Otimizadas'),
-          'Todas as imagens do projeto já estavam totalmente otimizadas para o menor tamanho possível.',
+          t('editor.projectAlreadyOptimized', 'Todas as imagens do projeto já estavam totalmente otimizadas para o menor tamanho possível.'),
           'info'
         );
       }
@@ -1342,7 +1345,6 @@ DATE:        ${exportDate.toLocaleString()}
         } catch (error) {
           console.error('Erro ao importar HTML:', error);
           toast(
-            t('editor.importErrorTitle', 'Erro na Importação'),
             t(
               'editor.htmlImportErrorDesc',
               'O arquivo HTML não contém dados do IF Builder ou está corrompido.'
@@ -1366,7 +1368,6 @@ DATE:        ${exportDate.toLocaleString()}
         } catch (error) {
           console.error('Erro ao importar:', error);
           toast(
-            t('editor.importErrorTitle', 'Erro na Importação'),
             t(
               'editor.importErrorDesc',
               'O arquivo selecionado não é um JSON válido ou está corrompido.'

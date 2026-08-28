@@ -105,7 +105,7 @@ describe('useSceneManagement Hook', () => {
             result.current.handleDeleteScene('scn_1');
         });
 
-        expect(mockToast).toHaveBeenCalledWith("Ação não permitida", expect.stringContaining("inicial"), "error");
+        expect(mockToast).toHaveBeenCalledWith(expect.stringContaining("inicial"), "error");
         expect(mockSetConfirmationModal).not.toHaveBeenCalled();
     });
 

@@ -4,6 +4,7 @@ import { GameData, View } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Eye, Plus, CircleHelp, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { IFBuilderText, IFBuilderIcon } from './IFBuilderLogo';
 
 const Header: React.FC<{
   gameData: GameData;
@@ -27,18 +28,18 @@ const Header: React.FC<{
     <header className="flex w-full h-[61px]">
       {/* Left Pane - Sidebar Alignment */}
       <div
-        className={`flex-shrink-0 bg-card border-b border-r border-muted-foreground/50 flex items-center relative transition-all duration-300 ${sidebarCollapsed ? 'w-20 justify-center' : 'w-56 px-4'}`}
+        className={`flex-shrink-0 bg-card border-b border-r border-muted-foreground/50 flex items-center relative transition-all duration-300 ${sidebarCollapsed ? 'w-20 justify-center' : 'w-48 px-4'}`}
       >
         <div className="absolute top-0 left-0 w-full h-[3px] bg-primary opacity-60" />
 
         <div
           onClick={onHome}
-          className={`flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${sidebarCollapsed ? 'justify-center' : ''}`}
+          className={`flex items-center cursor-pointer hover:opacity-80 transition-opacity ${sidebarCollapsed ? 'justify-center' : ''}`}
         >
           {sidebarCollapsed ? (
-            <h1 className="text-3xl font-bold text-foreground notranslate" translate="no">IF</h1>
+            <IFBuilderIcon className="w-7 h-7 text-foreground notranslate" />
           ) : (
-            <h1 className="text-3xl font-bold text-foreground truncate notranslate" translate="no">IF Builder</h1>
+            <IFBuilderText className="h-3.5 w-auto max-w-[150px] text-foreground notranslate" />
           )}
         </div>
 
@@ -75,7 +76,7 @@ const Header: React.FC<{
                 </div>
               ) : currentView === 'editor_interface' ? (
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.editorInterface', 'Interface do Editor')}</span>
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.editorInterface', 'Interface')}</span>
                   <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.editorInterfaceDesc', 'Configure o idioma do sistema e personalize o tema visual do editor.')}</p>
                 </div>
               ) : null}

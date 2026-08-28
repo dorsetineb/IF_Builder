@@ -950,7 +950,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_IMAGE_SIZE) {
-                toast(t('UIEditor.errors.uploadError'), t('SceneEditor.imageLimitExceeded', { size: MAX_IMAGE_SIZE / 1024 / 1024 }), "error");
+                toast(t('SceneEditor.imageLimitExceeded', { size: MAX_IMAGE_SIZE / 1024 / 1024, defaultValue: `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.` }), "error");
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -982,7 +982,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_AUDIO_SIZE) {
-                toast(t('UIEditor.errors.uploadError'), t('UIEditor.errors.audioLimitExceeded', { size: MAX_AUDIO_SIZE / 1024 / 1024 }), "error");
+                toast(t('UIEditor.errors.audioLimitExceeded', { size: MAX_AUDIO_SIZE / 1024 / 1024, defaultValue: `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024} MB.` }), "error");
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }

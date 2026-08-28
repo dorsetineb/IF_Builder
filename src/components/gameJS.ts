@@ -2028,7 +2028,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // CRITICAL FIX: If the game starts with a vignette (opening), 
                 // we must NOT fade out the vignette screen, or it will be skipped.
-                const nextScene = gameData.cenas[currentSceneId];
+                const nextScene = findScene(currentSceneId);
                 const isNextVignette = nextScene && nextScene.vignetteType && nextScene.vignetteType !== 'none';
                 
                 if (!isNextVignette) {
@@ -2046,7 +2046,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else if (scene.vignetteNextSceneId) {
                 const nextSceneId = scene.vignetteNextSceneId;
-                const nextScene = gameData.cenas[nextSceneId];
+                const nextScene = findScene(nextSceneId);
                 
                 if (nextScene) {
                     const isNextVignette = nextScene.vignetteType && nextScene.vignetteType !== 'none';
@@ -2645,11 +2645,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const centerBar = document.getElementById('hypercard-center-bar');
             if (centerBar) {
-                if (standardActionBar) {
-                    if (actionPopup) {
+                centerBar.remove();
+            }
+
+            if (standardActionBar) {
+                if (actionPopup) {
+                    if (actionPopup.parentElement !== standardActionBar) {
                         standardActionBar.insertBefore(actionPopup, standardActionBar.firstChild);
                     }
-                    if (actionButtons) {
+                    actionPopup.style.removeProperty('left');
+                    actionPopup.style.removeProperty('transform');
+                    actionPopup.style.removeProperty('top');
+                }
+                if (actionButtons) {
+                    if (actionButtons.parentElement !== standardActionBar) {
                         const inputArea = standardActionBar.querySelector('.input-area') || standardActionBar.querySelector('.choices-container');
                         if (inputArea) {
                             standardActionBar.insertBefore(actionButtons, inputArea);
@@ -2657,8 +2666,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             standardActionBar.appendChild(actionButtons);
                         }
                     }
+                    actionButtons.style.margin = '';
+                    actionButtons.style.position = '';
+                    actionButtons.style.display = '';
                 }
-                centerBar.remove();
             }
 
             const topBar = document.getElementById('hypercard-top-bar');
@@ -2786,7 +2797,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 textPanel.style.display = '';
                 textPanel.style.padding = '';
             }
-            if (standardActionBar) standardActionBar.classList.remove('hidden');
+            if (standardActionBar) {
+                standardActionBar.classList.remove('hidden');
+                if (actionButtons && actionButtons.parentElement === standardActionBar) {
+                    actionButtons.style.margin = '';
+                    actionButtons.style.position = '';
+                    actionButtons.style.display = '';
+                }
+            }
             
             // Remove text-scene-header and hypercard stage if present
             const textSceneHeader = document.getElementById('text-scene-header');
@@ -3813,7 +3831,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputLower = input.toLowerCase().trim();
         const echo = document.createElement('p'); echo.className = 'verb-echo'; echo.textContent = '> ' + input; sceneDescription.appendChild(echo);
         sceneDescription.scrollTop = sceneDescription.scrollHeight; actionLog.push({ type: 'input', text: '> ' + input });
-        const scene = gameData.cenas[currentSceneId]; 
+        const scene = findScene(currentSceneId) || (gameData.cenas && gameData.cenas[currentSceneId]) || (gameData.scenes && gameData.scenes[currentSceneId]) || {}; 
         const sceneObjects = getObjectsForScene(currentSceneId); 
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
         if (gameData.enableDiceRoll) {
@@ -4117,21 +4135,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showSuggestions = () => {
-        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
-        const currentSceneData = gameData.cenas[currentSceneId];
+        actionPopup.classList.remove('hidden'); 
+        actionPopup.innerHTML = '';
+        const currentSceneData = findScene(currentSceneId) || (gameData.cenas && gameData.cenas[currentSceneId]) || (gameData.scenes && gameData.scenes[currentSceneId]) || {};
         const sceneSuggestions = currentSceneData.suggestions || [];
         
-        const container = document.createElement('div'); container.className = 'action-popup-container';
+        const container = document.createElement('div'); 
+        container.className = 'action-popup-container';
         
         if (sceneSuggestions.length === 0) {
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            const row1 = document.createElement('div'); 
+            row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
             row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
             container.appendChild(row1);
         } else {
-
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
+            const row1 = document.createElement('div'); 
+            row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
             sceneSuggestions.forEach(v => { 
-                const btn = document.createElement('button'); btn.textContent = v; 
+                const btn = document.createElement('button'); 
+                btn.textContent = v; 
                 btn.addEventListener('click', () => { 
                     verbInput.textContent = v.toLowerCase() + ' '; 
                     verbInput.focus(); 
@@ -4150,6 +4172,19 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(row1); 
         }
         actionPopup.appendChild(container);
+
+        const suggBtn = document.getElementById('suggestions-button');
+        const actionBtns = document.querySelector('.action-buttons');
+        if (suggBtn && actionBtns && document.getElementById('hypercard-center-bar')) {
+            const centerOffset = suggBtn.offsetLeft + (suggBtn.offsetWidth / 2);
+            actionPopup.style.setProperty('left', centerOffset + 'px', 'important');
+            actionPopup.style.setProperty('transform', 'translateX(-50%)', 'important');
+            actionPopup.style.setProperty('top', 'calc(100% + 8px)', 'important');
+        } else {
+            actionPopup.style.removeProperty('left');
+            actionPopup.style.removeProperty('transform');
+            actionPopup.style.removeProperty('top');
+        }
     };
     const showInventory = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; 

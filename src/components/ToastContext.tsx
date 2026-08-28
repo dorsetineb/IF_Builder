@@ -5,13 +5,12 @@ export type ToastType = 'success' | 'error' | 'info';
 
 export interface ToastMessage {
     id: string;
-    title: string;
-    description?: string;
+    message: string;
     type: ToastType;
 }
 
 interface ToastContextType {
-    toast: (title: string, description?: string, type?: ToastType) => void;
+    toast: (messageOrTitle: string, descriptionOrType?: string | ToastType, type?: ToastType) => void;
     dismiss: (id: string) => void;
 }
 
@@ -28,14 +27,28 @@ export const useToast = () => {
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-    const toast = useCallback((title: string, description?: string, type: ToastType = 'info') => {
-        const id = Math.random().toString(36).substring(7);
-        setToasts((prev) => [...prev, { id, title, description, type }]);
+    const toast = useCallback((messageOrTitle: string, descriptionOrType?: string | ToastType, typeParam?: ToastType) => {
+        let finalMessage = messageOrTitle;
+        let finalType: ToastType = 'info';
 
-        // Auto dismiss after 5 seconds
+        if (descriptionOrType === 'success' || descriptionOrType === 'error' || descriptionOrType === 'info') {
+            finalType = descriptionOrType;
+            finalMessage = messageOrTitle;
+        } else if (typeof descriptionOrType === 'string' && descriptionOrType.trim().length > 0) {
+            // If both title and description are provided, use the descriptive contextual text
+            finalMessage = descriptionOrType;
+            finalType = typeParam || 'info';
+        } else if (typeParam) {
+            finalType = typeParam;
+        }
+
+        const id = Math.random().toString(36).substring(7);
+        setToasts((prev) => [...prev, { id, message: finalMessage, type: finalType }]);
+
+        // Auto dismiss after 4 seconds
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));
-        }, 5000);
+        }, 4000);
     }, []);
 
     const dismiss = useCallback((id: string) => {

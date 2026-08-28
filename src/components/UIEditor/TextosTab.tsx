@@ -305,11 +305,11 @@ export const TextosTab: React.FC<TextosTabProps> = ({
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="diceRollTextPrefix" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diceRollTextPrefix', 'Prefixo da Rolagem de Dados')}</label>
-                            <input type="text" id="diceRollTextPrefix" value={localDiceRollTextPrefix || ''} onChange={(e) => setLocalDiceRollTextPrefix?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Você tirou" />
+                            <input type="text" id="diceRollTextPrefix" value={localDiceRollTextPrefix || ''} onChange={(e) => setLocalDiceRollTextPrefix?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder={t('UIEditor.textos.diceRollTextPrefixPlaceholder', 'Você tirou')} />
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="diceRollButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diceRollButtonText', 'Texto do Botão de Rolagem de Dados')}</label>
-                            <input type="text" id="diceRollButtonText" value={localDiceRollButtonText || ''} onChange={(e) => setLocalDiceRollButtonText?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Rolar D6" />
+                            <input type="text" id="diceRollButtonText" value={localDiceRollButtonText || ''} onChange={(e) => setLocalDiceRollButtonText?.(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder={t('UIEditor.textos.diceRollButtonTextPlaceholder', 'Rolar D6')} />
                         </div>
                     </div>
                 </div>

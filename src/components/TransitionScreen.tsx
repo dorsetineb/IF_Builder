@@ -2,6 +2,7 @@ import React from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { useTheme } from './ThemeProvider';
 import { getDitherColors } from '../utils/themeStyles';
+import { IFBuilderLogo } from './IFBuilderLogo';
 
 interface TransitionScreenProps {
     isVisible: boolean;
@@ -46,18 +47,9 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
                 />
             </div>
 
-            {/* Static IF Logo - Bottom Right */}
-            <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-10 opacity-20">
-                <pre className="font-mono leading-none text-primary text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
-{`           ██████   █████████
-          ░░████   ░█████████
-         ░████   ░██         
-        ░████   ░█████████   
-       ░████   ░█████████   
-      ░████   ░██           
-     ██████  ░██            
-    ░░░░░░   ░░             `}
-                </pre>
+            {/* Static IFBUILDER Logo - Bottom Right */}
+            <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-10 opacity-20 text-primary">
+                <IFBuilderLogo className="w-96 sm:w-[480px] h-auto notranslate" />
             </div>
         </div>
     );

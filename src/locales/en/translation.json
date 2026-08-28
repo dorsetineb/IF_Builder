@@ -205,6 +205,7 @@
   },
   "guide": {
     "title": "Quick Guide",
+    "important": "IMPORTANT",
     "intro": "IF Builder makes crafting interactive fiction intuitive and flexible. A story is structured using <strong>Branches</strong>, <strong>Scenarios & Views</strong>, and <strong>Chapters</strong>, where players read rich descriptions, observe illustrations, explore interactive details, and make choices using buttons or natural language commands.",
     "toc": "Guide Index",
     "tocSelect": "Select a chapter...",
@@ -218,6 +219,7 @@
         "item4": "<strong>Starting Point and Endings:</strong> Define which node begins the adventure and mark conclusive branches as narrative endings.",
         "exampleTitle": "Clickable Text Example:",
         "exampleText": "You approach a locked iron <chest>.",
+        "exampleHtml": "You approach a locked iron <span class=\"text-indigo-400 font-bold bg-indigo-500/10 px-1 py-0.5 rounded cursor-pointer\">&lt;chest&gt;</span>.",
         "exampleTip": "Clicking the highlighted word triggers the action directly."
       },
       "scenarios": {
@@ -337,8 +339,15 @@
         "item2": "<strong>Colors & Typography:</strong> Customize background, text, titles, highlights, and serif, modern sans, or monospace fonts.",
         "item3": "<strong>Layout & Frames:</strong> Vertical or Horizontal orientation and image frames (Clean, Rounded, Vignette fade, and Glassmorphism).",
         "item4": "<strong>Screen Effects:</strong> Dynamic atmospheric layers like Rain, Snow, Dust/Particles, CRT Scanlines, Film Grain, and Retro Dither.",
-        "themesTitle": "Themes",
-        "effectsTitle": "Effects",
+        "themesTitle": "THEMES",
+        "themeMidnight": "Midnight",
+        "themeSepia": "Sepia",
+        "themeVampire": "Vampire",
+        "effectsTitle": "EFFECTS",
+        "effectRain": "Rain",
+        "effectSnow": "Snow",
+        "effectCrt": "CRT Scanlines",
+        "effectNoise": "Film Grain",
         "effectsList": "🌧️ Rain • ❄️ Snow • 📺 CRT Scanlines • 🎬 Film Grain"
       },
       "labels": {
@@ -363,6 +372,13 @@
         "title": "11. Connections Map",
         "new": "NEW",
         "desc": "Panoramic visual overview of the entire story structure, showing connections between branches, scenarios, and chapters.",
+        "narrativeStructure": "Narrative Structure",
+        "nodeOpening": "Opening",
+        "nodeBranch": "Branch",
+        "nodeChoiceA": "Choice A",
+        "nodeChoiceB": "Choice B",
+        "nodeConclusionX": "Conclusion X",
+        "nodeConclusionY": "Conclusion Y",
         "item1": "<strong>Story Flow Overview:</strong> Inspect narrative branches, decision paths, and story branches in a single graphic canvas.",
         "item2": "<strong>Instant Navigation:</strong> Double-click any node to jump directly into editing it.",
         "item3": "<strong>Spatial Organization:</strong> Drag and organize nodes to arrange acts, chapters, and timelines.",
@@ -604,7 +620,7 @@
     "openEditor": "Open Editor",
     "showNarrative": "View narrative list",
     "hideNarrative": "Hide narrative list",
-    "editorInterface": "Editor Interface"
+    "editorInterface": "Interface"
   },
   "sceneList": {
     "search": "Search narrative...",
@@ -1046,6 +1062,14 @@
       "previewText": "TEXT",
       "recommendedRes": "Recommended: Full HD (1920x1080), 16:9 aspect ratio."
     },
+    "tabs": {
+      "sistemasDesc": "Customize the mechanics, systems, and decision controls of your interactive fiction.",
+      "aparenciaDesc": "Customize the color palette, typography, frames, and visual layout of your interactive fiction.",
+      "textosDesc": "Configure button labels, system messages, and action fields.",
+      "scenes": "Branches",
+      "chapters": "Chapters",
+      "menu_principal": "Main Menu"
+    },
     "sistemas": {
       "activeSystems": "Active Systems",
       "activeSystemsDesc": "Enable and configure systems available in your game. You can mix multiple systems.",
@@ -1106,7 +1130,18 @@
       "alignTop": "Top",
       "colorPicker": "Color picker",
       "startMenuTitle": "Main Menu",
-      "systemMenuDesc": "Enables the Main Menu, manual saving and the system ESC button/key."
+      "systemMenuDesc": "Enables the Main Menu, manual saving and the system ESC button/key.",
+      "diceRollTitle": "Dice Rolling",
+      "diceRollDesc": "Enables luck/skill tests using dice to resolve interactions.",
+      "diceType": "Dice Type",
+      "diceD6": "D6 (6-Sided Die)",
+      "diceD20": "D20 (20-Sided Die)",
+      "speedFast": "Fast",
+      "speedNormal": "Normal",
+      "speedSlow": "Slow",
+      "speedVerySlow": "Very Slow",
+      "suggestions": "Suggestions",
+      "suggestionsDesc": "Enables the action suggestions button."
     },
     "textos": {
       "interfaceTexts": "Interface Texts",
@@ -1129,6 +1164,10 @@
       "retrospectiveButtonText": "Retrospective",
       "retrospectiveButton": "Retrospective Button",
       "retrospectivePlaceholder": "Retrospective",
+      "diceRollTextPrefix": "Dice Roll Prefix",
+      "diceRollTextPrefixPlaceholder": "You rolled",
+      "diceRollButtonText": "Dice Roll Button Text",
+      "diceRollButtonTextPlaceholder": "Roll D6",
       "navigationButtons": "Navigation Buttons",
       "suggestionsButton": "Suggestions Button",
       "suggestionsPlaceholder": "Suggestions",
