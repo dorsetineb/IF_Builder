@@ -1,23 +1,20 @@
-🚀 Atualizações e Melhorias da Versão v0.10.3
+🚀 Atualizações e Melhorias da Versão v0.10.4
 
-• Reorganização do Menu Lateral e Novas Páginas Dedicadas:
-  - As seções "Mecânicas", "Estilo Visual" e "Rótulos" agora são páginas independentes acessadas diretamente no menu lateral esquerdo.
-  - Nova ordem de navegação otimizada: Narrativa ➔ Mecânicas ➔ Estilo Visual ➔ Rótulos ➔ Objetos ➔ Rastreadores ➔ Verbos.
-  - Renomeação de "Verbos Globais" para "Verbos" (com ícone de balão de fala) e "Textos Padrão" para "Rótulos" (com ícone de tipografia).
-  - Remoção da página legada de Configurações para simplificar e modernizar a interface.
+• Nova Identidade Visual e Logotipo Pixel-Art Vetorial:
+  - Implementação do novo logotipo com tipografia Spaceship e ícone retrô em SVG vetorial de alta definição (IFBuilderLogo, IFBuilderText, IFBuilderIcon).
+  - Atualização visual na tela de BIOS (logo 50% ampliado), tela de Início (com versionamento alinhado ao topo) e cabeçalho do editor.
+  - No cabeçalho do editor, exibe o logotipo textual completo quando expandido e o ícone de computador quando recolhido.
+  - Novos assets vetoriais de animação e identidade em src/assets/ (boi, humano, computador e logos).
 
-• Otimização de Performance e Correção no Runtime:
-  - Otimização do efeito de chuva no Canvas para Linux e outros navegadores, eliminando gargalos de renderização.
-  - Correção de travamento ao clicar no botão "Start" da vinheta/abertura quando efeitos atmosféricos de tela estavam ativos.
+• Refinamentos de Layout e Interface do Usuário:
+  - Largura da barra lateral esquerda padronizada e compacta (w-48), eliminando espaços vazios.
+  - Botão inferior renomeado de "Interface do Editor" para "Interface" em todos os idiomas suportados.
+  - Correção no alinhamento e espaçamento inferior dos botões de interface nas ramificações exportadas.
+  - Correção no posicionamento e renderização imediata do painel de Sugestões nas ramificações.
+  - Padronização das notificações flutuantes (toasts), simplificando títulos e fornecendo mensagens contextuais claras.
 
-• Atualização do Instalador Linux:
-  - Atualização do link de download da versão Linux para o formato portátil .AppImage (com hash SHA-256 verificado), substituindo o pacote .deb.
-
-• Documentação e Tutoriais Completamente Atualizados:
-  - Reestruturação completa dos tutoriais em docs/pt/tutorial (14 módulos de 00 a 13) acompanhando a nova ordem do menu lateral.
-  - Novo guia detalhado de Cenários e Vistas (Point-and-Click com ferramentas de Retângulo, Círculo, Polígono Livre, Zoom/Pan, Ações e Condições de Bloqueio).
-  - Novos tutoriais para Mecânicas, Estilo Visual, Rótulos, Verbos Globais e Mapa de Ramificações.
-  - Nova documentação de referência para Cenários e Vistas em docs/pt/referencia/cenarios-e-vistas.md.
-
-• Roteiros de Vídeo Sincronizados:
-  - Criação da série completa de 14 roteiros de vídeo para gravação (de #00 a #13), com blocos de tempo, ações de tela e falas formatadas.
+• Internacionalização e Localização Completa (i18n):
+  - Guia Rápido: Tradução integral dos exemplos interativos, fluxograma narrativo do Mapa de Conexões, títulos de Temas, Efeitos visuais e avisos de segurança para Inglês e Espanhol.
+  - Rótulos e Mecânicas: Internacionalização dos campos e placeholders de Rolagem de Dados (Dice Roll Prefix, You rolled, Roll D6), tipos de dados e velocidades de transição.
+  - Abas de Pré-visualização: Sincronização dos seletores de visualização (Branches, Chapters, Main Menu).
+  - Editor de Cenários: Aba "Propriedades" devidamente localizada para todos os idiomas.
