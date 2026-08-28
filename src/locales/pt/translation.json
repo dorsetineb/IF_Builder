@@ -43,7 +43,7 @@
     "windowsTitle": "Windows",
     "windowsDesc": "Installer .exe",
     "linuxTitle": "Linux",
-    "linuxDesc": "Package .deb",
+    "linuxDesc": "Pacote .AppImage",
     "confirmBtn": "Baixar Instalador"
   },
   "common": {
@@ -397,7 +397,10 @@
     "sceneMap": "Mapa de Ramificações",
     "objects": "Objetos",
     "trackers": "Rastreadores",
-    "globalCommands": "Verbos Globais",
+    "globalCommands": "Verbos",
+    "mechanics": "Mecânicas",
+    "appearance": "Estilo Visual",
+    "defaultTexts": "Rótulos",
     "interface": "Interface",
     "quickGuide": "Guia Rápido",
     "aboutProject": "Sobre o Projeto",
@@ -903,7 +906,7 @@
     "tabs": {
       "layout": "Layout",
       "sistemas": "Mecânicas",
-      "textos": "Textos Padrão",
+      "textos": "Rótulos",
       "config": "Interface do Editor",
       "aparencia": "Estilo Visual"
     },

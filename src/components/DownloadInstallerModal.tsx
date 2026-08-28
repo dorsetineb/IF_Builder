@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, Monitor, Terminal, X } from 'lucide-react';
 import { APP_VERSION } from '../version';
+import { openExternalUrl } from '../utils/platform';
 
 interface DownloadInstallerModalProps {
   isOpen: boolean;
@@ -17,19 +18,27 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    const downloadUrl = platform === 'linux'
+      ? `https://github.com/dorsetineb/IF_Builder/releases/download/v${APP_VERSION}/if-builder_${APP_VERSION}_amd64.AppImage`
+      : `https://github.com/dorsetineb/IF_Builder/releases/download/v${APP_VERSION}/if-builder_${APP_VERSION}_x64-setup.exe`;
+
     const fileName = platform === 'linux'
-      ? `IFBuilder_${APP_VERSION}_amd64.deb`
-      : `IFBuilder_${APP_VERSION}_x64-setup.exe`;
+      ? `if-builder_${APP_VERSION}_amd64.AppImage`
+      : `if-builder_${APP_VERSION}_x64-setup.exe`;
 
-    const downloadUrl = `https://if-builder.vercel.app/api/download?platform=${platform}`;
-
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      await openExternalUrl(downloadUrl);
+    }
     onClose();
   };
 
@@ -93,7 +102,7 @@ export const DownloadInstallerModal: React.FC<DownloadInstallerModalProps> = ({
                 {t('downloadModal.linuxTitle', 'Linux')}
               </span>
               <span className="text-[10px] text-muted-foreground leading-tight block mt-0.5">
-                {t('downloadModal.linuxDesc', 'Package .deb')}
+                {t('downloadModal.linuxDesc', 'Pacote .AppImage')}
               </span>
             </div>
           </button>

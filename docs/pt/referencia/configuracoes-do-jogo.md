@@ -7,8 +7,8 @@ As **Configurações do Jogo** controlam a aparência visual, os sistemas de mec
 ## Acesso
 
 Disponível em dois locais:
-- **Ao criar um projeto**: Janela "Nova Ficção" → abas Mecânicas e Estilo Visual
-- **Após criação**: Sidebar → **"Interface"** (UIEditor / ThemeEditor)
+- **Ao criar um projeto**: Janela "Nova Ficção" → abas Abertura, Mecânicas e Estilo Visual
+- **Após criação**: Menu lateral esquerdo → páginas dedicadas **"Mecânicas"**, **"Estilo Visual"** e **"Rótulos"**
 
 ---
 

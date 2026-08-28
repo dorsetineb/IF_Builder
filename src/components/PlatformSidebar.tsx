@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useRef, useEffect } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { LayoutDashboard, Users, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
+import { LayoutDashboard, Users, Gamepad2, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -71,7 +71,6 @@ const PlatformSidebar: React.FC = () => {
 
                 <div className="mt-auto pt-4 flex flex-col gap-1 relative">
                     <NavItem to="/about" icon={Info} label={t('sidebar.aboutProject', 'Sobre o Projeto')} />
-                    <NavItem to="/settings" icon={Settings} label={t('sidebar.settings', 'Configurações')} />
                 </div>
             </nav>
 

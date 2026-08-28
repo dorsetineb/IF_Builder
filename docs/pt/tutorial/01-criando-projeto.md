@@ -8,81 +8,77 @@ Tempo estimado: 5–8 minutos
 ## Objetivo deste módulo
 
 Neste módulo você vai:
-- Criar um novo projeto no IF Builder
-- Configurar o título, descrição e imagem de capa
-- Escolher o modo de interação (Parser)
-- Ativar os sistemas que usaremos (Inventário, Trackers)
-- Configurar o visual inicial da ficção
+- Criar uma nova ficção no IF Builder
+- Configurar o título, descrição, botão inicial e imagem de capa
+- Escolher o modo de interação principal (Parser)
+- Ativar os sistemas que usaremos (Inventário e Rastreadores)
+- Definir o estilo visual de abertura
+- Conhecer a interface do editor e os painéis de trabalho
 
 ---
 
-## Passo 1 — Acessar o editor
+## Passo 1 — Acessar o Editor
 
-Após fazer login no [ifbuildr.com](http://www.ifbuildr.com), você verá a **tela de boas-vindas**. Clique em **"Criar uma ficção"**.
+Ao abrir o IF Builder, você verá a tela inicial. Clique em **"Nova Ficção"** (ou no ícone `+` na barra superior caso já tenha um projeto carregado).
 
-> 💡 Se você já tem um projeto aberto, vá até o cabeçalho e clique no ícone de **Novo Projeto** (documento com `+`).
+> 💡 O IF Builder salva automaticamente todas as alterações na memória do navegador, mas você pode exportar cópias de segurança em `.json` ou `.zip` a qualquer momento pelo cabeçalho.
 
 ---
 
-## Passo 2 — Configurar a Abertura
+## Passo 2 — Configurar a Abertura (Capítulo Inicial)
 
-A janela **"Nova Ficção"** abre com três abas: **Abertura**, **Mecânicas** e **Estilo Visual**.
+A janela modal **"Nova Ficção"** é organizada em três abas: **Abertura**, **Mecânicas** e **Estilo Visual**.
 
-Na aba **Abertura**, preencha:
+Na aba **Abertura**, preencha os detalhes iniciais:
 
 | Campo | Valor para o tutorial |
 |-------|-----------------------|
 | **Título** | A Chave do Farol |
-| **Descrição** | Uma noite de tempestade. Um farol abandonado. Uma chave que não deveria estar aqui. |
+| **Descrição** | Uma noite de tempestade. Um farol abandonado na costa rochosa. Uma chave que não deveria estar aqui. |
 | **Texto do Botão** | Começar a aventura |
-| **Imagem de Fundo** | *(opcional — use uma imagem escura de farol ou deixe em branco)* |
+| **Imagem de Fundo** | *(opcional — carregue uma ilustração ou foto de farol)* |
 
-> 💡 A imagem de capa aparece na tela inicial do jogo. Recomendado: **1920×1080 pixels**.
+> 💡 A imagem de capa é exibida no início da ficção. Resolução recomendada: **1920×1080px** (16:9) em formato JPG, PNG ou WebP.
 
 ---
 
 ## Passo 3 — Configurar as Mecânicas
 
-Clique na aba **Mecânicas**.
+Clique na aba **Mecânicas**:
 
-**Modo de interação**: Selecione **Parser (Descreva verbos)**  
-O jogador digitará ações como `pegar chave` ou `subir escada`.
+1. **Modo de Interação**: Selecione **Parser (Descreva ações por texto)**.  
+   O jogador digitará ações como `pegar chave`, `examinar porta` ou `subir escada`.
+2. **Sistemas Habilitados**:
 
-**Sistemas habilitados**: Ative os seguintes:
-
-| Sistema | Ativar? | Motivo |
-|---------|---------|--------|
-| ✅ Inventário | **Sim** | O jogador vai coletar a Chave Enferrujada |
-| ✅ Trackers | **Sim** | Vamos criar um Tracker de Saúde |
-| ⬜ Diário | Opcional | Registra automaticamente as ações do jogador |
-| ⬜ Sistema de Chances | Não | Usaremos Trackers em vez disso |
+| Sistema | Ativar? | Finalidade |
+|---------|---------|------------|
+| ✅ **Inventário** | **Sim** | O jogador coletará e usará a Chave Enferrujada |
+| ✅ **Rastreadores** | **Sim** | Usaremos para monitorar o contador de Saúde/Sanidade |
+| ⬜ **Diário de Bordo** | Opcional | Cria um histórico acessível de eventos e mensagens |
+| ⬜ **Rolagem de Dados** | Opcional | Testes probabilísticos (1d6, 1d20, d100) |
 
 ---
 
 ## Passo 4 — Configurar o Estilo Visual
 
-Clique na aba **Estilo Visual**.
+Clique na aba **Estilo Visual**:
 
-Para nossa ficção de mistério/terror, recomendamos:
+- **Layout de Ramos**:
+  - *Orientação*: Vertical
+  - *Posição da Imagem*: Acima do texto
+- **Temas Predefinidos**: Selecione **Meia-Noite** (paleta escura atmosférica, ideal para suspense e mistério).
 
-**Layout de Ramos**:
-- **Orientação**: Vertical
-- **Posição da Imagem**: Acima
-
-**Temas Predefinidos**: Selecione **Meia-Noite** (fundo escuro, tom misterioso)
-
-> 💡 Você pode mudar o tema a qualquer momento nas **Configurações do Jogo** na sidebar.
+> 💡 Todas as configurações de mecânicas, cores, molduras e textos podem ser reajustadas a qualquer momento usando as páginas **Mecânicas**, **Estilo Visual** e **Rótulos** no menu lateral esquerdo!
 
 ---
 
-## Passo 5 — Criar o Projeto
+## Passo 5 — Criar e Conhecer o Espaço de Trabalho
 
-Clique em **"Criar Projeto"**. O editor abrirá com a estrutura inicial da sua ficção.
+Clique no botão **"Criar Projeto"**. O editor carregará com a estrutura inicial:
 
-Você verá:
-- A **sidebar** à esquerda com os módulos do editor
-- A **lista de narrativa** com um ramo inicial criado automaticamente
-- O **Editor de Ramos** à direita, pronto para edição
+1. **Menu Lateral Esquerdo:** Navegação entre Narrativa, Mecânicas, Estilo Visual, Rótulos, Objetos, Rastreadores e Verbos.
+2. **Lista de Narrativa (Coluna Central):** Exibe todos os Capítulos, Ramificações e Cenários do seu projeto.
+3. **Editor de Nós (Painel Direito):** Onde você escreve textos, configura interações, desenha áreas interativas em cenários e gerencia multimídia.
 
 ---
 
@@ -90,11 +86,11 @@ Você verá:
 
 - [ ] Projeto criado com o título "A Chave do Farol"
 - [ ] Modo Parser selecionado
-- [ ] Inventário e Trackers ativados
+- [ ] Inventário e Rastreadores ativados
 - [ ] Tema visual "Meia-Noite" aplicado
 
 ---
 
 ## Próximo passo
 
-→ [Módulo 02 — Ramos e Descrições](./02-ramos-e-descricoes.md)
+→ [**Módulo 02 — Narrativa: Capítulos e Ramos**](./02-narrativa-capitulos-e-ramos.md)

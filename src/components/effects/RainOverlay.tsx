@@ -30,67 +30,42 @@ const RainOverlay: React.FC = () => {
             dy: number = 0;
             offset: number = 0;
             opacity: number = 0;
-            drip: HTMLCanvasElement | null = null;
+            color: string = '';
 
-            constructor() {
-                this.reset();
+            constructor(initial: boolean = false) {
+                this.reset(initial);
             }
 
-            reset() {
-                this.r = randomFrom(0.8, 1.6);
-                this.l = (this.r * 250);
-                this.x = randomFrom((canvas!.width * -0.25), (canvas!.width * 1.125));
-                this.y = randomFrom((canvas!.height * -0.25), (canvas!.height * -1));
+            reset(initial: boolean = false) {
+                if (!canvas) return;
+                this.r = randomFrom(0.8, 1.8);
+                this.l = this.r * 220;
+                this.x = randomFrom((canvas.width * -0.25), (canvas.width * 1.125));
+                this.y = initial ? randomFrom(0, canvas.height) : randomFrom((canvas.height * -0.2), (canvas.height * -0.8));
                 this.dx = randomFrom((wind_speed - 3), (wind_speed + 3));
                 this.dy = (this.r * (100 * fall_speed));
                 this.offset = (this.l * (this.dx / this.dy));
-                this.opacity = (this.r * randomFrom(0.2, 0.6));
-                this.drip = this.render();
-            }
-
-            render() {
-                const canv = document.createElement('canvas');
-                const ctx = canv.getContext('2d');
-                if (!ctx) return null;
-
-                const width = Math.abs(this.offset) + this.r;
-                // Ensure valid dimensions
-                if (width <= 0 || this.l <= 0) return null;
-
-                canv.setAttribute('width', width.toString());
-                canv.setAttribute('height', this.l.toString());
-
-                ctx.beginPath();
-
-                const drip = ctx.createLinearGradient(0, 0, 0, this.l);
-                drip.addColorStop(0, 'rgba(' + rain_color + ', 0)');
-                drip.addColorStop(1, 'rgba(' + rain_color + ', ' + this.opacity + ')');
-                ctx.fillStyle = drip;
-
-                const startX = (this.offset >= 0) ? 0 : Math.abs(this.offset);
-                ctx.moveTo(startX, 0);
-                ctx.lineTo(startX + this.r, 0);
-                ctx.lineTo(startX + this.r + this.offset, this.l);
-                ctx.lineTo(startX + this.offset, this.l);
-
-                ctx.closePath();
-                ctx.fill();
-
-                return canv;
+                this.opacity = randomFrom(0.15, 0.55);
+                this.color = 'rgba(' + rain_color + ', ' + this.opacity + ')';
             }
 
             draw() {
-                if (this.drip && ctx) {
-                    ctx.drawImage(this.drip, this.x, this.y);
-                }
+                if (!ctx) return;
+                ctx.beginPath();
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.r;
+                ctx.lineCap = 'round';
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.offset, this.y + this.l);
+                ctx.stroke();
             }
 
             fall() {
                 this.x += this.dx;
                 this.y += this.dy;
 
-                if (this.y > (canvas!.height * 1.25)) {
-                    this.reset();
+                if (canvas && this.y > (canvas.height * 1.25)) {
+                    this.reset(false);
                 }
             }
         }
@@ -101,23 +76,17 @@ const RainOverlay: React.FC = () => {
 
         const resizer = () => {
             if (!container || !canvas) return;
-            // Use container dimensions, but scale up slightly for wind effect logic if needed
-            // The original code used window.innerWidth * 1.5. 
-            // We'll trust the container size but maybe apply the logical scaling for the simulation
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || window.innerHeight;
 
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-
-            // Initial canvas sizing
             canvas.width = width;
             canvas.height = height;
 
-            // Recalculate drop count based on area/width
-            const drop_count = Math.floor(width * rain_weight * 1.5); // 1.5 factor to match density roughly
+            const drop_count = Math.min(150, Math.max(30, Math.floor(width * rain_weight * 0.75)));
 
             drops = [];
             for (let i = 0; i < drop_count; i++) {
-                drops[i] = new Drop();
+                drops[i] = new Drop(true);
             }
         };
 

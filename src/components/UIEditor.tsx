@@ -151,6 +151,7 @@ interface UIEditorProps {
     gameSuggestionsEmptyFeedback?: string;
     gameInventoryEmptyFeedback?: string;
     onNavigateToTrackers?: () => void;
+    activeTab?: 'sistemas' | 'aparencia' | 'textos';
 }
 
 // Define App Theme Primary Colors based on index.css
@@ -296,7 +297,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
     const [localRetrospectiveButtonText, setLocalRetrospectiveButtonText] = useState(gameRetrospectiveButtonText);
-    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos'>('sistemas');
+    const activeTab = props.activeTab || 'sistemas';
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -395,12 +396,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMenuTransitionType, setLocalMenuTransitionType] = useState<'fade' | 'slide' | 'none'>(props.gameMenuTransitionType || 'fade');
     const [localMenuTransitionSpeed, setLocalMenuTransitionSpeed] = useState<number>(props.gameMenuTransitionSpeed || 500);
     const [localMenuTransitionSound, setLocalMenuTransitionSound] = useState<string | undefined>(props.gameMenuTransitionSound);
-
-    const TABS = {
-        sistemas: t('UIEditor.tabs.sistemas'),
-        aparencia: t('UIEditor.tabs.aparencia'),
-        textos: t('UIEditor.tabs.textos'),
-    };
 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
@@ -1017,7 +1012,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 {/* Header with Save/Undo actions */}
                 <div className="flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50 bg-card shadow-sm relative z-10">
                     <p className="text-muted-foreground text-xs font-medium">
-                        {t('UIEditor.header.description')}
+                        {activeTab === 'sistemas'
+                            ? t('UIEditor.tabs.sistemasDesc', 'Personalize as mecânicas, sistemas e controles de decisão da sua ficção.')
+                            : activeTab === 'aparencia'
+                            ? t('UIEditor.tabs.aparenciaDesc', 'Personalize a paleta de cores, tipografia, molduras e layout visual da sua ficção.')
+                            : t('UIEditor.tabs.textosDesc', 'Configure os rótulos de botões, mensagens do sistema e campos de ação.')}
                     </p>
                     <div className="flex items-center gap-3">
                         {isDirty && (
@@ -1040,41 +1039,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <Save className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
                             <span>{t('UIEditor.header.save')}</span>
                         </button>
-                    </div>
-                </div>
-                <div className="border-b border-muted-foreground/50 flex items-center justify-between relative">
-                    <div className="flex space-x-1 overflow-x-auto">
-                        {Object.entries(TABS).map(([key, name]) => {
-                            const getTabIcon = (tabKey: string) => {
-                                switch (tabKey) {
-                                    case 'aparencia':
-                                        return <Palette className="w-3.5 h-3.5" />;
-                                    case 'sistemas':
-                                        return <SquareDashedMousePointer className="w-3.5 h-3.5" />;
-                                    case 'textos':
-                                        return <Type className="w-3.5 h-3.5" />;
-                                    case 'config':
-                                        return <Monitor className="w-3.5 h-3.5" />;
-                                    default:
-                                        return null;
-                                }
-                            };
-
-                            return (
-                                <button
-                                    key={key}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onClick={() => setActiveTab(key as any)}
-                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 justify-center ${activeTab === key
-                                        ? 'bg-primary text-primary-foreground font-bold'
-                                        : 'text-muted-foreground hover:bg-primary/25 hover:text-white'
-                                        }`}
-                                >
-                                    {getTabIcon(key)}
-                                    <span>{name}</span>
-                                </button>
-                            );
-                        })}
                     </div>
                 </div>
             </div>

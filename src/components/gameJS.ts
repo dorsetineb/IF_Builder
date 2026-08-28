@@ -381,6 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.rain_weight = 0.11;
             this.rain_color = '255,255,255';
             this.started = false;
+            this.boundResize = null;
         }
 
         init(targetId) {
@@ -405,7 +406,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Resize immediately
             this.resizer();
-            window.addEventListener('resize', () => this.resizer());
+            if (!this.boundResize) {
+                this.boundResize = () => this.resizer();
+                window.addEventListener('resize', this.boundResize);
+            }
         }
 
         start(targetId = 'scene-overlay') {
@@ -420,8 +424,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stop() {
             this.started = false;
-            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            if (this.ctx && this.canvas) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
         }
 
         randomFrom(min, max) {
@@ -430,12 +439,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resizer() {
             if (!this.canvas || !this.overlay) return;
-            const width = this.overlay.clientWidth;
-            const height = this.overlay.clientHeight;
+            const width = this.overlay.clientWidth || window.innerWidth;
+            const height = this.overlay.clientHeight || window.innerHeight;
             this.canvas.width = width;
             this.canvas.height = height;
             
-            const drop_count = Math.floor(width * this.rain_weight * 1.5);
+            const drop_count = Math.min(150, Math.max(30, Math.floor(width * this.rain_weight * 0.75)));
             this.drops = [];
             for (let i = 0; i < drop_count; i++) {
                 this.drops[i] = new Drop(this);
@@ -447,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (let i = 0; i < this.drops.length; i++) {
                 this.drops[i].fall();
-                this.drops[i].draw();
+                this.drops[i].draw(this.ctx);
             }
             this.animationFrameId = requestAnimationFrame(() => this.loop());
         }
@@ -456,57 +465,39 @@ document.addEventListener('DOMContentLoaded', () => {
     class Drop {
         constructor(effect) {
             this.effect = effect;
-            this.reset();
+            this.reset(true);
         }
         
-        reset() {
+        reset(initial = false) {
             const canvas = this.effect.canvas;
-            this.r = this.effect.randomFrom(0.8, 1.6);
-            this.l = (this.r * 250);
-            this.x = this.effect.randomFrom((canvas.width * -0.25), (canvas.width * 1.125));
-            this.y = this.effect.randomFrom((canvas.height * -0.25), (canvas.height * -1));
-            this.dx = this.effect.randomFrom((this.effect.wind_speed - 3), (this.effect.wind_speed + 3));
-            this.dy = (this.r * (100 * this.effect.fall_speed));
-            this.offset = (this.l * (this.dx / this.dy));
-            this.opacity = (this.r * this.effect.randomFrom(0.2, 0.6));
-            this.drip = this.render();
+            if (!canvas) return;
+            this.r = this.effect.randomFrom(0.8, 1.8);
+            this.l = this.r * 220;
+            this.x = this.effect.randomFrom(canvas.width * -0.25, canvas.width * 1.125);
+            this.y = initial ? this.effect.randomFrom(0, canvas.height) : this.effect.randomFrom(canvas.height * -0.2, canvas.height * -0.8);
+            this.dx = this.effect.randomFrom(this.effect.wind_speed - 3, this.effect.wind_speed + 3);
+            this.dy = this.r * (100 * this.effect.fall_speed);
+            this.offset = this.l * (this.dx / this.dy);
+            this.opacity = this.effect.randomFrom(0.15, 0.55);
+            this.color = 'rgba(' + this.effect.rain_color + ', ' + this.opacity + ')';
         }
 
-        render() {
-            const canv = document.createElement('canvas');
-            const ctx = canv.getContext('2d');
-            const width = Math.abs(this.offset) + this.r;
-            if (width <= 0 || this.l <= 0) return null;
-            canv.setAttribute('width', width);
-            canv.setAttribute('height', this.l);
-            
+        draw(ctx) {
+            if (!ctx) return;
             ctx.beginPath();
-            const drip = ctx.createLinearGradient(0, 0, 0, this.l);
-            drip.addColorStop(0, 'rgba(' + this.effect.rain_color + ', 0)');
-            drip.addColorStop(1, 'rgba(' + this.effect.rain_color + ', ' + this.opacity + ')');
-            ctx.fillStyle = drip;
-            
-            const startX = (this.offset >= 0) ? 0 : Math.abs(this.offset);
-            ctx.moveTo(startX, 0);
-            ctx.lineTo(startX + this.r, 0);
-            ctx.lineTo(startX + this.r + this.offset, this.l);
-            ctx.lineTo(startX + this.offset, this.l);
-            ctx.closePath();
-            ctx.fill();
-            return canv;
-        }
-
-        draw() {
-            if (this.drip && this.effect.ctx) {
-                this.effect.ctx.drawImage(this.drip, this.x, this.y);
-            }
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = this.r;
+            ctx.lineCap = 'round';
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x + this.offset, this.y + this.l);
+            ctx.stroke();
         }
 
         fall() {
             this.x += this.dx;
             this.y += this.dy;
-            if (this.y > (this.effect.canvas.height * 1.25)) {
-                this.reset();
+            if (this.effect.canvas && this.y > (this.effect.canvas.height * 1.25)) {
+                this.reset(false);
             }
         }
     }
@@ -699,6 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.canvasWidth = 0; this.canvasHeight = 0;
             this.started = false;
             this.duration = 1.0 / 50;
+            this.boundResize = null;
         }
         init(targetId) {
             this.overlay = document.getElementById(targetId);
@@ -713,7 +705,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.ctx = this.canvas.getContext('2d');
             this.resizer();
-            window.addEventListener('resize', () => this.resizer());
+            if (!this.boundResize) {
+                this.boundResize = () => this.resizer();
+                window.addEventListener('resize', this.boundResize);
+            }
         }
         start(targetId = 'scene-overlay') {
             if (this.started && this.currentTargetId === targetId) return;
@@ -726,7 +721,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         stop() {
             this.started = false;
-            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
             if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
         resizer() {
@@ -769,6 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.overlay = null;
             this.started = false;
             this.width = 0; this.height = 0;
+            this.boundResize = null;
         }
 
         init(targetId) {
@@ -785,7 +784,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.ctx = this.canvas.getContext('2d');
             this.resize();
-            window.addEventListener('resize', () => this.resize());
+            if (!this.boundResize) {
+                this.boundResize = () => this.resize();
+                window.addEventListener('resize', this.boundResize);
+            }
         }
 
         resize() {

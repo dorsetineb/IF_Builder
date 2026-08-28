@@ -255,8 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
     vignetteDiaryButton.id = 'vignette-diary-button';
     vignetteDiaryButton.className = 'ending-restart-button hidden';
     vignetteDiaryButton.style.cssText = btnStyle + ' margin-top: 10px;';
-    vignetteDiaryButton.textContent = gameData.gameTranslations.view_diary_btn;
-    vignetteContinueButton.parentElement.appendChild(vignetteDiaryButton);
+    vignetteDiaryButton.textContent = (gameData.gameTranslations && gameData.gameTranslations.view_diary_btn) || 'Ver Diário';
+    if (vignetteContinueButton && vignetteContinueButton.parentElement) {
+        vignetteContinueButton.parentElement.appendChild(vignetteDiaryButton);
+    }
     vignetteDiaryButton.addEventListener('click', () => showDiary(true));
 
     // Also add to standard ending screens
@@ -381,6 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.rain_weight = 0.11;
             this.rain_color = '255,255,255';
             this.started = false;
+            this.boundResize = null;
         }
 
         init(targetId) {
@@ -405,7 +408,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Resize immediately
             this.resizer();
-            window.addEventListener('resize', () => this.resizer());
+            if (!this.boundResize) {
+                this.boundResize = () => this.resizer();
+                window.addEventListener('resize', this.boundResize);
+            }
         }
 
         start(targetId = 'scene-overlay') {
@@ -420,8 +426,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stop() {
             this.started = false;
-            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            if (this.ctx && this.canvas) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
         }
 
         randomFrom(min, max) {
@@ -430,12 +441,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resizer() {
             if (!this.canvas || !this.overlay) return;
-            const width = this.overlay.clientWidth;
-            const height = this.overlay.clientHeight;
+            const width = this.overlay.clientWidth || window.innerWidth;
+            const height = this.overlay.clientHeight || window.innerHeight;
             this.canvas.width = width;
             this.canvas.height = height;
             
-            const drop_count = Math.floor(width * this.rain_weight * 1.5);
+            const drop_count = Math.min(150, Math.max(30, Math.floor(width * this.rain_weight * 0.75)));
             this.drops = [];
             for (let i = 0; i < drop_count; i++) {
                 this.drops[i] = new Drop(this);
@@ -447,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (let i = 0; i < this.drops.length; i++) {
                 this.drops[i].fall();
-                this.drops[i].draw();
+                this.drops[i].draw(this.ctx);
             }
             this.animationFrameId = requestAnimationFrame(() => this.loop());
         }
@@ -456,57 +467,39 @@ document.addEventListener('DOMContentLoaded', () => {
     class Drop {
         constructor(effect) {
             this.effect = effect;
-            this.reset();
+            this.reset(true);
         }
         
-        reset() {
+        reset(initial = false) {
             const canvas = this.effect.canvas;
-            this.r = this.effect.randomFrom(0.8, 1.6);
-            this.l = (this.r * 250);
-            this.x = this.effect.randomFrom((canvas.width * -0.25), (canvas.width * 1.125));
-            this.y = this.effect.randomFrom((canvas.height * -0.25), (canvas.height * -1));
-            this.dx = this.effect.randomFrom((this.effect.wind_speed - 3), (this.effect.wind_speed + 3));
-            this.dy = (this.r * (100 * this.effect.fall_speed));
-            this.offset = (this.l * (this.dx / this.dy));
-            this.opacity = (this.r * this.effect.randomFrom(0.2, 0.6));
-            this.drip = this.render();
+            if (!canvas) return;
+            this.r = this.effect.randomFrom(0.8, 1.8);
+            this.l = this.r * 220;
+            this.x = this.effect.randomFrom(canvas.width * -0.25, canvas.width * 1.125);
+            this.y = initial ? this.effect.randomFrom(0, canvas.height) : this.effect.randomFrom(canvas.height * -0.2, canvas.height * -0.8);
+            this.dx = this.effect.randomFrom(this.effect.wind_speed - 3, this.effect.wind_speed + 3);
+            this.dy = this.r * (100 * this.effect.fall_speed);
+            this.offset = this.l * (this.dx / this.dy);
+            this.opacity = this.effect.randomFrom(0.15, 0.55);
+            this.color = 'rgba(' + this.effect.rain_color + ', ' + this.opacity + ')';
         }
 
-        render() {
-            const canv = document.createElement('canvas');
-            const ctx = canv.getContext('2d');
-            const width = Math.abs(this.offset) + this.r;
-            if (width <= 0 || this.l <= 0) return null;
-            canv.setAttribute('width', width);
-            canv.setAttribute('height', this.l);
-            
+        draw(ctx) {
+            if (!ctx) return;
             ctx.beginPath();
-            const drip = ctx.createLinearGradient(0, 0, 0, this.l);
-            drip.addColorStop(0, 'rgba(' + this.effect.rain_color + ', 0)');
-            drip.addColorStop(1, 'rgba(' + this.effect.rain_color + ', ' + this.opacity + ')');
-            ctx.fillStyle = drip;
-            
-            const startX = (this.offset >= 0) ? 0 : Math.abs(this.offset);
-            ctx.moveTo(startX, 0);
-            ctx.lineTo(startX + this.r, 0);
-            ctx.lineTo(startX + this.r + this.offset, this.l);
-            ctx.lineTo(startX + this.offset, this.l);
-            ctx.closePath();
-            ctx.fill();
-            return canv;
-        }
-
-        draw() {
-            if (this.drip && this.effect.ctx) {
-                this.effect.ctx.drawImage(this.drip, this.x, this.y);
-            }
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = this.r;
+            ctx.lineCap = 'round';
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x + this.offset, this.y + this.l);
+            ctx.stroke();
         }
 
         fall() {
             this.x += this.dx;
             this.y += this.dy;
-            if (this.y > (this.effect.canvas.height * 1.25)) {
-                this.reset();
+            if (this.effect.canvas && this.y > (this.effect.canvas.height * 1.25)) {
+                this.reset(false);
             }
         }
     }
@@ -699,6 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.canvasWidth = 0; this.canvasHeight = 0;
             this.started = false;
             this.duration = 1.0 / 50;
+            this.boundResize = null;
         }
         init(targetId) {
             this.overlay = document.getElementById(targetId);
@@ -713,7 +707,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.ctx = this.canvas.getContext('2d');
             this.resizer();
-            window.addEventListener('resize', () => this.resizer());
+            if (!this.boundResize) {
+                this.boundResize = () => this.resizer();
+                window.addEventListener('resize', this.boundResize);
+            }
         }
         start(targetId = 'scene-overlay') {
             if (this.started && this.currentTargetId === targetId) return;
@@ -726,7 +723,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         stop() {
             this.started = false;
-            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
             if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
         resizer() {
@@ -769,6 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.overlay = null;
             this.started = false;
             this.width = 0; this.height = 0;
+            this.boundResize = null;
         }
 
         init(targetId) {
@@ -785,7 +786,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.ctx = this.canvas.getContext('2d');
             this.resize();
-            window.addEventListener('resize', () => this.resize());
+            if (!this.boundResize) {
+                this.boundResize = () => this.resize();
+                window.addEventListener('resize', this.boundResize);
+            }
         }
 
         resize() {
@@ -1221,8 +1225,16 @@ document.addEventListener('DOMContentLoaded', () => {
                  negativeEndingScreen.classList.remove('fade-out');
              }, 1000);
         }));
-        submitVerb.addEventListener('click', handleInput);
-        verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
+        if (submitVerb) {
+            submitVerb.addEventListener('mousedown', (e) => { e.preventDefault(); });
+            submitVerb.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleInput();
+            });
+        }
+        if (verbInput) {
+            verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
+        }
         if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
         if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
         if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
@@ -1249,45 +1261,53 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.error('ERRO: Botão de exportação (#export-pdf-button) NÃO encontrado no DOM durante init.');
         }
-        closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
+        closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay')?.classList.add('hidden'); }));
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.add('hidden'); });
         });
-        btnSaveMenu.addEventListener('click', () => renderSlots('save'));
-        btnLoadMenu.addEventListener('click', () => renderSlots('load'));
-        btnBackSystem.addEventListener('click', () => { systemSlotsContainer.classList.add('hidden'); systemMenuMain.classList.remove('hidden'); systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
+        if (btnSaveMenu) btnSaveMenu.addEventListener('click', () => renderSlots('save'));
+        if (btnLoadMenu) btnLoadMenu.addEventListener('click', () => renderSlots('load'));
+        if (btnBackSystem) btnBackSystem.addEventListener('click', () => { if (systemSlotsContainer) systemSlotsContainer.classList.add('hidden'); if (systemMenuMain) systemMenuMain.classList.remove('hidden'); if (systemModalTitle) systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
         
-        viewEndingButton.addEventListener('click', () => {
-             const isWin = isGameEnded === 'win';
-             // For defeat: check if there's a defeat scene/vignette to navigate to
-             if (!isWin) {
-                 const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
-                 if (defeatSceneId) {
-                     // Reset UI back to standard action bar for the defeat vignette
-                     standardActionBar.classList.remove('hidden');
-                     endingActionBar.classList.add('hidden');
-                     isGameEnded = false;
-                     loadScene(defeatSceneId, true);
-                     return;
+        if (viewEndingButton) {
+            viewEndingButton.addEventListener('click', () => {
+                 const isWin = isGameEnded === 'win';
+                 // For defeat: check if there's a defeat scene/vignette to navigate to
+                 if (!isWin) {
+                     const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
+                     if (defeatSceneId) {
+                         // Reset UI back to standard action bar for the defeat vignette
+                         if (standardActionBar) standardActionBar.classList.remove('hidden');
+                         if (endingActionBar) endingActionBar.classList.add('hidden');
+                         isGameEnded = false;
+                         loadScene(defeatSceneId, true);
+                         return;
+                     }
                  }
-             }
-             const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
-             const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
-             if (endMusic) playBgm(endMusic); else playBgm("");
-             endScreen.style.zIndex = '0';
-             endScreen.classList.remove('hidden');
-             gameContainer.classList.add('fade-out');
-             setTimeout(() => {
-                gameContainer.classList.add('hidden');
-                endScreen.style.zIndex = ''; 
-             }, 1000);
-        });
+                 const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
+                 const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
+                 if (endMusic) playBgm(endMusic); else playBgm("");
+                 if (endScreen) {
+                     endScreen.style.zIndex = '0';
+                     endScreen.classList.remove('hidden');
+                 }
+                 if (gameContainer) {
+                     gameContainer.classList.add('fade-out');
+                     setTimeout(() => {
+                        gameContainer.classList.add('hidden');
+                        if (endScreen) endScreen.style.zIndex = ''; 
+                     }, 1000);
+                 }
+            });
+        }
         
-        btnMainMenu.onclick = (e) => {
-            systemModal.classList.add('hidden');
-            isGameEnded = false; 
-            startGame();
-        };
+        if (btnMainMenu) {
+            btnMainMenu.onclick = (e) => {
+                if (systemModal) systemModal.classList.add('hidden');
+                isGameEnded = false; 
+                startGame();
+            };
+        }
         if (window.isSceneTest) startGame();
     };
 
@@ -1409,6 +1429,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const startGame = () => {
         removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
+        if ((!currentSceneId || !gameData.cenas[currentSceneId]) && gameData.cenas && Object.keys(gameData.cenas).length > 0) {
+            currentSceneId = Object.keys(gameData.cenas)[0];
+        }
         inventory = []; 
         visitedScenes = []; 
         actionLog = []; 
@@ -1430,6 +1453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fix Audio Persistence: If the starting scene has no specific music.
         // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
+        const isStartVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
         if (startScene) {
             if (startScene.backgroundMusic) {
                 playBgm(startScene.backgroundMusic);
@@ -1443,43 +1467,12 @@ document.addEventListener('DOMContentLoaded', () => {
              console.error("Start scene not found:", currentSceneId);
         }
 
-        standardActionBar.classList.remove('hidden');
-        endingActionBar.classList.add('hidden');
+        if (standardActionBar) standardActionBar.classList.remove('hidden');
+        if (endingActionBar) endingActionBar.classList.add('hidden');
         
-        const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
-        
-        if (!isVignette) {
+        if (gameContainer && !isStartVignette) {
             gameContainer.classList.remove('hidden');
-            if (window.isSceneTest) {
-                const hasImage = startScene && startScene.image && gameData.enableImages !== false;
-                
-                const showGame = () => {
-                     gameContainer.classList.add('ready');
-                };
-
-                if (hasImage) {
-                     const img = document.getElementById('scene-image');
-                     if (img && img instanceof HTMLImageElement) {
-                         if (img.complete && img.naturalHeight !== 0) {
-                             showGame();
-                         } else {
-                             img.onload = showGame;
-                             img.onerror = showGame;
-                             // Safety timeout
-                             setTimeout(showGame, 2000);
-                         }
-                     } else {
-                         showGame();
-                     }
-                } else {
-                     // Small delay to ensure layout frames are ready
-                     setTimeout(showGame, 50);
-                }
-
-            } else {
-                // Unhide game container instantly in standard play
-                gameContainer.classList.add('ready');
-            }
+            gameContainer.classList.add('ready');
         }
     };
 
@@ -1544,7 +1537,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const savesBtn = document.getElementById('start-saves-btn');
         const gearBtn = document.getElementById('gear-system-button');
 
-        if (!startScreen) return;
+        if (!startScreen) {
+            startGame();
+            return;
+        }
 
         if (!skipTransition) {
             const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
@@ -1694,13 +1690,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, notes: notesTextarea ? notesTextarea.value : '', timestamp: new Date().toLocaleString() };
         setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
-    };
-
-    const toggleSystemMenu = () => {
-        if (systemModal.classList.contains('hidden')) {
-            systemModal.classList.remove('hidden'); systemMenuMain.classList.remove('hidden'); systemSlotsContainer.classList.add('hidden');
-            systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
-        } else systemModal.classList.add('hidden');
     };
 
     const renderSlots = (mode) => {
@@ -2146,61 +2135,72 @@ document.addEventListener('DOMContentLoaded', () => {
         // Blur Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'blur') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Clear any existing blur container first
-                    const existing = vOverlay.querySelector('.blur-overlay-container');
+                    const existing = overlayEl.querySelector('.blur-overlay-container');
                     if (existing) existing.remove();
                     
                     const blurContainer = document.createElement('div');
                     blurContainer.className = 'blur-overlay-container';
                     blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
-                    vOverlay.appendChild(blurContainer);
+                    overlayEl.appendChild(blurContainer);
                 }
             });
+        } else {
+            if (vOverlay) {
+                const existing = vOverlay.querySelector('.blur-overlay-container');
+                if (existing) existing.remove();
+            }
         }
 
         // Chromatic Aberration Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'chromatic') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Clear any existing chromatic container first
-                    const existing = vOverlay.querySelector('.chromatic-overlay-container');
+                    const existing = overlayEl.querySelector('.chromatic-overlay-container');
                     if (existing) existing.remove();
                     
                     const chromaticContainer = document.createElement('div');
                     chromaticContainer.className = 'chromatic-overlay-container';
                     chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
-                    vOverlay.appendChild(chromaticContainer);
+                    overlayEl.appendChild(chromaticContainer);
                 }
             });
+        } else {
+            if (vOverlay) {
+                const existing = vOverlay.querySelector('.chromatic-overlay-container');
+                if (existing) existing.remove();
+            }
         }
 
         // TV Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'tv') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Use CSS class - filter is applied via ::before pseudo-element to only affect background
                     vignetteScreen.classList.add('tv-active');
 
                     // Clear any existing TV container first
-                    const existing = vOverlay.querySelector('.tv-overlay-container');
+                    const existing = overlayEl.querySelector('.tv-overlay-container');
                     if (existing) existing.remove();
                     
                     const tvContainer = document.createElement('div');
                     tvContainer.className = 'tv-overlay-container';
                     tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
-                    vOverlay.appendChild(tvContainer);
+                    overlayEl.appendChild(tvContainer);
                 }
             });
         } else {
             // Remove CSS class
             vignetteScreen.classList.remove('tv-active');
-            const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
+                const existing = vOverlay.querySelector('.tv-overlay-container');
+                if (existing) existing.remove();
             }
         }
 
@@ -2236,16 +2236,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Nosferatu Effect Logic for Vignette
         if (scene.overlayEffect === 'nosferatu') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
                     // Clear any existing nosferatu container first
-                    const existing = vOverlay.querySelector('.nosferatu-container');
+                    const existing = overlayEl.querySelector('.nosferatu-container');
                     if (existing) existing.remove();
                     
                     const nosferatuContainer = document.createElement('div');
                     nosferatuContainer.className = 'nosferatu-container';
                     nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
-                    vOverlay.appendChild(nosferatuContainer);
+                    overlayEl.appendChild(nosferatuContainer);
                 }
                 // CSS class handles the background filter via ::before pseudo-element
                 vignetteScreen.classList.add('nosferatu-active');
@@ -2275,22 +2275,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fog Effect Logic for Vignette
         if (scene.overlayEffect === 'fog') {
             requestAnimationFrame(() => {
-                const vOverlay = document.getElementById('vignette-overlay');
-                if (vOverlay) {
-                    const existing = vOverlay.querySelector('.fog-container');
+                const overlayEl = document.getElementById('vignette-overlay');
+                if (overlayEl) {
+                    const existing = overlayEl.querySelector('.fog-container');
                     if (existing) existing.remove();
                     
                     const fogContainer = document.createElement('div');
                     fogContainer.className = 'fog-container';
                     fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
-                    vOverlay.appendChild(fogContainer);
-                    vOverlay.classList.add('overlay-fog');
+                    overlayEl.appendChild(fogContainer);
+                    overlayEl.classList.add('overlay-fog');
                     
                     updateFogSizes(fogContainer);
                 }
             });
         } else {
-            const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 vOverlay.classList.remove('overlay-fog');
                 const existing = vOverlay.querySelector('.fog-container');
@@ -2299,8 +2298,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
-        const scene = gameData.cenas[sceneId]; if (!scene) return;
+    const findScene = (sceneId) => {
+        if (!sceneId) return null;
+        const cenas = (gameData && (gameData.cenas || gameData.scenes)) || {};
+        if (cenas[sceneId]) return cenas[sceneId];
+        const lowerId = String(sceneId).trim().toLowerCase();
+        for (const key of Object.keys(cenas)) {
+            if (key.trim().toLowerCase() === lowerId) {
+                return cenas[key];
+            }
+        }
+        for (const val of Object.values(cenas)) {
+            if (val && val.id && String(val.id).trim().toLowerCase() === lowerId) {
+                return val;
+            }
+        }
+        return null;
+    };
+
+    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
+        let scene = findScene(sceneId);
+        if (!scene) {
+            const keys = Object.keys((gameData && gameData.cenas) || {});
+            if (keys.length > 0) {
+                sceneId = keys[0];
+                scene = gameData.cenas[sceneId];
+            } else {
+                return;
+            }
+        }
+        if (!scene) return;
+        sceneId = scene.id;
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
         } else if (scene.stopBackgroundMusic) {
@@ -2318,7 +2346,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
-        actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
+        if (scene.sceneType === 'hypercard_stack') {
+            const startCard = (scene.stackCards && scene.stackCards.length > 0)
+                ? (scene.stackCards.find(c => c.id === scene.startCardId) || scene.stackCards[0])
+                : null;
+            const cardName = startCard ? startCard.name : '';
+            const displayName = scene.name + (cardName ? ' · ' + cardName : '');
+            const displayImage = startCard ? (startCard.image || scene.image) : scene.image;
+            const displayDescription = startCard ? (startCard.description || '') : '';
+            actionLog.push({ type: 'scene', name: displayName, timestamp: new Date().toLocaleTimeString(), description: displayDescription, image: displayImage });
+        } else {
+            actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
+        }
         
         // Check if this is a vignette scene
         if (scene.vignetteType && scene.vignetteType !== 'none') {
@@ -2348,6 +2387,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        gameContainer.classList.remove('hidden');
+        gameContainer.classList.remove('fade-out');
+        
         let effectiveTransition = gameData.gameImageTransitionType || 'fade';
         if (effectiveTransition === 'none') transition = false;
         let speed = 0.5;
@@ -2372,14 +2414,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const defaultDuration = speed + 's';
         document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
-        if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
+
+        const isTargetHyperCard = scene.sceneType === 'hypercard_stack';
+        const isCurrentHyperCard = gameContainer && gameContainer.classList.contains('hypercard-fullscreen');
+
+        if (isTargetHyperCard && !isCurrentHyperCard && transition && gameData.enableImages !== false) {
+            // Transitioning from Branch/Chapter to Scenario (HyperCard Fullscreen)
+            const durationMs = speed * 1000;
+
+            if (effectiveTransition !== 'none' && gameContainer) {
+                // Clone the previous branch view container to perform smooth outgoing transition
+                const clone = gameContainer.cloneNode(true);
+                clone.id = 'branch-transition-clone';
+                clone.className = gameContainer.className + ' scene-curtain-transition ' + ('trans-' + effectiveTransition + '-out');
+                clone.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;background-color:var(--bg-color);margin:0;padding:0;';
+                document.body.appendChild(clone);
+
+                // Render scenario in fullscreen directly underneath
+                renderScene(scene, successPrefix, inputEchoText);
+
+                setTimeout(() => {
+                    clone.remove();
+                }, durationMs + 50);
+            } else {
+                renderScene(scene, successPrefix, inputEchoText);
+            }
+
+            autoSaveGame();
+            return;
+        }
+
+        if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false && !isTargetHyperCard) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
+                 if (sceneOverlay) {
+                     sceneOverlay.style.transition = 'opacity ' + defaultDuration + ' ease-in-out';
+                     sceneOverlay.style.opacity = '0';
+                 }
                  const durationMs = speed * 1000;
-                 setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
-             } else renderScene(scene, successPrefix);
-        } else { renderScene(scene, successPrefix); }
+                 setTimeout(() => { 
+                     renderScene(scene, successPrefix, inputEchoText); 
+                     sceneImage.classList.remove(animClass); 
+                     sceneImageBack.src = ''; 
+                     sceneImageBack.classList.add('hidden'); 
+                     if (sceneOverlay) {
+                         sceneOverlay.style.opacity = '1';
+                     }
+                 }, durationMs + 50);
+             } else renderScene(scene, successPrefix, inputEchoText);
+        } else { renderScene(scene, successPrefix, inputEchoText); }
         autoSaveGame();
     };
 
@@ -2408,22 +2492,209 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const renderChancesIcons = () => {
+        const chancesContainer = document.getElementById('chances-container');
+        if (!chancesContainer) return;
+        if (!gameData.enableChances) {
+            chancesContainer.style.display = 'none';
+            return;
+        }
+        chancesContainer.innerHTML = '';
+        const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
+        const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
+        for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
+            const icon = document.createElement('div');
+            const isLost = i >= chances;
+            icon.className = 'chance-icon ' + (isLost ? 'lost' : '');
+            
+            // Aplicar animação se este ícone foi o afetado agora
+            if (lastChanceChange && lastChanceChange.index === i) {
+                icon.classList.add('animate-chance-' + lastChanceChange.type);
+            }
+            
+            icon.innerHTML = isLost ? iconOutlineSvg : iconSvg;
+            chancesContainer.appendChild(icon);
+        }
+        lastChanceChange = null;
+    };
+
     const adjustLayoutForImagesAndChances = (scene) => {
         const imagePanel = imageContainer ? imageContainer.parentElement : null;
         const textPanel = document.querySelector('.text-panel');
         const chancesContainer = document.getElementById('chances-container');
-        
+        const actionButtons = document.querySelector('.action-buttons');
+        const actionPopup = document.getElementById('action-popup');
+        const standardActionBar = document.getElementById('standard-action-bar');
+        const suggestionsButton = document.getElementById('suggestions-button');
+        const inventoryButton = document.getElementById('inventory-button');
+        const diaryButton = document.getElementById('diary-button');
+        const notesButton = document.getElementById('notes-button');
+        const trackersButton = document.getElementById('trackers-button');
+        const systemButton = document.getElementById('system-button');
         const isImagesEnabled = gameData.enableImages !== false;
         
         if (sceneNameOverlay) {
             sceneNameOverlay.style.whiteSpace = 'nowrap';
         }
+
+        const gameContainer = document.getElementById('game-container');
+
+        if (scene.sceneType === 'hypercard_stack') {
+            if (gameContainer) gameContainer.classList.add('hypercard-fullscreen');
+
+            // Scene Title (Left)
+            if (sceneNameOverlay && imageContainer) {
+                if (sceneNameOverlay.parentElement !== imageContainer) {
+                    imageContainer.appendChild(sceneNameOverlay);
+                }
+                sceneNameOverlay.style.position = 'fixed';
+                sceneNameOverlay.style.top = '20px';
+                sceneNameOverlay.style.left = '20px';
+                sceneNameOverlay.style.margin = '0';
+                sceneNameOverlay.style.height = '36px';
+                sceneNameOverlay.style.minHeight = '36px';
+                sceneNameOverlay.style.display = 'flex';
+                sceneNameOverlay.style.alignItems = 'center';
+                sceneNameOverlay.style.zIndex = '40';
+            }
+
+            // Interactive Buttons (Center)
+            let centerBar = document.getElementById('hypercard-center-bar');
+            if (!centerBar) {
+                centerBar = document.createElement('div');
+                centerBar.id = 'hypercard-center-bar';
+                centerBar.className = 'hypercard-center-bar';
+                if (imageContainer) {
+                    imageContainer.appendChild(centerBar);
+                } else if (gameContainer) {
+                    gameContainer.appendChild(centerBar);
+                }
+            }
+
+            if (actionButtons && centerBar) {
+                if (actionButtons.parentElement !== centerBar) {
+                    centerBar.appendChild(actionButtons);
+                }
+                actionButtons.style.display = 'flex';
+                actionButtons.style.margin = '0';
+                actionButtons.style.position = 'relative';
+            }
+
+            if (actionPopup && actionButtons && actionPopup.parentElement !== actionButtons) {
+                actionButtons.appendChild(actionPopup);
+            }
+
+            // Chances Icons (Right)
+            if (chancesContainer && imageContainer) {
+                if (chancesContainer.parentElement !== imageContainer) {
+                    imageContainer.appendChild(chancesContainer);
+                }
+                chancesContainer.style.position = 'fixed';
+                chancesContainer.style.top = '20px';
+                chancesContainer.style.right = '20px';
+                chancesContainer.style.margin = '0';
+                chancesContainer.style.height = '36px';
+                chancesContainer.style.zIndex = '40';
+                chancesContainer.style.display = gameData.enableChances ? 'flex' : 'none';
+                chancesContainer.style.alignItems = 'center';
+                chancesContainer.style.gap = '8px';
+                chancesContainer.style.justifyContent = 'flex-end';
+                chancesContainer.style.backgroundColor = 'transparent';
+                chancesContainer.style.padding = '0';
+                chancesContainer.style.border = 'none';
+                chancesContainer.style.borderRadius = '0';
+                chancesContainer.style.backdropFilter = 'none';
+                chancesContainer.style.boxSizing = 'border-box';
+            }
+
+            // Suggestions button is strictly and unconditionally hidden in scenario
+            if (suggestionsButton) {
+                suggestionsButton.classList.add('hidden');
+                suggestionsButton.style.setProperty('display', 'none', 'important');
+            }
+
+            // Manage visibility of interactive buttons in scenario
+            if (inventoryButton) {
+                const isInvEnabled = gameData.enableInventory !== false;
+                inventoryButton.classList.toggle('hidden', !isInvEnabled);
+                inventoryButton.style.display = isInvEnabled ? '' : 'none';
+            }
+            if (diaryButton) {
+                const isDiaryEnabled = gameData.enableDiary !== false;
+                diaryButton.classList.toggle('hidden', !isDiaryEnabled);
+                diaryButton.style.display = isDiaryEnabled ? '' : 'none';
+            }
+            if (notesButton) {
+                const isNotesEnabled = !!gameData.enableNotes;
+                notesButton.classList.toggle('hidden', !isNotesEnabled);
+                notesButton.style.display = isNotesEnabled ? '' : 'none';
+            }
+            if (trackersButton) {
+                const hasTrackers = (gameData.consequenceTrackers || []).length > 0;
+                trackersButton.classList.toggle('hidden', !hasTrackers);
+                trackersButton.style.display = hasTrackers ? '' : 'none';
+            }
+            if (systemButton) {
+                const isSysBtn = !gameData.enableSystemMenu && (gameData.gameShowSystemButton ?? true);
+                systemButton.classList.toggle('hidden', !isSysBtn);
+                systemButton.style.display = isSysBtn ? '' : 'none';
+            }
+
+            renderChancesIcons();
+            return;
+        } else {
+            if (gameContainer) gameContainer.classList.remove('hypercard-fullscreen');
+
+            const centerBar = document.getElementById('hypercard-center-bar');
+            if (centerBar) {
+                if (standardActionBar) {
+                    if (actionPopup) {
+                        standardActionBar.insertBefore(actionPopup, standardActionBar.firstChild);
+                    }
+                    if (actionButtons) {
+                        const inputArea = standardActionBar.querySelector('.input-area') || standardActionBar.querySelector('.choices-container');
+                        if (inputArea) {
+                            standardActionBar.insertBefore(actionButtons, inputArea);
+                        } else {
+                            standardActionBar.appendChild(actionButtons);
+                        }
+                    }
+                }
+                centerBar.remove();
+            }
+
+            const topBar = document.getElementById('hypercard-top-bar');
+            if (topBar) topBar.remove();
+
+            if (suggestionsButton) {
+                const isChoice = gameData.gameInteractionType === 'choice';
+                const isSuggEnabled = (gameData.enableSuggestions ?? true) && !isChoice;
+                suggestionsButton.classList.toggle('hidden', !isSuggEnabled);
+                suggestionsButton.style.display = isSuggEnabled ? '' : 'none';
+            }
+            if (inventoryButton) {
+                const isChoice = gameData.gameInteractionType === 'choice';
+                const isInvEnabled = (gameData.enableInventory ?? true) && !isChoice;
+                inventoryButton.classList.toggle('hidden', !isInvEnabled);
+                inventoryButton.style.display = isInvEnabled ? '' : 'none';
+            }
+        }
         
         if (!isImagesEnabled) {
             // Completely hide image panel and container
-            if (imagePanel) imagePanel.style.display = 'none';
+            if (imagePanel) {
+                imagePanel.style.display = 'none';
+                imagePanel.style.flex = '';
+                imagePanel.style.width = '';
+                imagePanel.style.height = '';
+                imagePanel.style.maxWidth = '';
+            }
             if (imageContainer) imageContainer.style.display = 'none';
-            if (textPanel) textPanel.style.padding = '0';
+            if (textPanel) {
+                textPanel.style.display = '';
+                textPanel.style.padding = '0';
+            }
+            if (standardActionBar) standardActionBar.classList.remove('hidden');
             
             // Create text-scene-header if not present
             let textSceneHeader = document.getElementById('text-scene-header');
@@ -2482,14 +2753,54 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             // Restore default panels visibility
-            if (imagePanel) imagePanel.style.display = '';
-            if (imageContainer) imageContainer.style.display = '';
-            if (textPanel) textPanel.style.padding = '';
+            if (imagePanel) {
+                imagePanel.style.display = '';
+                imagePanel.style.alignItems = '';
+                imagePanel.style.justifyContent = '';
+                imagePanel.style.flex = '';
+                imagePanel.style.width = '';
+                imagePanel.style.height = '';
+                imagePanel.style.maxWidth = '';
+                imagePanel.style.backgroundColor = '';
+            }
+            if (imageContainer) {
+                imageContainer.style.display = '';
+                imageContainer.style.alignItems = '';
+                imageContainer.style.justifyContent = '';
+                imageContainer.style.width = '';
+                imageContainer.style.height = '';
+                imageContainer.style.overflow = '';
+                imageContainer.style.backgroundColor = '';
+                imageContainer.style.position = '';
+            }
+            if (sceneImage) {
+                sceneImage.style.objectFit = '';
+                sceneImage.style.maxWidth = '';
+                sceneImage.style.maxHeight = '';
+                sceneImage.style.width = '';
+                sceneImage.style.height = '';
+                sceneImage.style.position = '';
+                sceneImage.style.display = '';
+                sceneImage.style.margin = '';
+                sceneImage.style.borderRadius = '';
+            }
+            if (textPanel) {
+                textPanel.style.display = '';
+                textPanel.style.padding = '';
+            }
+            if (standardActionBar) standardActionBar.classList.remove('hidden');
             
-            // Remove text-scene-header if present
+            // Remove text-scene-header and hypercard stage if present
             const textSceneHeader = document.getElementById('text-scene-header');
             if (textSceneHeader) {
                 textSceneHeader.remove();
+            }
+            const stage = document.getElementById('hypercard-stage');
+            if (stage && imageContainer) {
+                if (sceneImage && sceneImage.parentElement === stage) {
+                    imageContainer.appendChild(sceneImage);
+                }
+                stage.remove();
             }
             
             // Move scene-name-overlay back inside imageContainer
@@ -2532,99 +2843,572 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderScene = (scene, successPrefix = null) => {
-        const isImagesEnabled = gameData.enableImages !== false;
-        if (scene.image && isImagesEnabled) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
-        else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
-        if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
-        
-        // Handle Overlay Effect
-        if (sceneOverlay) {
-            sceneOverlay.className = 'scene-overlay'; // Reset
-            // Clear previous effect DOM
-            const existingBlur = sceneOverlay.querySelector('.blur-overlay-container');
-            if (existingBlur) existingBlur.remove();
-            const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
-            if (existingChromatic) existingChromatic.remove();
-            const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
-            if (existingTV) existingTV.remove();
-            const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
-            if (existingConfetti) existingConfetti.remove();
-            const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
-            if (existingGlitch) existingGlitch.remove();
-            
-            if (scene.overlayEffect) {
-                sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
-            }
+    let currentStackCardId = null;
 
-            // Rain Effect Logic
-            if (scene.overlayEffect === 'rain') {
-                if (typeof rainEffect !== 'undefined') rainEffect.start('scene-overlay');
-            } else {
-                if (typeof rainEffect !== 'undefined') rainEffect.stop();
-            }
+    const showImageLightbox = (imgSrc) => {
+        if (!imgSrc) return;
+        let lightbox = document.getElementById('image-lightbox-modal');
+        if (!lightbox) {
+            lightbox = document.createElement('div');
+            lightbox.id = 'image-lightbox-modal';
+            lightbox.className = 'modal-overlay hidden';
+            lightbox.style.zIndex = '9999';
+            lightbox.style.cursor = 'pointer';
+            lightbox.innerHTML = 
+                '<button class="modal-close-button" id="image-lightbox-close" style="position: fixed; top: 15px; right: 20px; z-index: 10000;">&times;</button>' +
+                '<div class="image-lightbox-container" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative;">' +
+                    '<img id="image-lightbox-img" src="" alt="Detalhe da Imagem" style="max-width: 90vw; max-height: 85vh; object-fit: contain; border: 2px solid var(--border-color); background: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.8);" />' +
+                '</div>';
+            document.body.appendChild(lightbox);
 
-            // Blur Effect Logic - Inject DOM structure
-            if (scene.overlayEffect === 'blur') {
-                const blurContainer = document.createElement('div');
-                blurContainer.className = 'blur-overlay-container';
-                blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
-                sceneOverlay.appendChild(blurContainer);
+            const closeLightbox = () => lightbox.classList.add('hidden');
+            const closeBtn = lightbox.querySelector('.modal-close-button');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeLightbox();
+                });
             }
-
-            // Chromatic Aberration Effect Logic - Inject DOM structure
-            if (scene.overlayEffect === 'chromatic') {
-                const chromaticContainer = document.createElement('div');
-                chromaticContainer.className = 'chromatic-overlay-container';
-                chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
-                sceneOverlay.appendChild(chromaticContainer);
-            }
-
-            // TV Effect Logic - Inject DOM structure
-            if (scene.overlayEffect === 'tv') {
-                sceneOverlay.parentElement?.classList.add('tv-distortion-active');
-                
-                const tvContainer = document.createElement('div');
-                tvContainer.className = 'tv-overlay-container';
-                tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
-                sceneOverlay.appendChild(tvContainer);
-            } else {
-                sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
-            }
-
-            // Confetti Effect Logic - Inject canvas and start animation
-            if (scene.overlayEffect === 'confetti') {
-                if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
-            } else {
-                if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
-            }
-
-            // Glitch Effect Logic - Inject SVG filter and apply to image
-            if (scene.overlayEffect === 'glitch') {
-                // Ensure SVG filter exists
-                if (!document.getElementById('glitch-distortion-filter')) {
-                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svg.setAttribute('style', 'position:absolute;width:0;height:0;');
-                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
-                    document.body.appendChild(svg);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox || e.target.id === 'image-lightbox-img' || e.target.closest('.image-lightbox-container')) {
+                    closeLightbox();
                 }
-                // Apply filter directly to images
-                if (sceneImage) sceneImage.style.filter = 'url(#glitch-distortion-filter)';
-                if (sceneImageBack) sceneImageBack.style.filter = 'url(#glitch-distortion-filter)';
-                sceneOverlay.parentElement?.classList.add('glitch-distortion-active');
-                if (typeof glitchEffect !== 'undefined') glitchEffect.start('scene-overlay');
-            } else {
-                // Remove filter from images
-                if (sceneImage) sceneImage.style.filter = '';
-                if (sceneImageBack) sceneImageBack.style.filter = '';
-                sceneOverlay.parentElement?.classList.remove('glitch-distortion-active');
-                if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+            });
+        }
+        const lightboxImg = lightbox.querySelector('#image-lightbox-img');
+        if (lightboxImg) lightboxImg.src = imgSrc;
+        lightbox.classList.remove('hidden');
+    };
+
+    const showFloatingDialogue = (title, text, image) => {
+        let modal = document.getElementById('hypercard-floating-dialogue');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'hypercard-floating-dialogue';
+            modal.className = 'modal-overlay hidden';
+            modal.innerHTML = 
+                '<div class="modal-content item-modal-content hypercard-dialogue-content">' +
+                    '<button class="modal-close-button" id="hypercard-dialogue-close">&times;</button>' +
+                    '<div class="item-modal-body">' +
+                        '<div id="hypercard-dialogue-image-container" class="item-modal-image-container hidden" title="Clique para ampliar">' +
+                            '<img id="hypercard-dialogue-image" src="" alt="Imagem" />' +
+                        '</div>' +
+                        '<div id="hypercard-dialogue-text-container" class="item-modal-text-container">' +
+                            '<h3 id="hypercard-dialogue-name" class="item-modal-name"></h3>' +
+                            '<p id="hypercard-dialogue-description"></p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            document.body.appendChild(modal);
+
+            const closeDialogue = () => {
+                modal.classList.add('hidden');
+            };
+            const closeBtn = modal.querySelector('.modal-close-button');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeDialogue();
+                });
             }
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeDialogue();
+            });
         }
 
-        // Nosferatu Effect Logic for Scene
-        if (scene.overlayEffect === 'nosferatu') {
-            // Clear any existing nosferatu container first
+        // Clean up any legacy duplicate title elements if existing in DOM
+        const legacyTopTitle = modal.querySelector('#hypercard-dialogue-title');
+        if (legacyTopTitle) legacyTopTitle.remove();
+
+        const modalContent = modal.querySelector('.modal-content');
+        const nameEl = modal.querySelector('#hypercard-dialogue-name');
+        const descEl = modal.querySelector('#hypercard-dialogue-description') || modal.querySelector('#hypercard-dialogue-text');
+        const imgContainer = modal.querySelector('#hypercard-dialogue-image-container') || modal.querySelector('#hypercard-dialogue-img-container');
+        const imgEl = modal.querySelector('#hypercard-dialogue-image') || modal.querySelector('#hypercard-dialogue-img');
+
+        const finalTitle = title || "Examinar";
+        if (nameEl) nameEl.textContent = finalTitle;
+        if (descEl) {
+            descEl.innerHTML = window.safeHTML(formatText(text || ""), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+            setupHighlights(descEl);
+        }
+        
+        if (imgContainer && imgEl) {
+            if (image) {
+                imgEl.src = image;
+                imgContainer.classList.remove('hidden');
+                if (modalContent) modalContent.classList.add('has-image');
+                imgContainer.onclick = (e) => {
+                    e.stopPropagation();
+                    showImageLightbox(image);
+                };
+            } else {
+                imgEl.src = '';
+                imgContainer.classList.add('hidden');
+                if (modalContent) modalContent.classList.remove('has-image');
+                imgContainer.onclick = null;
+            }
+        }
+        modal.classList.remove('hidden');
+    };
+
+    const renderHyperCardStack = (scene, targetCardId = null) => {
+        const cards = scene.stackCards && scene.stackCards.length > 0 ? scene.stackCards : [];
+        if (cards.length === 0) return;
+
+        const isCardChange = targetCardId !== null && targetCardId !== currentStackCardId;
+        const card = cards.find(c => c.id === (targetCardId || currentStackCardId || scene.startCardId)) || cards[0];
+        currentStackCardId = card.id;
+
+        if (isCardChange) {
+            const cardDisplayName = scene.name + (card.name ? ' · ' + card.name : '');
+            actionLog.push({
+                type: 'scene',
+                name: cardDisplayName,
+                timestamp: new Date().toLocaleTimeString(),
+                description: card.description || '',
+                image: card.image || ''
+            });
+            autoSaveGame();
+        }
+
+        // Clean up previous overlay and stage
+        const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        const existingRevealBtn = document.getElementById('hypercard-reveal-btn');
+        if (existingRevealBtn) existingRevealBtn.remove();
+
+        if (sceneNameOverlay) {
+            sceneNameOverlay.textContent = scene.name + (card.name ? ' · ' + card.name : '');
+            sceneNameOverlay.style.opacity = '1';
+        }
+
+        renderChancesIcons();
+        applySceneOverlay(scene.overlayEffect);
+
+        if (imageContainer && sceneImage) {
+            let stage = document.getElementById('hypercard-stage');
+            if (!stage) {
+                stage = document.createElement('div');
+                stage.id = 'hypercard-stage';
+                imageContainer.appendChild(stage);
+                stage.addEventListener('click', () => {
+                    const p = document.getElementById('action-popup');
+                    if (p && !p.classList.contains('hidden')) {
+                        p.classList.add('hidden');
+                        activePopupType = null;
+                    }
+                });
+            }
+
+            if (sceneOverlay && sceneOverlay.parentElement !== imageContainer) {
+                imageContainer.appendChild(sceneOverlay);
+            }
+
+            let imageBack = document.getElementById('hypercard-image-back');
+            if (!imageBack) {
+                imageBack = document.createElement('img');
+                imageBack.id = 'hypercard-image-back';
+                imageBack.className = 'hidden';
+                stage.appendChild(imageBack);
+            }
+
+            if (sceneImage.parentElement !== stage) {
+                stage.appendChild(sceneImage);
+            }
+
+            // Update image
+            sceneImage.src = card.image || '';
+            sceneImage.classList.toggle('hidden', !card.image);
+            if (imageContainer) imageContainer.classList.toggle('no-image', !card.image);
+
+            // Clean up existing overlay and icon badges from previous cards
+            const existingOverlay = stage.querySelector('#hypercard-hotspot-overlay');
+            if (existingOverlay) existingOverlay.remove();
+            stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => el.remove());
+
+            const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            overlay.id = 'hypercard-hotspot-overlay';
+            overlay.setAttribute('viewBox', '0 0 1000 1000');
+            overlay.setAttribute('preserveAspectRatio', 'none');
+            overlay.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;z-index:25;pointer-events:auto;overflow:visible;');
+            stage.appendChild(overlay);
+
+            let filterStyle = '';
+            if (scene.overlayEffect === 'nosferatu') {
+                filterStyle = 'filter:sepia(0.8) contrast(1.1) brightness(0.9);';
+            } else if (scene.overlayEffect === 'glitch') {
+                filterStyle = 'filter:url(#glitch-distortion-filter);';
+            }
+            stage.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:0;padding:0;';
+            sceneImage.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:2;' + filterStyle;
+            if (imageBack) {
+                imageBack.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;border:none;margin:0;padding:0;pointer-events:none;z-index:1;' + filterStyle;
+            }
+
+            const HOTSPOT_ICONS_SVG = {
+                eye: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+                mouse: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/></svg>',
+                hand: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>',
+                search: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+                'arrow-up': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>',
+                'arrow-down': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>',
+                'arrow-left': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
+                'arrow-right': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+                box: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+                key: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
+                sword: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg>',
+                flask: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.15 19.3c-.85 1.34.11 3.1 1.69 3.1h12.32c1.58 0 2.54-1.76 1.69-3.1L14 9.31V2"/><line x1="8.5" x2="15.5" y1="2" y2="2"/><line x1="6.5" x2="17.5" y1="15" y2="15"/></svg>',
+                book: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',
+                map: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>',
+                crown: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>',
+                star: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+                heart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+                zap: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+                shield: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+                coins: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18 6v1a6 6 0 0 1-6 6H9"/><circle cx="16" cy="16" r="6"/></svg>',
+                clock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+                skull: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>',
+                user: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+                trophy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+                alert: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>',
+                flame: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+                droplet: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>',
+                sun: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+                moon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+                activity: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+            };
+
+            const isRevealingZones = false;
+
+            (card.hotspots || []).forEach(hotspot => {
+                const hx = hotspot.x * 10;
+                const hy = hotspot.y * 10;
+                const hw = hotspot.width * 10;
+                const hh = hotspot.height * 10;
+
+                let elem;
+                if (hotspot.shape === 'circle') {
+                    elem = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    elem.setAttribute('cx', String(hx + hw / 2));
+                    elem.setAttribute('cy', String(hy + hh / 2));
+                    elem.setAttribute('rx', String(hw / 2));
+                    elem.setAttribute('ry', String(hh / 2));
+                } else if (hotspot.shape === 'polygon' && hotspot.points && hotspot.points.length > 0) {
+                    elem = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    elem.setAttribute('points', hotspot.points.map(p => (p.x * 10) + ',' + (p.y * 10)).join(' '));
+                } else {
+                    elem = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    elem.setAttribute('x', String(hx));
+                    elem.setAttribute('y', String(hy));
+                    elem.setAttribute('width', String(hw));
+                    elem.setAttribute('height', String(hh));
+                    elem.setAttribute('rx', '4');
+                }
+
+                elem.setAttribute('vector-effect', 'non-scaling-stroke');
+                // The clickable area itself is always transparent
+                elem.setAttribute('fill', 'transparent');
+                elem.setAttribute('stroke', 'transparent');
+                elem.setAttribute('stroke-width', '2');
+                elem.setAttribute('class', 'hypercard-hotspot-zone');
+                elem.style.cursor = 'pointer';
+
+                // Centered Icon Badge in the middle of the hotspot (Square, strict color fidelity)
+                const iconName = hotspot.icon || 'eye';
+                const iconSvg = HOTSPOT_ICONS_SVG[iconName] || HOTSPOT_ICONS_SVG['eye'];
+                const centerX = hotspot.x + hotspot.width / 2;
+                const centerY = hotspot.y + hotspot.height / 2;
+
+                const hideBg = !!hotspot.hideIconBg;
+                const iconColor = hotspot.iconColor || '#ffffff';
+                const bgColor = hideBg ? 'transparent' : (hotspot.iconBgColor || '#000000');
+                const borderColor = hideBg ? 'transparent' : (hotspot.iconBorderColor || '#30363d');
+                const borderCss = hideBg ? 'border:none;' : 'border:1px solid ' + borderColor + ';';
+                const shadowCss = 'box-shadow:none;';
+
+                const iconEl = document.createElement('div');
+                iconEl.className = 'hypercard-hotspot-icon-badge';
+                iconEl.style.cssText = 'position:absolute;left:' + centerX + '%;top:' + centerY + '%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:0;background:' + bgColor + ';' + borderCss + 'display:flex;align-items:center;justify-content:center;color:' + iconColor + ';' + shadowCss + 'pointer-events:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:28;';
+                iconEl.innerHTML = iconSvg;
+
+                const isAlwaysVisible = hotspot.highlightStyle === 'icons-visible' || hotspot.highlightStyle === 'always-visible' || hotspot.highlightStyle === 'pulsing-pin';
+                const isHidden = hotspot.highlightStyle === 'hidden';
+
+                if (isAlwaysVisible) {
+                    iconEl.style.opacity = '1';
+                    iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
+                } else if (isHidden) {
+                    iconEl.style.display = 'none';
+                    iconEl.style.opacity = '0';
+                } else {
+                    // icons-hover
+                    iconEl.style.opacity = '0';
+                    iconEl.style.transform = 'translate(-50%, -50%) scale(0.85)';
+                }
+                stage.appendChild(iconEl);
+
+                // Hover interaction - STRICT COLOR FIDELITY & NO GLOW
+                elem.addEventListener('mouseenter', () => {
+                    if (!isAlwaysVisible && !isHidden) {
+                        iconEl.style.display = 'flex';
+                        iconEl.style.opacity = '1';
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.08)';
+                    } else if (isAlwaysVisible) {
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1.08)';
+                    }
+                });
+
+                elem.addEventListener('mouseleave', () => {
+                    if (!isAlwaysVisible && !isHidden) {
+                        iconEl.style.opacity = isRevealingZones ? '1' : '0';
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
+                    } else if (isAlwaysVisible) {
+                        iconEl.style.transform = 'translate(-50%, -50%) scale(1)';
+                    }
+                });
+
+                if (hotspot.title) {
+                    const titleTag = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                    titleTag.textContent = hotspot.title;
+                    elem.appendChild(titleTag);
+                }
+
+                elem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
+                    if (hotspot.soundEffect) {
+                        try {
+                            const snd = new Audio(hotspot.soundEffect);
+                            snd.play().catch(() => {});
+                        } catch (err) {}
+                    }
+
+                    if (hotspot.requiresInInventory) {
+                        const hasRequired = inventory.some(i => i.id === hotspot.requiresInInventory);
+                        if (!hasRequired) {
+                            const dialogTitle = hotspot.title || "Bloqueado";
+                            showFloatingDialogue("Bloqueado", hotspot.lockedMessage || "Você não possui o item necessário para interagir aqui.");
+                            actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                            actionLog.push({ type: 'output', text: hotspot.lockedMessage || "Você não possui o item necessário para interagir aqui." });
+                            autoSaveGame();
+                            return;
+                        }
+                        if (hotspot.consumesItem) {
+                            removeFromInventory(hotspot.requiresInInventory);
+                        }
+                    }
+
+                    if (hotspot.actionType === 'collect_item' && hotspot.addsToInventory) {
+                        const itemObj = gameData.globalObjects ? gameData.globalObjects[hotspot.addsToInventory] : null;
+                        if (itemObj) {
+                            addToInventory(itemObj);
+                            const dialogTitle = hotspot.title || hotspot.examineTitle || itemObj.name || "Objeto Coletado";
+                            const dialogText = hotspot.examineText || ("Você obteve: " + itemObj.name);
+                            const dialogImg = itemObj.image || hotspot.examineImage || '';
+                            showFloatingDialogue(dialogTitle, dialogText, dialogImg);
+                            actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                            actionLog.push({ type: 'output', text: dialogText, image: dialogImg });
+                            autoSaveGame();
+                        }
+                    }
+
+                    if (hotspot.trackerEffects && hotspot.trackerEffects.length > 0) {
+                        updateTrackers(hotspot.trackerEffects);
+                    }
+
+                    const effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
+
+                    if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId) {
+                        const targetCard = cards.find(c => c.id === hotspot.targetCardId);
+                        const targetImg = targetCard ? targetCard.image : '';
+
+                        actionLog.push({ type: 'input', text: '> ' + (hotspot.title || 'Mudar de vista') });
+
+                        // Immediately hide all current icons alongside the transitioning image
+                        stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => {
+                            el.style.transition = 'opacity 0.25s ease-out';
+                            el.style.opacity = '0';
+                            el.style.pointerEvents = 'none';
+                        });
+                        overlay.style.pointerEvents = 'none';
+
+                        if (effectiveTrans !== 'none' && sceneImage && sceneImage.src && targetImg && imageBack) {
+                            imageBack.src = targetImg;
+                            imageBack.classList.remove('hidden');
+                            const animClass = 'trans-' + effectiveTrans + '-out';
+                            sceneImage.classList.add(animClass);
+                            setTimeout(() => {
+                                renderHyperCardStack(scene, hotspot.targetCardId);
+                                sceneImage.classList.remove(animClass);
+                                imageBack.src = '';
+                                imageBack.classList.add('hidden');
+                            }, 380);
+                        } else {
+                            renderHyperCardStack(scene, hotspot.targetCardId);
+                        }
+                    } else if (hotspot.actionType === 'navigate_scene' && hotspot.targetSceneId) {
+                        const targetScene = findScene(hotspot.targetSceneId);
+
+                        if (hotspot.title) {
+                            actionLog.push({ type: 'input', text: '> ' + hotspot.title });
+                        }
+
+                        // Immediately hide all current icons alongside the transitioning image
+                        stage.querySelectorAll('.hypercard-hotspot-icon-badge').forEach(el => {
+                            el.style.transition = 'opacity 0.25s ease-out';
+                            el.style.opacity = '0';
+                            el.style.pointerEvents = 'none';
+                        });
+                        overlay.style.pointerEvents = 'none';
+
+                        const isTargetScenario = targetScene && targetScene.sceneType === 'hypercard_stack';
+
+                        if (!isTargetScenario) {
+                            // Transitioning from Scenario to Branch/Chapter
+                            // Create a temporary standalone curtain snapshot of the current view
+                            const currentViewImg = (sceneImage && sceneImage.src) ? sceneImage.src : (card && card.image ? card.image : '');
+                            if (effectiveTrans !== 'none' && currentViewImg) {
+                                const curtain = document.createElement('div');
+                                curtain.className = 'scene-curtain-transition ' + ('trans-' + effectiveTrans + '-out');
+                                curtain.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url("' + currentViewImg + '");background-size:cover;background-position:center;background-repeat:no-repeat;z-index:9999;pointer-events:none;';
+                                document.body.appendChild(curtain);
+
+                                setTimeout(() => {
+                                    curtain.remove();
+                                }, 380);
+                            }
+
+                            // Load target branch scene directly
+                            loadScene(hotspot.targetSceneId, false);
+                        } else {
+                            // Scenario to another Scenario
+                            const targetImg = targetScene ? (targetScene.stackCards && targetScene.stackCards[0] ? targetScene.stackCards[0].image : (targetScene.image || '')) : '';
+                            if (effectiveTrans !== 'none' && sceneImage && sceneImage.src && targetImg && imageBack) {
+                                imageBack.src = targetImg;
+                                imageBack.classList.remove('hidden');
+                                const animClass = 'trans-' + effectiveTrans + '-out';
+                                sceneImage.classList.add(animClass);
+                                setTimeout(() => {
+                                    loadScene(hotspot.targetSceneId, false);
+                                    sceneImage.classList.remove(animClass);
+                                    imageBack.src = '';
+                                    imageBack.classList.add('hidden');
+                                }, 380);
+                            } else {
+                                loadScene(hotspot.targetSceneId, false);
+                            }
+                        }
+                    } else if (hotspot.actionType === 'examine') {
+                        const dialogTitle = hotspot.title || hotspot.examineTitle || "Examinar";
+                        showFloatingDialogue(dialogTitle, hotspot.examineText || "", hotspot.examineImage);
+                        actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                        if (hotspot.examineText || hotspot.examineImage) {
+                            actionLog.push({ type: 'output', text: hotspot.examineText || "", image: hotspot.examineImage });
+                        }
+                        autoSaveGame();
+                    } else if (hotspot.actionType === 'toggle_tracker') {
+                        const dialogTitle = hotspot.title || "Rastreador";
+                        if (hotspot.examineText) {
+                            showFloatingDialogue(dialogTitle, hotspot.examineText, hotspot.examineImage);
+                            actionLog.push({ type: 'input', text: '> ' + dialogTitle });
+                            actionLog.push({ type: 'output', text: hotspot.examineText, image: hotspot.examineImage });
+                        }
+                        autoSaveGame();
+                    }
+                });
+
+                overlay.appendChild(elem);
+            });
+        }
+    };
+
+    const applySceneOverlay = (overlayEffect) => {
+        if (!sceneOverlay) return;
+        sceneOverlay.className = 'scene-overlay'; // Reset
+        sceneOverlay.style.opacity = '1';
+        sceneOverlay.style.zIndex = '20';
+        sceneOverlay.style.pointerEvents = 'none';
+
+        // Clear previous effect DOM
+        const existingBlur = sceneOverlay.querySelector('.blur-overlay-container');
+        if (existingBlur) existingBlur.remove();
+        const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
+        if (existingChromatic) existingChromatic.remove();
+        const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
+        if (existingTV) existingTV.remove();
+        const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
+        if (existingConfetti) existingConfetti.remove();
+        const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
+        if (existingGlitch) existingGlitch.remove();
+
+        if (overlayEffect) {
+            sceneOverlay.classList.add('overlay-' + overlayEffect);
+        }
+
+        // Rain Effect Logic
+        if (overlayEffect === 'rain') {
+            if (typeof rainEffect !== 'undefined') rainEffect.start('scene-overlay');
+        } else {
+            if (typeof rainEffect !== 'undefined') rainEffect.stop();
+        }
+
+        // Blur Effect Logic
+        if (overlayEffect === 'blur') {
+            const blurContainer = document.createElement('div');
+            blurContainer.className = 'blur-overlay-container';
+            blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
+            sceneOverlay.appendChild(blurContainer);
+        }
+
+        // Chromatic Aberration Effect Logic
+        if (overlayEffect === 'chromatic') {
+            const chromaticContainer = document.createElement('div');
+            chromaticContainer.className = 'chromatic-overlay-container';
+            chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
+            sceneOverlay.appendChild(chromaticContainer);
+        }
+
+        // TV Effect Logic
+        if (overlayEffect === 'tv') {
+            sceneOverlay.parentElement?.classList.add('tv-distortion-active');
+            
+            const tvContainer = document.createElement('div');
+            tvContainer.className = 'tv-overlay-container';
+            tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+            sceneOverlay.appendChild(tvContainer);
+        } else {
+            sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
+        }
+
+        // Confetti Effect Logic
+        if (overlayEffect === 'confetti') {
+            if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
+        } else {
+            if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+        }
+
+        // Glitch Effect Logic
+        if (overlayEffect === 'glitch') {
+            if (!document.getElementById('glitch-distortion-filter')) {
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('style', 'position:absolute;width:0;height:0;');
+                svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                document.body.appendChild(svg);
+            }
+            if (sceneImage) sceneImage.style.filter = 'url(#glitch-distortion-filter)';
+            if (sceneImageBack) sceneImageBack.style.filter = 'url(#glitch-distortion-filter)';
+            sceneOverlay.parentElement?.classList.add('glitch-distortion-active');
+            if (typeof glitchEffect !== 'undefined') glitchEffect.start('scene-overlay');
+        } else {
+            if (sceneImage) sceneImage.style.filter = '';
+            if (sceneImageBack) sceneImageBack.style.filter = '';
+            sceneOverlay.parentElement?.classList.remove('glitch-distortion-active');
+            if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+        }
+
+        // Nosferatu Effect Logic
+        if (overlayEffect === 'nosferatu') {
             const existing = sceneOverlay.querySelector('.nosferatu-container');
             if (existing) existing.remove();
             
@@ -2637,26 +3421,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sceneImageBack) sceneImageBack.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
             sceneOverlay.parentElement?.classList.add('nosferatu-active');
         } else {
-            // Remove nosferatu effects if not active
             const existing = sceneOverlay.querySelector('.nosferatu-container');
             if (existing) existing.remove();
             sceneOverlay.parentElement?.classList.remove('nosferatu-active');
-            // Only clear filter if not another filter effect
-            if (scene.overlayEffect !== 'glitch' && scene.overlayEffect !== 'tv') {
+            if (overlayEffect !== 'glitch' && overlayEffect !== 'tv') {
                 if (sceneImage) sceneImage.style.filter = '';
                 if (sceneImageBack) sceneImageBack.style.filter = '';
             }
         }
 
-        // Wiggle Effect Logic for Scene
-        if (scene.overlayEffect === 'wiggle') {
+        // Wiggle Effect Logic
+        if (overlayEffect === 'wiggle') {
             sceneOverlay.parentElement?.classList.add('wiggle-active');
         } else {
             sceneOverlay.parentElement?.classList.remove('wiggle-active');
         }
 
-        // Fog Effect Logic for Scene
-        if (scene.overlayEffect === 'fog') {
+        // Fog Effect Logic
+        if (overlayEffect === 'fog') {
              const existing = sceneOverlay.querySelector('.fog-container');
              if (existing) existing.remove();
 
@@ -2672,8 +3454,40 @@ document.addEventListener('DOMContentLoaded', () => {
              const existing = sceneOverlay.querySelector('.fog-container');
              if (existing) existing.remove();
         }
+    };
+
+    const renderScene = (scene, successPrefix = null, inputEchoText = null) => {
+        adjustLayoutForImagesAndChances(scene);
+
+        // Clear any previous HyperCard overlay if entering standard scene
+        const existingOverlay = document.getElementById('hypercard-hotspot-overlay');
+        if (existingOverlay && scene.sceneType !== 'hypercard_stack') existingOverlay.remove();
+        const existingRevealBtn = document.getElementById('hypercard-reveal-btn');
+        if (existingRevealBtn && scene.sceneType !== 'hypercard_stack') existingRevealBtn.remove();
+
+        // Always apply scene overlay (works for both hypercard stacks and standard scenes)
+        applySceneOverlay(scene.overlayEffect);
+
+        if (scene.sceneType === 'hypercard_stack') {
+            renderHyperCardStack(scene);
+            return;
+        }
+
+        const isImagesEnabled = gameData.enableImages !== false;
+        if (scene.image && isImagesEnabled && scene.sceneType !== 'hypercard_stack') { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        else if (scene.sceneType !== 'hypercard_stack') { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
+        if (sceneNameOverlay && scene.sceneType !== 'hypercard_stack') { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
 
         sceneDescription.innerHTML = '';
+        
+        if (inputEchoText) {
+            const formattedInput = inputEchoText.trim().startsWith('>') ? inputEchoText.trim() : ('> ' + inputEchoText.trim());
+            const echo = document.createElement('p');
+            echo.className = 'verb-echo';
+            echo.textContent = formattedInput;
+            sceneDescription.appendChild(echo);
+            actionLog.push({ type: 'input', text: formattedInput, isLeadInput: true });
+        }
         
         let fullDescription = scene.description || '';
         if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
@@ -2682,7 +3496,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
+        const setDiceButtonsDisabled = (disabled) => {
+            const parserDiceBtn = document.getElementById('parser-dice-roll-button');
+            if (parserDiceBtn) {
+                parserDiceBtn.disabled = disabled;
+                parserDiceBtn.style.opacity = disabled ? '0.5' : '1';
+                parserDiceBtn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            }
+            const choiceDiceBtns = document.querySelectorAll('.dice-roll-btn');
+            choiceDiceBtns.forEach(btn => {
+                btn.disabled = disabled;
+                btn.style.opacity = disabled ? '0.5' : '1';
+                btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            });
+        };
+
         isPrinting = true;
+        setDiceButtonsDisabled(true);
         sceneDescription.classList.add('typewriting-active');
         
         // Loop protection
@@ -2701,6 +3531,7 @@ document.addEventListener('DOMContentLoaded', () => {
             skipParagraph = false;
             if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
+                setDiceButtonsDisabled(false);
                 sceneDescription.classList.remove('typewriting-active');
                 if (chances <= 0) gameOver(); else if (scene.isEndingScene) activateEndingUI('win');
                 return; 
@@ -2772,6 +3603,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             } else { 
                 isPrinting = false;
+                setDiceButtonsDisabled(false);
                 window.removeEventListener('keydown', globalEnterSkip);
                 sceneDescription.classList.remove('typewriting-active');
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
@@ -2782,27 +3614,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // renderNextParagraph called immediately
         if (mySessionId === renderSessionId) renderNextParagraph();
         
-        const chancesContainer = document.getElementById('chances-container');
-        if (chancesContainer) {
-            chancesContainer.innerHTML = '';
-            const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
-            const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
-            for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
-                const icon = document.createElement('div');
-                const isLost = i >= chances;
-                icon.className = 'chance-icon ' + (isLost ? 'lost' : '');
-                
-                // Aplicar animação se este ícone foi o afetado agora
-                if (lastChanceChange && lastChanceChange.index === i) {
-                    icon.classList.add('animate-chance-' + lastChanceChange.type);
-                }
-                
-                icon.innerHTML = isLost ? iconOutlineSvg : iconSvg;
-                chancesContainer.appendChild(icon);
-            }
-            lastChanceChange = null;
-        }
-        
+        renderChancesIcons();
         adjustLayoutForImagesAndChances(scene);
         
         // CHOICE MODE HANDLING
@@ -2823,6 +3635,43 @@ document.addEventListener('DOMContentLoaded', () => {
             choicesContainer.style.gap = '10px';
             choicesContainer.style.marginTop = '10px';
             
+            // Remove any parser dice button if leftover
+            const parserDiceBtn = document.getElementById('parser-dice-roll-button');
+            if (parserDiceBtn) parserDiceBtn.remove();
+
+            const isDiceAllowed = gameData.enableDiceRoll && scene.allowDiceRollInScene !== false;
+            const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;margin-right:6px;width:18px;height:18px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
+            const getDiceBtnText = () => gameData.gameDiceRollButtonText || ('Rolar ' + (gameData.diceType || 'd20').toUpperCase());
+
+            if (isDiceAllowed) {
+                const diceBtn = document.createElement('button');
+                diceBtn.innerHTML = diceSvgIcon + '<span>' + getDiceBtnText() + '</span>';
+                diceBtn.className = 'choice-button dice-roll-btn';
+                diceBtn.style.padding = '12px 16px';
+                diceBtn.style.textAlign = 'center';
+                diceBtn.style.backgroundColor = 'var(--dice-button-bg, #3b82f6)';
+                diceBtn.style.color = 'var(--dice-button-text-color, #ffffff)';
+                diceBtn.style.border = '2px solid var(--dice-button-bg, #3b82f6)';
+                diceBtn.style.borderRadius = '0px';
+                diceBtn.style.fontFamily = 'var(--font-family)';
+                diceBtn.style.fontSize = '1em';
+                diceBtn.style.fontWeight = 'bold';
+                diceBtn.style.cursor = 'pointer';
+                diceBtn.style.transition = 'all 0.2s';
+                diceBtn.style.width = '100%';
+                diceBtn.style.textTransform = 'uppercase';
+                diceBtn.style.display = 'flex';
+                diceBtn.style.alignItems = 'center';
+                diceBtn.style.justifyContent = 'center';
+
+                diceBtn.onclick = () => {
+                    diceBtn.disabled = true;
+                    diceBtn.style.opacity = '0.5';
+                    triggerDiceRoll(scene);
+                };
+                choicesContainer.appendChild(diceBtn);
+            }
+
             if (scene.choices && scene.choices.length > 0) {
                 scene.choices.forEach(choice => {
                     const btn = document.createElement('button');
@@ -2873,9 +3722,36 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const inputArea = document.querySelector('.input-area');
             if (inputArea) inputArea.classList.remove('hidden');
+            if (suggestionsButton) suggestionsButton.classList.remove('hidden');
+            if (inventoryButton) inventoryButton.classList.remove('hidden');
+
             // Remove any leftover choices container
             const oldChoices = document.getElementById('choices-container');
             if (oldChoices) oldChoices.remove();
+
+            // PARSER MODE DICE ROLL BUTTON INJECTION (To the RIGHT of Action button)
+            let parserDiceBtn = document.getElementById('parser-dice-roll-button');
+            const isDiceAllowed = gameData.enableDiceRoll && scene.allowDiceRollInScene !== false;
+            const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;margin-right:6px;width:18px;height:18px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
+            const getDiceBtnText = () => gameData.gameDiceRollButtonText || ('Rolar ' + (gameData.diceType || 'd20').toUpperCase());
+
+            if (isDiceAllowed) {
+                if (!parserDiceBtn && inputArea) {
+                    parserDiceBtn = document.createElement('button');
+                    parserDiceBtn.id = 'parser-dice-roll-button';
+                    parserDiceBtn.className = 'dice-roll-btn-parser';
+                    inputArea.appendChild(parserDiceBtn);
+                }
+                if (parserDiceBtn) {
+                    parserDiceBtn.innerHTML = diceSvgIcon + '<span>' + getDiceBtnText() + '</span>';
+                    parserDiceBtn.classList.remove('hidden');
+                    parserDiceBtn.onclick = () => {
+                        triggerDiceRoll(scene);
+                    };
+                }
+            } else if (parserDiceBtn) {
+                parserDiceBtn.classList.add('hidden');
+            }
         }
 
         actionPopup.classList.add('hidden'); verbInput.textContent = ''; activePopupType = null;
@@ -2901,7 +3777,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOver = () => { 
         activateEndingUI('lose'); 
     };
-    const handleInput = () => { if (isPrinting) return; const input = verbInput.textContent.trim(); if (input) { processCommand(input); verbInput.textContent = ''; } };
+    const handleInput = () => {
+        if (isPrinting) return;
+        const input = (verbInput ? (verbInput.innerText || verbInput.textContent || '') : '').trim();
+        if (input) {
+            processCommand(input);
+            if (verbInput) {
+                verbInput.textContent = '';
+                verbInput.innerText = '';
+            }
+        }
+    };
     
     // Prevent Enter from creating new lines in contenteditable and trigger handleInput instead
     verbInput.addEventListener('keydown', (e) => {
@@ -2932,7 +3818,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const scene = gameData.cenas[currentSceneId]; 
         const sceneObjects = getObjectsForScene(currentSceneId); 
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
-        let foundInteraction = scene.interactions.find(i => {
+        if (gameData.enableDiceRoll) {
+            const diceTriggerWords = ['rolar', 'dado', 'rolar dado', 'rolardado', 'd6', 'd20'];
+            if (diceTriggerWords.some(w => hasWord(w, inputLower))) {
+                triggerDiceRoll(scene);
+                return;
+            }
+        }
+
+        const sceneInteractions = (scene && scene.interactions) ? scene.interactions : [];
+
+        let foundInteraction = sceneInteractions.find(i => {
             if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
             if (i.requiresInInventory) {
                 const reqObj = inventory.find(o => o.id === i.requiresInInventory);
@@ -2950,7 +3846,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return !anyObjectMentioned;
         });
         if (!foundInteraction) {
-            foundInteraction = scene.interactions.find(i => {
+            foundInteraction = sceneInteractions.find(i => {
                 if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
                 if (i.requiresInInventory) {
                     const reqObj = inventory.find(o => o.id === i.requiresInInventory);
@@ -2973,10 +3869,158 @@ document.addEventListener('DOMContentLoaded', () => {
              if (obj) { printOutput(obj.examineDescription); return; }
              printOutput(scene.description); return;
         }
-        printOutput(scene.negativeFeedback || gameData.mensagem_falha_padrao || "Não aconteceu nada.");
+        printOutput((scene && scene.negativeFeedback) || gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
-    const executeInteraction = (interaction) => {
+    const matchDiceVerb = (verbStr, rollResult) => {
+        if (!verbStr) return false;
+        const v = verbStr.trim().toLowerCase();
+        if (!v.startsWith('dice:')) return false;
+        const valStr = v.substring(5).trim();
+        if (valStr.includes('-')) {
+            const parts = valStr.split('-');
+            const min = parseInt(parts[0], 10);
+            const max = parseInt(parts[1], 10);
+            if (!isNaN(min) && !isNaN(max)) {
+                return rollResult >= min && rollResult <= max;
+            }
+        }
+        if (valStr.includes('..')) {
+            const parts = valStr.split('..');
+            const min = parseInt(parts[0], 10);
+            const max = parseInt(parts[1], 10);
+            if (!isNaN(min) && !isNaN(max)) {
+                return rollResult >= min && rollResult <= max;
+            }
+        }
+        const exact = parseInt(valStr, 10);
+        if (!isNaN(exact)) {
+            return rollResult === exact;
+        }
+        return false;
+    };
+
+    const playDiceRollOverlayAnimation = (diceType, finalResult, isSuccess, statusText, callback) => {
+        const descContainer = document.getElementById('scene-description') || document.body;
+        let overlay = document.getElementById('dice-roll-overlay');
+        const diceSvgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" style="display:inline-block;vertical-align:middle;width:48px;height:48px;"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.17l-4.25-4.25a2.24 2.24 0 0 0-3.17 0L10.5 6.58"/><path d="m6 18 4-4"/><path d="m14 10 4-4"/><path d="M7 14h.01"/><path d="M11 18h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>';
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'dice-roll-overlay';
+            overlay.className = 'dice-roll-overlay';
+            overlay.innerHTML = '<div class="dice-roll-box">' +
+                '<div class="dice-roll-icon">' + diceSvgIcon + '</div>' +
+                '<div class="dice-roll-number" id="dice-roll-number">?</div>' +
+                '<div class="dice-roll-status" id="dice-roll-status"></div>' +
+            '</div>';
+            descContainer.appendChild(overlay);
+        } else {
+            if (overlay.parentNode !== descContainer) {
+                descContainer.appendChild(overlay);
+            }
+            overlay.classList.remove('hidden');
+        }
+
+        const numberEl = overlay.querySelector('#dice-roll-number');
+        const statusEl = overlay.querySelector('#dice-roll-status');
+        if (numberEl) {
+            numberEl.classList.remove('roll-final');
+            numberEl.textContent = '?';
+        }
+        if (statusEl) {
+            statusEl.classList.remove('roll-final', 'status-success', 'status-failure');
+            statusEl.textContent = '';
+        }
+
+        const maxVal = diceType === 'd6' ? 6 : 20;
+        let iterations = 0;
+        const maxIterations = 12;
+        const interval = setInterval(() => {
+            iterations++;
+            const randomVal = Math.floor(Math.random() * maxVal) + 1;
+            if (numberEl) numberEl.textContent = randomVal;
+
+            if (iterations >= maxIterations) {
+                clearInterval(interval);
+                if (numberEl) {
+                    numberEl.textContent = finalResult;
+                    numberEl.classList.add('roll-final');
+                }
+                if (statusEl && statusText) {
+                    statusEl.textContent = statusText;
+                    statusEl.className = 'dice-roll-status roll-final ' + (isSuccess ? 'status-success' : 'status-failure');
+                }
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    if (callback) callback();
+                }, 1600);
+            }
+        }, 60);
+    };
+
+    const triggerDiceRoll = (scene) => {
+        if (isPrinting) return;
+        const diceType = gameData.diceType || 'd20';
+        const maxVal = diceType === 'd6' ? 6 : 20;
+        const rollResult = Math.floor(Math.random() * maxVal) + 1;
+        const prefix = gameData.diceRollTextPrefix || 'Você tirou';
+
+        const config = (scene && scene.allowDiceRollInScene && scene.diceRollConfig) ? scene.diceRollConfig : null;
+        const cutoff = config ? (config.cutoffValue || (diceType === 'd6' ? 4 : 10)) : (diceType === 'd6' ? 4 : 10);
+        const isSuccess = rollResult >= cutoff;
+        const statusText = isSuccess ? ((config && config.successText) || 'Sucesso!') : ((config && config.failureText) || 'Falha!');
+        const inputEchoText = '> ' + statusText;
+
+        playDiceRollOverlayAnimation(diceType, rollResult, isSuccess, statusText, () => {
+            const resultText = '> ' + prefix + ' ' + rollResult;
+            
+            // Output dice result (> Você tirou X) in origin scene description and actionLog
+            const echo = document.createElement('p');
+            echo.className = 'verb-echo';
+            echo.textContent = resultText;
+            sceneDescription.appendChild(echo);
+            sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            actionLog.push({ type: 'input', text: resultText });
+
+            const targetInteractions = (scene && scene.interactions) ? scene.interactions : [];
+
+            let targetVerb = null;
+            if (config) {
+                if (isSuccess) {
+                    targetVerb = config.successVerb;
+                } else {
+                    targetVerb = config.failureVerb;
+                }
+            }
+
+            let matched = null;
+            if (targetVerb) {
+                const normalizedTarget = targetVerb.trim().toLowerCase();
+                matched = targetInteractions.find(i => {
+                    return (i.verbs || []).some(v => v.trim().toLowerCase() === normalizedTarget);
+                });
+            }
+
+            if (!matched) {
+                matched = targetInteractions.find(i => {
+                    return (i.verbs || []).some(v => matchDiceVerb(v, rollResult));
+                });
+            }
+
+            if (matched) {
+                executeInteraction(matched, inputEchoText);
+            } else {
+                const statusEcho = document.createElement('p');
+                statusEcho.className = 'verb-echo';
+                statusEcho.textContent = inputEchoText;
+                sceneDescription.appendChild(statusEcho);
+                sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                actionLog.push({ type: 'input', text: inputEchoText });
+            }
+        });
+    };
+
+    const executeInteraction = (interaction, inputEchoText = null) => {
         if (interaction.consumesItem && interaction.requiresInInventory) { removeFromInventory(interaction.requiresInInventory); }
         if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
         if (interaction.addsToInventory && interaction.target) {
@@ -2991,14 +4035,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
-        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
+        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage, inputEchoText);
         else {
             const scene = gameData.cenas[currentSceneId];
             if (interaction.newSceneDescription) { 
                 if (interaction.successMessage) scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
                 else scene.description = interaction.newSceneDescription;
-                renderScene(scene); 
-            } else if (interaction.successMessage) printOutput(interaction.successMessage);
+                renderScene(scene, null, inputEchoText); 
+            } else if (interaction.successMessage) {
+                if (inputEchoText) {
+                    const formattedInput = inputEchoText.trim().startsWith('>') ? inputEchoText.trim() : ('> ' + inputEchoText.trim());
+                    const echo = document.createElement('p');
+                    echo.className = 'verb-echo';
+                    echo.textContent = formattedInput;
+                    sceneDescription.appendChild(echo);
+                    actionLog.push({ type: 'input', text: formattedInput });
+                }
+                printOutput(interaction.successMessage);
+            } else if (inputEchoText) {
+                const formattedInput = inputEchoText.trim().startsWith('>') ? inputEchoText.trim() : ('> ' + inputEchoText.trim());
+                const echo = document.createElement('p');
+                echo.className = 'verb-echo';
+                echo.textContent = formattedInput;
+                sceneDescription.appendChild(echo);
+                actionLog.push({ type: 'input', text: formattedInput });
+            }
         }
     };
 
@@ -3097,7 +4158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div'); container.className = 'action-popup-container';
         if (inventory.length === 0) { 
             const msg = document.createElement('div'); 
-            msg.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.className = 'empty-inventory-msg';
             msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
             container.appendChild(msg); 
         }
@@ -3117,6 +4178,19 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(list);
         }
         actionPopup.appendChild(container);
+
+        const invBtn = document.getElementById('inventory-button');
+        const actionBtns = document.querySelector('.action-buttons');
+        if (invBtn && actionBtns && document.getElementById('hypercard-center-bar')) {
+            const centerOffset = invBtn.offsetLeft + (invBtn.offsetWidth / 2);
+            actionPopup.style.setProperty('left', centerOffset + 'px', 'important');
+            actionPopup.style.setProperty('transform', 'translateX(-50%)', 'important');
+            actionPopup.style.setProperty('top', 'calc(100% + 8px)', 'important');
+        } else {
+            actionPopup.style.removeProperty('left');
+            actionPopup.style.removeProperty('transform');
+            actionPopup.style.removeProperty('top');
+        }
     };
 
 
@@ -3153,23 +4227,65 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name; itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
-        setupHighlights(itemModalDescription);
-        if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
-        else itemModalImageContainer.classList.add('hidden');
+        if (!itemModal) return;
+        const modalContent = itemModal.querySelector('.modal-content') || itemModal;
+        if (itemModalName) itemModalName.textContent = item.name;
+        if (itemModalDescription) {
+            itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+            setupHighlights(itemModalDescription);
+        }
+        if (itemModalImageContainer && itemModalImage) {
+            if (item.image) {
+                itemModalImage.src = item.image;
+                itemModalImageContainer.classList.remove('hidden');
+                modalContent.classList.add('has-image');
+                itemModalImageContainer.onclick = (e) => {
+                    e.stopPropagation();
+                    showImageLightbox(item.image);
+                };
+            } else {
+                itemModalImage.src = '';
+                itemModalImageContainer.classList.add('hidden');
+                modalContent.classList.remove('has-image');
+                itemModalImageContainer.onclick = null;
+            }
+        }
         itemModal.classList.remove('hidden');
     };
     const openAcquisitionModal = (item, customDescription) => {
         if (!acquisitionModal) return;
         acquisitionModalTitle.textContent = item.name;
-        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(acquisitionModalDescription);
-        if (item.image) { acquisitionModalImage.src = item.image; acquisitionModalImageContainer.classList.remove('hidden'); }
-        else acquisitionModalImageContainer.classList.add('hidden');
+        if (item.image && acquisitionModalImageContainer && acquisitionModalImage) {
+            acquisitionModalImage.src = item.image;
+            acquisitionModalImageContainer.classList.remove('hidden');
+            acquisitionModalImageContainer.onclick = (e) => {
+                e.stopPropagation();
+                showImageLightbox(item.image);
+            };
+        } else if (acquisitionModalImageContainer) {
+            acquisitionModalImageContainer.classList.add('hidden');
+            acquisitionModalImageContainer.onclick = null;
+        }
         acquisitionModal.classList.remove('hidden');
     };
+
+    const toggleSystemMenu = () => {
+        if (!systemModal) return;
+        if (!systemModal.classList.contains('hidden')) {
+            systemModal.classList.add('hidden');
+        } else {
+            if (systemMenuMain) systemMenuMain.classList.remove('hidden');
+            if (systemSlotsContainer) systemSlotsContainer.classList.add('hidden');
+            if (systemModalTitle) systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
+            systemModal.classList.remove('hidden');
+        }
+    };
+
     const showDiary = (isConclusion = false) => {
-        diaryLog.innerHTML = ''; let currentInterContainer = null;
+        if (!diaryModal || !diaryLog) return;
+        diaryLog.innerHTML = '';
         
         const diaryTitle = document.getElementById('diary-modal-title');
         if (diaryTitle) {
@@ -3222,27 +4338,94 @@ document.addEventListener('DOMContentLoaded', () => {
             diaryLog.appendChild(statsContainer);
         }
 
-        actionLog.forEach(entry => {
+        let currentInterContainer = null;
+        let currentImagesCol = null;
+
+        for (let i = 0; i < actionLog.length; i++) {
+            const entry = actionLog[i];
             if (entry.type === 'scene') {
                 const div = document.createElement('div'); div.className = 'diary-entry';
-                if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
+                
+                const imagesCol = document.createElement('div');
+                imagesCol.className = 'diary-images-column';
+                if (entry.image) {
+                    const img = document.createElement('img');
+                    img.className = 'diary-main-image';
+                    img.src = entry.image;
+                    img.style.cursor = 'zoom-in';
+                    img.title = 'Clique para ampliar';
+                    img.onclick = () => showImageLightbox(entry.image);
+                    imagesCol.appendChild(img);
+                }
+                div.appendChild(imagesCol);
+                currentImagesCol = imagesCol;
+
                 const txt = document.createElement('div'); txt.className = 'text-container'; 
-                txt.innerHTML = window.safeHTML('<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>', { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
-                div.appendChild(txt); diaryLog.appendChild(div);
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'scene-name';
+                nameSpan.textContent = entry.name || '';
+                txt.appendChild(nameSpan);
+
+                if (i + 1 < actionLog.length && actionLog[i + 1].type === 'input' && actionLog[i + 1].isLeadInput) {
+                    const leadInputP = document.createElement('p');
+                    leadInputP.className = 'diary-input';
+                    leadInputP.textContent = actionLog[i + 1].text;
+                    txt.appendChild(leadInputP);
+                    i++;
+                }
+
+                if (entry.description) {
+                    const descP = document.createElement('p');
+                    descP.innerHTML = window.safeHTML(formatText(entry.description || ''), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                    txt.appendChild(descP);
+                }
+
+                div.appendChild(txt);
+                diaryLog.appendChild(div);
                 setupHighlights(txt);
-                currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
+                currentInterContainer = document.createElement('div');
+                currentInterContainer.className = 'diary-interactions-container';
+                txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
-                    const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
-                    if (entry.type === 'output') { p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); setupHighlights(p); } else p.textContent = entry.text;
-                    currentInterContainer.appendChild(p);
+                    if (entry.type === 'output' && entry.image && currentImagesCol) {
+                        const subImg = document.createElement('img');
+                        subImg.className = 'diary-examine-image';
+                        subImg.src = entry.image;
+                        subImg.style.cursor = 'zoom-in';
+                        subImg.title = 'Clique para ampliar';
+                        subImg.onclick = () => showImageLightbox(entry.image);
+                        currentImagesCol.appendChild(subImg);
+                    }
+                    if (entry.text) {
+                        const p = document.createElement('p');
+                        p.className = 'diary-' + entry.type; 
+                        if (entry.type === 'output') {
+                            p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                            setupHighlights(p);
+                        } else {
+                            p.textContent = entry.text;
+                        }
+                        currentInterContainer.appendChild(p);
+                    }
                 }
             }
-        });
+        }
         diaryModal.classList.remove('hidden'); 
         setTimeout(() => { 
             diaryLog.scrollTop = isConclusion ? 0 : diaryLog.scrollHeight; 
         }, 10);
     };
-    init();
+    try {
+        init();
+        if (gameData.enableSystemMenu && !window.isSceneTest && document.getElementById('start-screen')) {
+            showStartScreen(true);
+        } else {
+            startGame();
+        }
+    } catch (e) {
+        console.error("Initialization error:", e);
+        try { init(); startGame(); } catch (err) {}
+    }
 });

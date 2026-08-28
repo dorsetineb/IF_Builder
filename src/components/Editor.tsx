@@ -65,7 +65,6 @@ import NodeTypeModal from './NodeTypeModal';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Info, Settings as SettingsIcon, CircleHelp, X, Save, FileArchive, FileCode, Columns3, List } from 'lucide-react';
-import Settings from '../pages/Settings';
 import AboutProject from '../pages/AboutProject';
 import EditorInterface from '../pages/EditorInterface';
 
@@ -1432,13 +1431,30 @@ const Editor: React.FC = () => {
             />
             <main
               ref={mainRef}
-              className={`flex-1 relative bg-background p-0 ${currentView === 'interface' ? 'overflow-hidden' : 'overflow-y-auto'}`}
+              className={`flex-1 relative bg-background p-0 ${
+                currentView === 'interface' ||
+                currentView === 'mechanics' ||
+                currentView === 'appearance' ||
+                currentView === 'default_texts'
+                  ? 'overflow-hidden'
+                  : 'overflow-y-auto'
+              }`}
             >
               {/* currentView === 'vignettes' block removed */}
-              {currentView === 'interface' && (
-                <Suspense fallback={<LoadingOverlay message="Carregando Editor de Interface..." />}>
+              {(currentView === 'interface' ||
+                currentView === 'mechanics' ||
+                currentView === 'appearance' ||
+                currentView === 'default_texts') && (
+                <Suspense fallback={<LoadingOverlay message="Carregando..." />}>
                   <UIEditor
                     key={importKey}
+                    activeTab={
+                      currentView === 'appearance'
+                        ? 'aparencia'
+                        : currentView === 'default_texts'
+                        ? 'textos'
+                        : 'sistemas'
+                    }
                     {...gameData}
                     enableInventory={gameData.enableInventory ?? detectedActiveSystems.inventory}
                     enableChances={
@@ -1798,7 +1814,6 @@ const Editor: React.FC = () => {
               </Suspense>
             )}
 
-            {currentView === 'settings' && <Settings hideHeader />}
             {currentView === 'about' && <AboutProject hideHeader />}
             {currentView === 'editor_interface' && <EditorInterface hideHeader />}
           </main>

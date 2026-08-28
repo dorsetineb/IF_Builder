@@ -9,7 +9,6 @@ import Analytics from './components/Analytics';
 
 // Lazy load heavy components
 const PlatformLayout = lazy(() => import('./components/layouts/PlatformLayout'));
-const Settings = lazy(() => import('./pages/Settings'));
 const Editor = lazy(() => import('./components/Editor'));
 const AboutProject = lazy(() => import('./pages/AboutProject'));
 
@@ -21,7 +20,7 @@ const AppContent: React.FC = () => {
         const path = location.pathname;
         if (path === '/about') {
             document.title = t('app.aboutTitle', 'IF Builder / Sobre o Projeto');
-        } else if (path === '/editor' || path === '/settings') {
+        } else if (path === '/editor') {
             document.title = t('app.editorTitle', 'IF Builder / Editor de Narrativa');
         } else {
             document.title = t('app.title', 'IF Builder / Ficções Interativas');
@@ -36,7 +35,6 @@ const AppContent: React.FC = () => {
 
                 {/* Platform Routes */}
                 <Route element={<PlatformLayout />}>
-                    <Route path="/settings" element={<Settings />} />
                     <Route path="/about" element={<AboutProject />} />
                     <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
                 </Route>

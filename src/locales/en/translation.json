@@ -40,7 +40,7 @@
     "windowsTitle": "Windows",
     "windowsDesc": "Installer .exe",
     "linuxTitle": "Linux",
-    "linuxDesc": "Package .deb",
+    "linuxDesc": "Package .AppImage",
     "confirmBtn": "Download Installer"
   },
   "auth": {
@@ -511,7 +511,10 @@
     "sceneMap": "Branch Map",
     "objects": "Objects",
     "trackers": "Trackers",
-    "globalCommands": "Global Verbs",
+    "globalCommands": "Verbs",
+    "mechanics": "Mechanics",
+    "appearance": "Visual Style",
+    "defaultTexts": "Labels",
     "interface": "Interface",
     "quickGuide": "Quick Guide",
     "aboutProject": "About Project",
@@ -918,9 +921,9 @@
     },
     "tabs": {
       "layout": "Layout",
-      "config": "Editor Interface",
       "sistemas": "Mechanics",
-      "textos": "Standard Texts",
+      "textos": "Labels",
+      "config": "Editor Interface",
       "aparencia": "Visual Style"
     },
     "header": {

@@ -43,7 +43,7 @@
     "windowsTitle": "Windows",
     "windowsDesc": "Installer .exe",
     "linuxTitle": "Linux",
-    "linuxDesc": "Package .deb",
+    "linuxDesc": "Paquete .AppImage",
     "confirmBtn": "Descargar Instalador"
   },
   "common": {
@@ -286,14 +286,18 @@
     "sceneMap": "Mapa de Ramificaciones",
     "objects": "Objetos",
     "trackers": "Rastreadores",
-    "globalCommands": "Verbos Globales",
+    "globalCommands": "Verbos",
+    "mechanics": "Mecánicas",
+    "appearance": "Estilo Visual",
+    "defaultTexts": "Rótulos",
     "interface": "Interfaz",
     "quickGuide": "Guía Rápida",
     "aboutProject": "Sobre el Proyecto",
     "settings": "Ajustes",
     "openEditor": "Abrir Editor",
     "showNarrative": "Ver lista de narrativas",
-    "hideNarrative": "Ocultar lista de narrativas"
+    "hideNarrative": "Ocultar lista de narrativas",
+    "editorInterface": "Interfaz del Editor"
   },
   "sceneList": {
     "search": "Buscar narrativa...",
@@ -839,7 +843,7 @@
       "layout": "Diseño",
       "config": "Interfaz del Editor",
       "sistemas": "Mecánicas",
-      "textos": "Textos Estándar",
+      "textos": "Rótulos",
       "aparencia": "Estilo Visual"
     },
     "header": {

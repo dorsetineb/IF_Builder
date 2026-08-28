@@ -408,4 +408,4 @@ export interface GameData {
   };
 }
 
-export type View = 'welcome' | 'scenes' | 'interface' | 'vignettes' | 'map' | 'global_objects' | 'global_commands' | 'trackers' | 'settings' | 'about' | 'guide' | 'three_panels' | 'editor_interface';
+export type View = 'welcome' | 'scenes' | 'interface' | 'mechanics' | 'appearance' | 'default_texts' | 'vignettes' | 'map' | 'global_objects' | 'global_commands' | 'trackers' | 'settings' | 'about' | 'guide' | 'three_panels' | 'editor_interface';

@@ -3,14 +3,14 @@ import { View, GameData, Scene } from '../types';
 import {
   BookOpen,
   Box,
-  Settings,
   CircleHelp,
   MessageSquare,
   Zap,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Columns3,
   Activity,
   Monitor,
+  SquareDashedMousePointer,
+  Palette,
+  Type,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -120,6 +120,51 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         {/* Vinhetas */}
         {/* Vignettes button removed */}
 
+        {/* Mecânicas */}
+        <button
+          className={getButtonClass('mechanics')}
+          onClick={() => handleSetView('mechanics')}
+          title={isCollapsed ? t('sidebar.mechanics', 'Mecânicas') : undefined}
+        >
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'mechanics' ? 'translate-x-0' : ''}`}
+          />
+          <SquareDashedMousePointer className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.mechanics', 'Mecânicas')}</span>
+          )}
+        </button>
+
+        {/* Estilo Visual */}
+        <button
+          className={getButtonClass('appearance')}
+          onClick={() => handleSetView('appearance')}
+          title={isCollapsed ? t('sidebar.appearance', 'Estilo Visual') : undefined}
+        >
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'appearance' ? 'translate-x-0' : ''}`}
+          />
+          <Palette className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.appearance', 'Estilo Visual')}</span>
+          )}
+        </button>
+
+        {/* Rótulos */}
+        <button
+          className={getButtonClass('default_texts')}
+          onClick={() => handleSetView('default_texts')}
+          title={isCollapsed ? t('sidebar.defaultTexts', 'Rótulos') : undefined}
+        >
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'default_texts' ? 'translate-x-0' : ''}`}
+          />
+          <Type className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.defaultTexts', 'Rótulos')}</span>
+          )}
+        </button>
+
         {(gameData.gameInteractionType || 'parser') !== 'choice' && (
           <button
             className={getButtonClass('global_objects')}
@@ -156,7 +201,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <button
             className={getButtonClass('global_commands')}
             onClick={() => handleSetView('global_commands')}
-            title={isCollapsed ? t('sidebar.globalCommands', 'Verbos Globais') : undefined}
+            title={isCollapsed ? t('sidebar.globalCommands', 'Verbos') : undefined}
           >
             <div
               className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_commands' ? 'translate-x-0' : ''}`}
@@ -164,26 +209,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <MessageSquare className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <span className="truncate relative z-10">
-                {t('sidebar.globalCommands', 'Verbos Globais')}
+                {t('sidebar.globalCommands', 'Verbos')}
               </span>
             )}
           </button>
         )}
-
-        {/* Configurações (anteriormente Interface) */}
-        <button
-          className={getButtonClass('interface')}
-          onClick={() => handleSetView('interface')}
-          title={isCollapsed ? t('sidebar.settings', 'Configurações') : undefined}
-        >
-          <div
-            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`}
-          />
-          <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.settings', 'Configurações')}</span>
-          )}
-        </button>
       </nav>
 
       <div className="mt-auto pt-2 pb-4 pl-3 pr-0 flex flex-col gap-1 relative border-t border-muted-foreground/50 bg-card z-20 flex-shrink-0">

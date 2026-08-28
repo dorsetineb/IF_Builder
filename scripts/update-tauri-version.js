@@ -65,8 +65,8 @@ if (fs.existsSync(latestJsonPath)) {
     latestJson.releaseNotes = releaseNotesContent;
   }
   if (latestJson.downloads) {
-    latestJson.downloads.windows = `/downloads/IFBuilder_${newVersion}_x64-setup.exe`;
-    latestJson.downloads.linux = `/downloads/IFBuilder_${newVersion}_amd64.deb`;
+    latestJson.downloads.windows = `https://github.com/dorsetineb/IF_Builder/releases/download/v${newVersion}/if-builder_${newVersion}_x64-setup.exe`;
+    latestJson.downloads.linux = `https://github.com/dorsetineb/IF_Builder/releases/download/v${newVersion}/if-builder_${newVersion}_amd64.AppImage`;
   }
   fs.writeFileSync(latestJsonPath, JSON.stringify(latestJson, null, 2) + '\n');
 }

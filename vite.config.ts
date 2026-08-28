@@ -116,7 +116,7 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
             releaseName: `IF Builder v${currentVersion}`,
             releaseNotes: '',
             htmlUrl: `https://github.com/dorsetineb/IF_Builder/releases/tag/v${currentVersion}`,
-            downloadUrl: `https://github.com/dorsetineb/IF_Builder/releases/download/v${currentVersion}/IFBuilder_${currentVersion}_amd64.deb`
+            downloadUrl: `https://github.com/dorsetineb/IF_Builder/releases/download/v${currentVersion}/if-builder_${currentVersion}_amd64.AppImage`
           }));
           return;
         }
@@ -141,7 +141,8 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
               const assets = data.assets || [];
               let targetAsset: any = null;
               if (platform === 'linux') {
-                targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.deb'));
+                targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.appimage'))
+                  || assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.deb'));
               } else {
                 targetAsset = assets.find((asset: any) => asset.name?.toLowerCase().endsWith('.exe'));
               }
@@ -173,7 +174,7 @@ function vercelApiDevPlugin(env: Record<string, string>): Plugin {
 
           const pkgJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, './package.json'), 'utf-8'));
           const currentVersion = pkgJson.version || '0.6.1';
-          const defaultFileName = platform === 'linux' ? `IFBuilder_${currentVersion}_amd64.deb` : `IFBuilder_${currentVersion}_x64-setup.exe`;
+          const defaultFileName = platform === 'linux' ? `if-builder_${currentVersion}_amd64.AppImage` : `if-builder_${currentVersion}_x64-setup.exe`;
           const localFilePath = path.resolve(__dirname, `./public/downloads/${defaultFileName}`);
 
           if (fs.existsSync(localFilePath)) {
