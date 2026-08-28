@@ -1712,7 +1712,7 @@ const Editor: React.FC = () => {
                               onTabChange={setSidePanelTab}
                               onPreviewScene={(scene) => {
                                 setPreviewSceneId(scene.id);
-                                setIsPreviewOpen(true);
+                                setIsPreviewing(true);
                               }}
                               isDirty={isDirty}
                               onSetDirty={setIsDirty}

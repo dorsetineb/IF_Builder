@@ -74,20 +74,44 @@ const sumBase64AssetBytes = (gameData: GameData): number => {
     };
     measure(gameData.gameLogo);
     measure(gameData.gameSplashImage);
+    measure(gameData.startScreenBgImage);
     measure(gameData.gameBackgroundMusic);
     measure(gameData.positiveEndingImage);
     measure(gameData.positiveEndingMusic);
     measure(gameData.negativeEndingImage);
     measure(gameData.negativeEndingMusic);
+
+    if (gameData.vignettes && Array.isArray(gameData.vignettes)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        gameData.vignettes.forEach((vig: any) => {
+            measure(vig.image);
+            measure(vig.backgroundMusic);
+        });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Object.values(gameData.scenes).forEach((scene: any) => {
+    Object.values(gameData.scenes || {}).forEach((scene: any) => {
         measure(scene.image);
         measure(scene.backgroundMusic);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scene.interactions?.forEach((i: any) => measure(i.soundEffect));
+        if (scene.stackCards && Array.isArray(scene.stackCards)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            scene.stackCards.forEach((card: any) => {
+                measure(card.image);
+                measure(card.backgroundMusic);
+                if (card.hotspots && Array.isArray(card.hotspots)) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    card.hotspots.forEach((h: any) => {
+                        measure(h.soundEffect);
+                        measure(h.examineImage);
+                    });
+                }
+            });
+        }
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Object.values(gameData.globalObjects).forEach((obj: any) => measure(obj.image));
+    Object.values(gameData.globalObjects || {}).forEach((obj: any) => measure(obj.image));
     return total;
 };
 
@@ -102,20 +126,18 @@ const calculateExportSizes = (gameData: GameData): { zipMB: number; htmlMB: numb
         const engineJsonBytes = JSON.stringify(engineData).length;
 
         // ── HTML ──────────────────────────────────────────────────────────────
-        // HTML = editorJson + engineJson + (base64Assets × 0.75) + 261KB overhead
-        // The ×0.75 term accounts for assets injected a third time into HTML markup
-        // (ending screen background-images, splash, etc.) and overhead is gameJS+CSS+template.
-        // Verified: empty project → 0+0+0+261KB = 262KB ✓
-        //           Fuja da Masmorra → 36.94MB + 13.85MB + 0.261 = 51.05MB ≈ 51.2MB ✓
-        const htmlMB = (editorJsonBytes + engineJsonBytes + base64AssetBytes * 0.75 + 261 * 1024) / (1024 * 1024);
+        // HTML contains both editorJson (<script id="if-builder-source">) and
+        // engineJson (window.embeddedGameData in game.js) with all base64 data inline,
+        // plus wrapper overhead (DOMPurify, CSS, template).
+        const htmlMB = (editorJsonBytes + engineJsonBytes + 261 * 1024) / (1024 * 1024);
 
         // ── ZIP ───────────────────────────────────────────────────────────────
-        // ZIP = base64Assets × 0.988 + 45KB overhead
-        // Factor 0.988: JSZip DEFLATE on already-compressed binary images yields
-        // minimal savings; net ratio from base64→binary→deflate ≈ 0.988 of base64 size.
-        // Verified: empty project → 0×0.988 + 45KB = 45KB ✓
-        //           Fuja da Masmorra → 18.47MB×0.988 + 0.045 = 18.3MB ✓
-        const zipMB = (base64AssetBytes * 0.988 + 45 * 1024) / (1024 * 1024);
+        // In ZIP export, all Base64 assets are extracted as binary files into the assets/ folder.
+        // Binary size = base64 chars × 0.75 (Base64 expands binary by 4/3).
+        // Plus serialized JSON text files (which now only contain short asset path strings, ~100KB)
+        // and ZIP overhead + fonts (~45KB).
+        const zipBinaryAssetBytes = base64AssetBytes * 0.75;
+        const zipMB = (zipBinaryAssetBytes + 145 * 1024) / (1024 * 1024);
 
         return { zipMB, htmlMB };
     } catch {
@@ -124,8 +146,8 @@ const calculateExportSizes = (gameData: GameData): { zipMB: number; htmlMB: numb
 };
 
 export const calculateEditorStats = (gameData: GameData): ProjectStats => {
-    const scenes = Object.values(gameData.scenes);
-    const objects = Object.values(gameData.globalObjects);
+    const scenes = Object.values(gameData.scenes || {});
+    const objects = Object.values(gameData.globalObjects || {});
     const vignettes = gameData.vignettes || [];
 
     let totalWords = 0;
@@ -184,6 +206,22 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
             if (!hasEffect) interactionsWithoutEffect++;
         });
 
+        // HyperCard Stack Cards & Hotspots literacy and object tracking
+        if (scene.stackCards && Array.isArray(scene.stackCards)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            scene.stackCards.forEach((card: any) => {
+                sceneWords += countWords(card.name) + countWords(card.description);
+                if (card.hotspots && Array.isArray(card.hotspots)) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    card.hotspots.forEach((h: any) => {
+                        sceneWords += countWords(h.title) + countWords(h.examineTitle) + countWords(h.examineText) + countWords(h.lockedMessage);
+                        if (h.addsToInventory) usedObjectIds.add(h.addsToInventory);
+                        if (h.requiresInInventory) usedObjectIds.add(h.requiresInInventory);
+                    });
+                }
+            });
+        }
+
         // Min/Max Word Tracking
         if (sceneWords > sceneMostWords.count) {
             sceneMostWords = { id: scene.id, name: scene.name || 'Untitled', count: sceneWords };
@@ -197,8 +235,12 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
 
         totalWords += sceneWords;
         
-        // QA Status
-        if (!scene.image || scene.image.trim() === '') missingSceneImages++;
+        // QA Status: for HyperCard stack scenes, check if any card has an image
+        const isStack = scene.sceneType === 'hypercard_stack';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const hasStackImage = isStack && scene.stackCards && scene.stackCards.length > 0 && scene.stackCards.some((c: any) => c.image && c.image.trim() !== '');
+        const hasImage = (scene.image && scene.image.trim() !== '') || hasStackImage;
+        if (!hasImage) missingSceneImages++;
         if (!scene.description || scene.description.trim() === '') missingSceneDescriptions++;
 
         // Type Distribution
@@ -214,9 +256,12 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         else scenesByType.scenes++;
 
         // Dead Ends
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const hasStackExits = isStack && scene.stackCards && scene.stackCards.some((c: any) => c.hotspots && c.hotspots.some((h: any) => h.targetSceneId || h.targetCardId));
         const hasExits = (scene.exits && Object.values(scene.exits).some(e => e)) || 
                         (scene.choices && scene.choices.length > 0) ||
-                        (scene.interactions && scene.interactions.some(i => i.goToScene || i.vignetteId));
+                        (scene.interactions && scene.interactions.some(i => i.goToScene || i.vignetteId)) ||
+                        hasStackExits;
         if (!hasExits && !isVictory && !isDefeat && !isOpening) deadEnds++;
     });
 
@@ -238,7 +283,9 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
             const oExits = other.exits && Object.values(other.exits).includes(s.id);
             const oChoices = other.choices && other.choices.some(c => c.targetSceneId === s.id);
             const oInteractions = other.interactions && other.interactions.some(i => i.goToScene === s.id || i.vignetteId === s.id);
-            return oExits || oChoices || oInteractions;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const oStackExits = other.stackCards && other.stackCards.some((c: any) => c.hotspots && c.hotspots.some((h: any) => h.targetSceneId === s.id));
+            return oExits || oChoices || oInteractions || oStackExits;
         });
     }).length;
 
@@ -259,6 +306,36 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
                 reason: 'heavy_image',
                 value: sizeMB.toFixed(2),
                 threshold: 0.5,
+            });
+        }
+        if (scene.stackCards && Array.isArray(scene.stackCards)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            scene.stackCards.forEach((card: any, cIndex: number) => {
+                if (card.image && card.image.startsWith('data:') && card.image.length > IMAGE_SIZE_THRESHOLD_BYTES) {
+                    const sizeMB = (card.image.length / (1024 * 1024));
+                    performanceAlerts.push({
+                        sceneId: scene.id,
+                        sceneName: `${name} (${card.name || `Vista ${cIndex + 1}`})`,
+                        reason: 'heavy_image',
+                        value: sizeMB.toFixed(2),
+                        threshold: 0.5,
+                    });
+                }
+                if (card.hotspots && Array.isArray(card.hotspots)) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    card.hotspots.forEach((h: any) => {
+                        if (h.examineImage && h.examineImage.startsWith('data:') && h.examineImage.length > IMAGE_SIZE_THRESHOLD_BYTES) {
+                            const sizeMB = (h.examineImage.length / (1024 * 1024));
+                            performanceAlerts.push({
+                                sceneId: scene.id,
+                                sceneName: `${name} (Hotspot: ${h.title || 'Exame'})`,
+                                reason: 'heavy_image',
+                                value: sizeMB.toFixed(2),
+                                threshold: 0.5,
+                            });
+                        }
+                    });
+                }
             });
         }
         if (scene.description && scene.description.length > DESCRIPTION_LENGTH_THRESHOLD) {

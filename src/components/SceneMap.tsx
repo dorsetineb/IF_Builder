@@ -109,6 +109,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
           type: MapNodeType;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           original?: any;
+          cardId?: string;
+          isHotspot?: boolean;
         }[] = [];
 
         // 1. Opening Vignette (as Scene) links to Start Scene

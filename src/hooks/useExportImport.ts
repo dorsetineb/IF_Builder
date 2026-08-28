@@ -101,6 +101,20 @@ export const useExportImport = ({
           inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`, assetsFolder, assetMap);
         });
       }
+      if (scene.stackCards && Array.isArray(scene.stackCards)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        scene.stackCards.forEach((card: any, cIndex: number) => {
+          card.image = processAsset(card.image, `card_image_${sceneId}_${cIndex}`, assetsFolder, assetMap);
+          card.backgroundMusic = processAsset(card.backgroundMusic, `card_bgm_${sceneId}_${cIndex}`, assetsFolder, assetMap);
+          if (card.hotspots && Array.isArray(card.hotspots)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            card.hotspots.forEach((h: any, hIndex: number) => {
+              h.soundEffect = processAsset(h.soundEffect, `card_h_sfx_${sceneId}_${cIndex}_${hIndex}`, assetsFolder, assetMap);
+              h.examineImage = processAsset(h.examineImage, `card_h_img_${sceneId}_${cIndex}_${hIndex}`, assetsFolder, assetMap);
+            });
+          }
+        });
+      }
     }
 
     for (const objId in exportData.globalObjects) {
@@ -1123,6 +1137,22 @@ DATE:        ${exportDate.toLocaleString()}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const scenePromises = Object.values(data.scenes).map(async (scene: any) => {
           if (scene.image) scene.image = await optimizeField(scene.image);
+          if (scene.stackCards && Array.isArray(scene.stackCards)) {
+            await Promise.all(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              scene.stackCards.map(async (card: any) => {
+                if (card.image) card.image = await optimizeField(card.image);
+                if (card.hotspots && Array.isArray(card.hotspots)) {
+                  await Promise.all(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    card.hotspots.map(async (h: any) => {
+                      if (h.examineImage) h.examineImage = await optimizeField(h.examineImage);
+                    })
+                  );
+                }
+              })
+            );
+          }
         });
         await Promise.all(scenePromises);
       }
@@ -1236,6 +1266,24 @@ DATE:        ${exportDate.toLocaleString()}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   scene.interactions.map(async (inter: any) => {
                     inter.soundEffect = await restoreAsset(inter.soundEffect);
+                  })
+                );
+              }
+              if (scene.stackCards && Array.isArray(scene.stackCards)) {
+                await Promise.all(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  scene.stackCards.map(async (card: any) => {
+                    card.image = await restoreAsset(card.image);
+                    card.backgroundMusic = await restoreAsset(card.backgroundMusic);
+                    if (card.hotspots && Array.isArray(card.hotspots)) {
+                      await Promise.all(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        card.hotspots.map(async (h: any) => {
+                          h.soundEffect = await restoreAsset(h.soundEffect);
+                          h.examineImage = await restoreAsset(h.examineImage);
+                        })
+                      );
+                    }
                   })
                 );
               }
