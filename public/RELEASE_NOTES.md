@@ -1,8 +1,23 @@
-🚀 Atualizações e Melhorias da Versão v0.10.2
+🚀 Atualizações e Melhorias da Versão v0.10.3
 
-• Barra de Ações Integrada nos Cenários: Os botões interativos (Inventário, Diário, Anotações, Rastreadores/Status e Sistema/Opções) agora estão disponíveis no topo dos cenários, perfeitamente centralizados e alinhados na mesma linha horizontal que o título da vista e os ícones de chances/vidas.
-• Menu Suspenso de Inventário sem Sombras: O pop-up de itens e aviso de inventário vazio foi posicionado com precisão diretamente abaixo do botão de Inventário, com design clean e sem sombras indesejadas.
-• Nova Ação "Alterar Rastreador" em Áreas Interativas: Suporte completo à alteração e vinculação de rastreadores nas áreas interativas (hotspots) de cenários, com seletor de rastreadores com ícones, valor numérico de impacto, texto de feedback opcional e atalho para criar novos rastreadores.
-• Padronização Visual do Botão "+ Vincular": Atualização do botão de vínculo de rastreadores para "+ Vincular", aplicando a cor de destaque da aparência selecionada tanto nas ramificações quanto nos cenários.
-• Feedback de Diálogo na Coleta de Objetos em Cenários: Suporte a feedback com texto e imagem personalizados em pop-up estilo exame ao coletar objetos em hotspots de cenários.
-• Melhorias nas Telas Iniciais e Editor: Sincronização do efeito de varredura dither e lanterna, troca dinâmica de imagem da vista sem perda de hotspots e aprimoramentos de responsividade nos botões de ação.
+• Reorganização do Menu Lateral e Novas Páginas Dedicadas:
+  - As seções "Mecânicas", "Estilo Visual" e "Rótulos" agora são páginas independentes acessadas diretamente no menu lateral esquerdo.
+  - Nova ordem de navegação otimizada: Narrativa ➔ Mecânicas ➔ Estilo Visual ➔ Rótulos ➔ Objetos ➔ Rastreadores ➔ Verbos.
+  - Renomeação de "Verbos Globais" para "Verbos" (com ícone de balão de fala) e "Textos Padrão" para "Rótulos" (com ícone de tipografia).
+  - Remoção da página legada de Configurações para simplificar e modernizar a interface.
+
+• Otimização de Performance e Correção no Runtime:
+  - Otimização do efeito de chuva no Canvas para Linux e outros navegadores, eliminando gargalos de renderização.
+  - Correção de travamento ao clicar no botão "Start" da vinheta/abertura quando efeitos atmosféricos de tela estavam ativos.
+
+• Atualização do Instalador Linux:
+  - Atualização do link de download da versão Linux para o formato portátil .AppImage (com hash SHA-256 verificado), substituindo o pacote .deb.
+
+• Documentação e Tutoriais Completamente Atualizados:
+  - Reestruturação completa dos tutoriais em docs/pt/tutorial (14 módulos de 00 a 13) acompanhando a nova ordem do menu lateral.
+  - Novo guia detalhado de Cenários e Vistas (Point-and-Click com ferramentas de Retângulo, Círculo, Polígono Livre, Zoom/Pan, Ações e Condições de Bloqueio).
+  - Novos tutoriais para Mecânicas, Estilo Visual, Rótulos, Verbos Globais e Mapa de Ramificações.
+  - Nova documentação de referência para Cenários e Vistas em docs/pt/referencia/cenarios-e-vistas.md.
+
+• Roteiros de Vídeo Sincronizados:
+  - Criação da série completa de 14 roteiros de vídeo para gravação (de #00 a #13), com blocos de tempo, ações de tela e falas formatadas.
