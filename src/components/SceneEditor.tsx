@@ -795,7 +795,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           )}
 
                           {enableDiceRoll && !isVignetteMode && (
-                            <div className="pt-4 mt-4 border-t border-border">
+                            <div className="mt-4">
                               <label className="flex items-center gap-3 cursor-pointer select-none group p-3 bg-muted/20 hover:bg-muted/40 border border-border rounded-lg transition-colors">
                                 <input
                                   type="checkbox"
