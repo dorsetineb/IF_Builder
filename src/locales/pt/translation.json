@@ -164,7 +164,7 @@
       "desktopAppDesc": "Esta é a versão v{{version}} do aplicativo. Para baixar a última versão, procure o link na página Sobre o Projeto.",
       "changelogTitle": "Log de Desenvolvimento",
       "latestTag": "Última Versão",
-      "devlogContent": "🚀 Atualizações e Melhorias da Versão v0.10.3\n\n• Reorganização do Menu Lateral e Novas Páginas Dedicadas:\n  - As seções \"Mecânicas\", \"Estilo Visual\" e \"Rótulos\" agora são páginas independentes acessadas diretamente no menu lateral esquerdo.\n  - Nova ordem de navegação otimizada: Narrativa ➔ Mecânicas ➔ Estilo Visual ➔ Rótulos ➔ Objetos ➔ Rastreadores ➔ Verbos.\n  - Renomeação de \"Verbos Globais\" para \"Verbos\" (com ícone de balão de fala) e \"Textos Padrão\" para \"Rótulos\" (com ícone de tipografia).\n  - Remoção da página legada de Configurações para simplificar e modernizar a interface.\n\n• Otimização de Performance e Correção no Runtime:\n  - Otimização do efeito de chuva no Canvas para Linux e outros navegadores, eliminando gargalos de renderização.\n  - Correção de travamento ao clicar no botão \"Start\" da vinheta/abertura quando efeitos atmosféricos de tela estavam ativos.\n\n• Atualização do Instalador Linux:\n  - Atualização do link de download da versão Linux para o formato portátil .AppImage (com hash SHA-256 verificado), substituindo o pacote .deb.\n\n• Documentação e Tutoriais Completamente Atualizados:\n  - Reestruturação completa dos tutoriais em docs/pt/tutorial (14 módulos de 00 a 13) acompanhando a nova ordem do menu lateral.\n  - Novo guia detalhado de Cenários e Vistas (Point-and-Click com ferramentas de Retângulo, Círculo, Polígono Livre, Zoom/Pan, Ações e Condições de Bloqueio).\n  - Novos tutoriais para Mecânicas, Estilo Visual, Rótulos, Verbos Globais e Mapa de Ramificações.\n  - Nova documentação de referência para Cenários e Vistas em docs/pt/referencia/cenarios-e-vistas.md.\n\n• Roteiros de Vídeo Sincronizados:\n  - Criação da série completa de 14 roteiros de vídeo para gravação (de #00 a #13), com blocos de tempo, ações de tela e falas formatadas.",
+      "devlogContent": "🚀 Atualizações e Melhorias da Versão v0.10.4\r\n\r\n• Nova Identidade Visual e Logotipo Pixel-Art Vetorial:\r\n  - Implementação do novo logotipo com tipografia Spaceship e ícone retrô em SVG vetorial de alta definição (IFBuilderLogo, IFBuilderText, IFBuilderIcon).\r\n  - Atualização visual na tela de BIOS (logo 50% ampliado), tela de Início (com versionamento alinhado ao topo) e cabeçalho do editor.\r\n  - No cabeçalho do editor, exibe o logotipo textual completo quando expandido e o ícone de computador quando recolhido.\r\n  - Novos assets vetoriais de animação e identidade em src/assets/ (boi, humano, computador e logos).\r\n\r\n• Refinamentos de Layout e Interface do Usuário:\r\n  - Largura da barra lateral esquerda padronizada e compacta (w-48), eliminando espaços vazios.\r\n  - Botão inferior renomeado de \"Interface do Editor\" para \"Interface\" em todos os idiomas suportados.\r\n  - Correção no alinhamento e espaçamento inferior dos botões de interface nas ramificações exportadas.\r\n  - Correção no posicionamento e renderização imediata do painel de Sugestões nas ramificações.\r\n  - Padronização das notificações flutuantes (toasts), simplificando títulos e fornecendo mensagens contextuais claras.\r\n\r\n• Internacionalização e Localização Completa (i18n):\r\n  - Guia Rápido: Tradução integral dos exemplos interativos, fluxograma narrativo do Mapa de Conexões, títulos de Temas, Efeitos visuais e avisos de segurança para Inglês e Espanhol.\r\n  - Rótulos e Mecânicas: Internacionalização dos campos e placeholders de Rolagem de Dados (Dice Roll Prefix, You rolled, Roll D6), tipos de dados e velocidades de transição.\r\n  - Abas de Pré-visualização: Sincronização dos seletores de visualização (Branches, Chapters, Main Menu).\r\n  - Editor de Cenários: Aba \"Propriedades\" devidamente localizada para todos os idiomas.",
       "newsTitle": "✨ Novidades",
       "newsItem1": "Sistema de atualização automática no desktop com suporte a repositórios do GitHub.",
       "newsItem2": "Notificação com resumo das notas de versão e confirmação explícita para autorizar download e instalação.",
@@ -1002,11 +1002,12 @@
       "audioLimitExceeded": "O áudio excede o limite de {{size}}MB."
     },
     "tabs": {
-      "layout": "Layout",
-      "sistemas": "Mecânicas",
-      "textos": "Rótulos",
-      "config": "Interface do Editor",
-      "aparencia": "Estilo Visual"
+      "sistemasDesc": "Personalize as mecânicas, sistemas e controles de decisão da sua ficção.",
+      "aparenciaDesc": "Personalize a paleta de cores, tipografia, molduras e layout visual da sua ficção.",
+      "textosDesc": "Configure os rótulos de botões, mensagens do sistema e campos de ação.",
+      "scenes": "Ramificações",
+      "chapters": "Capítulos",
+      "menu_principal": "Menu Principal"
     },
     "header": {
       "description": "Personalize as mecânicas da ficção, configure a interface, menus e textos.",
@@ -1045,14 +1046,6 @@
       "previewPhoto": "IMAGEM DA RAMIFICAÇÃO",
       "previewText": "TEXTO",
       "recommendedRes": "Recomendado: Full HD (1920x1080), proporção 16:9."
-    },
-    "tabs": {
-      "sistemasDesc": "Personalize as mecânicas, sistemas e controles de decisão da sua ficção.",
-      "aparenciaDesc": "Personalize a paleta de cores, tipografia, molduras e layout visual da sua ficção.",
-      "textosDesc": "Configure os rótulos de botões, mensagens do sistema e campos de ação.",
-      "scenes": "Ramificações",
-      "chapters": "Capítulos",
-      "menu_principal": "Menu Principal"
     },
     "sistemas": {
       "activeSystems": "Sistemas Ativos",
