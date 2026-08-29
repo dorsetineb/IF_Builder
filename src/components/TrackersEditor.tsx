@@ -3,6 +3,7 @@ import { ConsequenceTracker, Scene, Interaction, TrackerEffect, GameObject } fro
 import { Plus, Trash2, Search, Activity, ArrowLeft, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, ExternalLink, SlidersHorizontal, Box, Sword, Key, Map as MapIcon, Eye, FlaskConical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ColorInput } from './UIEditor/ColorInput';
+import SceneSelectOptions from './common/SceneSelectOptions';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -434,14 +435,13 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                                     <select
                                                         value={selectedTracker.consequenceSceneId || ''}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, 'consequenceSceneId', e.target.value)}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all [&>option]:bg-card"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all [&>option]:bg-card [&>optgroup]:bg-card [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
                                                     >
                                                         <option value="" className="bg-card text-muted-foreground">{t('trackersEditor.noConsequence', 'Nenhuma (Nada acontece)')}</option>
-                                                        {allScenes.map(scene => (
-                                                            <option key={scene.id} value={scene.id} className="bg-card text-foreground">
-                                                                {scene.name}
-                                                            </option>
-                                                        ))}
+                                                        <SceneSelectOptions
+                                                            allScenes={allScenes || []}
+                                                            showId={true}
+                                                        />
                                                     </select>
                                                     {selectedTracker.consequenceSceneId && (
                                                         <button

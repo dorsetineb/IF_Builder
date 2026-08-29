@@ -11,9 +11,10 @@ interface BranchingPreviewProps {
 const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allScenes }) => {
     const { t } = useTranslation();
 
-    const getNodeColor = (scene: Scene | { vignetteType?: string, isEndingScene?: boolean }) => {
+    const getNodeColor = (scene: Scene | { vignetteType?: string, isEndingScene?: boolean, sceneType?: string }) => {
         if (scene.isEndingScene || scene.vignetteType === 'conclusion') return 'green';
         if (scene.vignetteType === 'opening' || scene.vignetteType === 'transition') return 'blue';
+        if ('sceneType' in scene && scene.sceneType === 'hypercard_stack') return 'emerald';
         return 'amber';
     };
 
@@ -37,10 +38,20 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
             if (scene.vignetteNextSceneId === currentScene.id) {
                 linked = true;
             }
+            // Check hypercard hotspots
+            if (scene.sceneType === 'hypercard_stack' && scene.stackCards) {
+                scene.stackCards.forEach(card => {
+                    card.hotspots?.forEach(h => {
+                        if (h.actionType === 'navigate_scene' && h.targetSceneId === currentScene.id) {
+                            linked = true;
+                        }
+                    });
+                });
+            }
 
             if (linked) {
                 sources.set(scene.id, {
-                    name: scene.name,
+                    name: scene.name?.trim() || scene.id,
                     color: getNodeColor(scene)
                 });
             }
@@ -55,7 +66,7 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
         currentScene.interactions.forEach(inter => {
             if (inter.goToScene) {
                 const targetScene = allScenes.find(s => s.id === inter.goToScene);
-                if (targetScene) targets.set(targetScene.id, { name: targetScene.name, color: getNodeColor(targetScene) });
+                if (targetScene) targets.set(targetScene.id, { name: targetScene.name?.trim() || targetScene.id, color: getNodeColor(targetScene) });
             }
         });
         // Choices
@@ -63,7 +74,7 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
             currentScene.choices.forEach(choice => {
                 if (choice.targetSceneId) {
                     const targetScene = allScenes.find(s => s.id === choice.targetSceneId);
-                    if (targetScene) targets.set(targetScene.id, { name: targetScene.name, color: getNodeColor(targetScene) });
+                    if (targetScene) targets.set(targetScene.id, { name: targetScene.name?.trim() || targetScene.id, color: getNodeColor(targetScene) });
                 }
             });
         }
@@ -76,17 +87,28 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 });
             } else {
                 const targetScene = allScenes.find(s => s.id === currentScene.vignetteNextSceneId);
-                if (targetScene) targets.set(targetScene.id, { name: targetScene.name, color: getNodeColor(targetScene) });
+                if (targetScene) targets.set(targetScene.id, { name: targetScene.name?.trim() || targetScene.id, color: getNodeColor(targetScene) });
             }
+        }
+        // Hotspots in hypercard_stack
+        if (currentScene.sceneType === 'hypercard_stack' && currentScene.stackCards) {
+            currentScene.stackCards.forEach(card => {
+                card.hotspots?.forEach(h => {
+                    if (h.actionType === 'navigate_scene' && h.targetSceneId) {
+                        const targetScene = allScenes.find(s => s.id === h.targetSceneId);
+                        if (targetScene) targets.set(targetScene.id, { name: targetScene.name?.trim() || targetScene.id, color: getNodeColor(targetScene) });
+                    }
+                });
+            });
         }
         return Array.from(targets.values()).slice(0, 5); // Limit to 5 for display
     }, [currentScene, allScenes]);
 
     const currentColor = getNodeColor(currentScene);
     const currentColorClasses = {
-        border: currentColor === 'amber' ? 'border-amber-500/50' : currentColor === 'blue' ? 'border-blue-500/50' : 'border-green-500/50',
-        text: currentColor === 'amber' ? 'text-amber-600 dark:text-amber-400' : currentColor === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400',
-        shadow: currentColor === 'amber' ? 'shadow-[0_0_15px_rgba(245,158,11,0.15)]' : currentColor === 'blue' ? 'shadow-[0_0_15_rgba(59,130,246,0.15)]' : 'shadow-[0_0_15_rgba(34,197,94,0.15)]',
+        border: currentColor === 'amber' ? 'border-amber-500/50' : currentColor === 'blue' ? 'border-blue-500/50' : currentColor === 'emerald' ? 'border-emerald-500/50' : 'border-green-500/50',
+        text: currentColor === 'amber' ? 'text-amber-600 dark:text-amber-400' : currentColor === 'blue' ? 'text-blue-600 dark:text-blue-400' : currentColor === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' : 'text-green-600 dark:text-green-400',
+        shadow: currentColor === 'amber' ? 'shadow-[0_0_15px_rgba(245,158,11,0.15)]' : currentColor === 'blue' ? 'shadow-[0_0_15_rgba(59,130,246,0.15)]' : currentColor === 'emerald' ? 'shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'shadow-[0_0_15_rgba(34,197,94,0.15)]',
     };
 
     return (

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from './ConfirmationModal';
+import SceneSelectOptions from './common/SceneSelectOptions';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette, DiceType, DiceOutcomeRange, DiceRollConfig } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Plus, Trash2, Upload, Search, MousePointer2, Box, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Sword, Key, Map as MapIcon, Eye, FlaskConical, X, Dices } from 'lucide-react';
@@ -544,9 +545,13 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <div className="flex gap-4 items-start">
                             <div className="w-2/3 space-y-1.5">
                                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.goToSceneLabel', 'Ir para Ramificação')}</label>
-                                <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground h-[42px]">
+                                <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground h-[42px] [&>option]:bg-card [&>optgroup]:bg-card [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground">
                                     <option value="">{t('interactionEditor.stayInScene', '(Permanecer na ramificação)')}</option>
-                                    {(allScenes || []).filter(s => s && s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name || s.id} ({s.id})</option>)}
+                                    <SceneSelectOptions
+                                        allScenes={allScenes || []}
+                                        excludeSceneId={currentSceneId}
+                                        showId={true}
+                                    />
                                 </select>
                             </div>
                             <div className="w-1/3 space-y-1.5">

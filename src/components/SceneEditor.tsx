@@ -19,6 +19,7 @@ import InteractionEditor from './InteractionEditor';
 import { ErrorBoundary } from './ErrorBoundary';
 import BranchingPreview from './BranchingPreview';
 import ImageUploadField from './ui/ImageUploadField';
+import SceneSelectOptions from './common/SceneSelectOptions';
 import {
   Upload,
   Trash2,
@@ -865,19 +866,15 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                     onChange={(e) =>
                                       updateLocalScene('vignetteNextSceneId', e.target.value)
                                     }
-                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card [&>optgroup]:bg-card [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
                                   >
                                     <option value="">{t('sceneEditor.justClose')}</option>
                                     <option value="END_GAME">{t('sceneEditor.endGame')}</option>
-                                    <optgroup label={t('sceneEditor.scenesGroup')}>
-                                      {allScenes
-                                        .filter((s) => s.id !== localScene.id)
-                                        .map((s) => (
-                                          <option key={s.id} value={s.id}>
-                                            {s.name}
-                                          </option>
-                                        ))}
-                                    </optgroup>
+                                    <SceneSelectOptions
+                                      allScenes={allScenes}
+                                      excludeSceneId={localScene.id}
+                                      showId={true}
+                                    />
                                   </select>
                                 </div>
                               )}
@@ -1492,14 +1489,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                   newChoices[index] = { ...choice, targetSceneId: e.target.value };
                                   updateLocalScene('choices', newChoices);
                                 }}
-                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
+                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card [&>optgroup]:bg-card [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
                               >
                                 <option value="">{t('sceneEditor.selectPlaceholder')}</option>
-                                {allScenes.map((s) => (
-                                  <option key={s.id} value={s.id}>
-                                    {s.name}
-                                  </option>
-                                ))}
+                                <SceneSelectOptions
+                                  allScenes={allScenes}
+                                  excludeSceneId={localScene.id}
+                                  showId={true}
+                                />
                               </select>
                               <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                             </div>
