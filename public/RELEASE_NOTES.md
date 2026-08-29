@@ -1,20 +1,18 @@
-🚀 Atualizações e Melhorias da Versão v0.10.4
+🚀 Atualizações e Melhorias da Versão v0.10.5
 
-• Nova Identidade Visual e Logotipo Pixel-Art Vetorial:
-  - Implementação do novo logotipo com tipografia Spaceship e ícone retrô em SVG vetorial de alta definição (IFBuilderLogo, IFBuilderText, IFBuilderIcon).
-  - Atualização visual na tela de BIOS (logo 50% ampliado), tela de Início (com versionamento alinhado ao topo) e cabeçalho do editor.
-  - No cabeçalho do editor, exibe o logotipo textual completo quando expandido e o ícone de computador quando recolhido.
-  - Novos assets vetoriais de animação e identidade em src/assets/ (boi, humano, computador e logos).
+• Compatibilidade e Estabilidade do AppImage no Linux:
+  - Correção definitiva do travamento no processo WebKitWebProcess ao clicar em "Iniciar Programa" ou abrir demos no Linux.
+  - Configuração nativa no backend Rust para desativar modos instáveis de composição por hardware e DMA-BUF (WEBKIT_DISABLE_DMABUF_RENDERER, WEBKIT_DISABLE_COMPOSITING_MODE e __NV_DISABLE_EXPLICIT_SYNC).
+  - Atualização do workflow de publicação no GitHub Actions com inclusão de todo o ecossistema de plugins multimídia do GStreamer (base, good, bad, ugly, libav, pulseaudio, alsa, gl), tornando o AppImage 100% autossuficiente em qualquer distribuição Linux.
+  - Isolamento de runtime para direcionar o GStreamer aos plugins empacotados no AppImage ($APPDIR), prevenindo incompatibilidades de ABI em distribuições rolling-release (Arch Linux, Fedora, openSUSE).
+  - Tratamento defensivo na reprodução de efeitos sonoros da BIOS e trilhas sonoras contra ausência de dispositivos de áudio.
 
-• Refinamentos de Layout e Interface do Usuário:
-  - Largura da barra lateral esquerda padronizada e compacta (w-48), eliminando espaços vazios.
-  - Botão inferior renomeado de "Interface do Editor" para "Interface" em todos os idiomas suportados.
-  - Correção no alinhamento e espaçamento inferior dos botões de interface nas ramificações exportadas.
-  - Correção no posicionamento e renderização imediata do painel de Sugestões nas ramificações.
-  - Padronização das notificações flutuantes (toasts), simplificando títulos e fornecendo mensagens contextuais claras.
+• Aprimoramento do Seletor de Destinos ("IR PARA"):
+  - Criação do seletor inteligente SceneSelectOptions com agrupamento visual estruturado por categorias: Cenários (HyperCard), Ramificações, Capítulos e Abertura.
+  - Rótulos com fallback automático no formato "Nome (ID)" ou "Tipo (ID)", garantindo que cenas sem título sejam sempre legíveis e conectáveis a partir de qualquer nó (inclusive no capítulo de abertura).
+  - Integração padronizada em todos os editores: Editor de Cenas Narrativas, Interações, Rastreadores/Consequências e Hotspots de Cenários.
+  - Suporte completo a nós de cenários no Mapa de Conexões e visualizador de ramificações (BranchingPreview).
 
-• Internacionalização e Localização Completa (i18n):
-  - Guia Rápido: Tradução integral dos exemplos interativos, fluxograma narrativo do Mapa de Conexões, títulos de Temas, Efeitos visuais e avisos de segurança para Inglês e Espanhol.
-  - Rótulos e Mecânicas: Internacionalização dos campos e placeholders de Rolagem de Dados (Dice Roll Prefix, You rolled, Roll D6), tipos de dados e velocidades de transição.
-  - Abas de Pré-visualização: Sincronização dos seletores de visualização (Branches, Chapters, Main Menu).
-  - Editor de Cenários: Aba "Propriedades" devidamente localizada para todos os idiomas.
+• Internacionalização e Qualidade:
+  - Novas chaves de tradução i18n para categorias de cenas em Português, Inglês e Espanhol.
+  - Cobertura de testes unitários com 100% de aprovação (30/30 testes no Vitest).
