@@ -28,7 +28,7 @@ const Header: React.FC<{
     <header className="flex w-full h-[61px]">
       {/* Left Pane - Sidebar Alignment */}
       <div
-        className={`flex-shrink-0 bg-card border-b border-r border-muted-foreground/50 flex items-center relative transition-all duration-300 ${sidebarCollapsed ? 'w-20 justify-center' : 'w-48 px-4'}`}
+        className={`flex-shrink-0 bg-card border-b border-r border-muted-foreground/50 flex items-center relative transition-all duration-300 ${sidebarCollapsed ? 'w-20 justify-center' : 'w-56 px-4'}`}
       >
         <div className="absolute top-0 left-0 w-full h-[3px] bg-primary opacity-60" />
 
@@ -39,7 +39,7 @@ const Header: React.FC<{
           {sidebarCollapsed ? (
             <IFBuilderIcon className="w-7 h-7 text-foreground notranslate" />
           ) : (
-            <IFBuilderText className="h-3.5 w-auto max-w-[150px] text-foreground notranslate" />
+            <IFBuilderText className="h-3.5 w-auto max-w-[170px] text-foreground notranslate" />
           )}
         </div>
 
