@@ -595,6 +595,57 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             </div>
                         </div>
 
+                        {/* Row 5.5: Image Transition & Speed */}
+                        <div className="flex gap-4 items-start">
+                            <div className="w-1/2 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.transitionLabel', 'Transição')}</label>
+                                <select
+                                    value={selectedInteraction.transitionType || ''}
+                                    onChange={e => handleInteractionChange('transitionType', e.target.value || undefined)}
+                                    className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground h-[42px] [&>option]:bg-card [&>optgroup]:bg-card [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
+                                >
+                                    <option value="">{t('interactionEditor.defaultTransition', '(Padrão do Jogo)')}</option>
+                                    <option value="fade">{t('interactionEditor.transFade', 'Esmaecer (Fade)')}</option>
+                                    <option value="slide-left">{t('interactionEditor.transSlideLeft', 'Deslizar para Esquerda')}</option>
+                                    <option value="slide-right">{t('interactionEditor.transSlideRight', 'Deslizar para Direita')}</option>
+                                    <option value="slide-up">{t('interactionEditor.transSlideUp', 'Deslizar para Cima')}</option>
+                                    <option value="slide-down">{t('interactionEditor.transSlideDown', 'Deslizar para Baixo')}</option>
+                                    <option value="zoom">{t('interactionEditor.transZoom', 'Zoom In / Out')}</option>
+                                    <option value="blur">{t('interactionEditor.transBlur', 'Desfoque (Blur)')}</option>
+                                    <option value="none">{t('interactionEditor.transNone', 'Nenhuma (Corte Seco)')}</option>
+                                </select>
+                            </div>
+                            <div className="w-1/2 space-y-1.5">
+                                <label className={`block text-[10px] font-bold uppercase tracking-widest ${selectedInteraction.transitionType === 'none' ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                                    {t('interactionEditor.speedLabel', 'Velocidade')}
+                                </label>
+                                <div className={`flex items-center gap-2 h-[42px] px-3 bg-input border border-input rounded ${selectedInteraction.transitionType === 'none' ? 'opacity-40 cursor-not-allowed' : ''}`}>
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="4"
+                                        step="1"
+                                        disabled={selectedInteraction.transitionType === 'none'}
+                                        value={selectedInteraction.transitionSpeed !== undefined ? selectedInteraction.transitionSpeed : 3}
+                                        onChange={e => {
+                                            const step = parseInt(e.target.value);
+                                            handleInteractionChange('transitionSpeed', step);
+                                        }}
+                                        className="w-full h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
+                                    />
+                                    <span className="text-[11px] font-bold w-16 text-right whitespace-nowrap text-foreground">
+                                        {(selectedInteraction.transitionSpeed === 4)
+                                            ? t('interactionEditor.speedFast', 'Rápido')
+                                            : (selectedInteraction.transitionSpeed === 2)
+                                            ? t('interactionEditor.speedSlow', 'Lento')
+                                            : (selectedInteraction.transitionSpeed === 1)
+                                            ? t('interactionEditor.speedVerySlow', 'Muito Lento')
+                                            : t('interactionEditor.speedNormal', 'Normal')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Row 6: Update Scene Description */}
                         <div className="space-y-1.5">
                             <label className={`block text-[10px] font-bold uppercase tracking-widest ${selectedInteraction.goToScene ? 'text-zinc-600' : 'text-zinc-400'}`}>{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da ramificação')}</label>

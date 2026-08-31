@@ -38,7 +38,7 @@ export const useNewProjectForm = ({ onCreate }: UseNewProjectFormProps) => {
     const [textSpeed, setTextSpeed] = useState<number>(3);
 
     const [enableImages, setEnableImages] = useState(true);
-    const [imageTransitionType, setImageTransitionType] = useState<'fade' | 'slide' | 'none'>('fade');
+    const [imageTransitionType, setImageTransitionType] = useState<GameData['gameImageTransitionType']>('fade');
     const [imageSpeed, setImageSpeed] = useState<number>(3);
 
     const [enableSystemMenu, setEnableSystemMenu] = useState(true);

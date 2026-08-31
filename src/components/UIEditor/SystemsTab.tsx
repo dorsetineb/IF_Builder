@@ -440,9 +440,14 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                     onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
                                                     className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                 >
-                                                    <option value="fade">{t('UIEditor.sistemas.transFade')}</option>
-                                                    <option value="slide">{t('UIEditor.sistemas.transSlide')}</option>
-                                                    <option value="none">{t('UIEditor.sistemas.transNone')}</option>
+                                                    <option value="fade">{t('UIEditor.sistemas.transFade', 'Esmaecer (Fade)')}</option>
+                                                    <option value="slide-left">{t('UIEditor.sistemas.transSlideLeft', 'Deslizar para Esquerda')}</option>
+                                                    <option value="slide-right">{t('UIEditor.sistemas.transSlideRight', 'Deslizar para Direita')}</option>
+                                                    <option value="slide-up">{t('UIEditor.sistemas.transSlideUp', 'Deslizar para Cima')}</option>
+                                                    <option value="slide-down">{t('UIEditor.sistemas.transSlideDown', 'Deslizar para Baixo')}</option>
+                                                    <option value="zoom">{t('UIEditor.sistemas.transZoom', 'Zoom In')}</option>
+                                                    <option value="blur">{t('UIEditor.sistemas.transBlur', 'Desfoque (Blur)')}</option>
+                                                    <option value="none">{t('UIEditor.sistemas.transNone', 'Nenhuma')}</option>
                                                 </select>
                                             </div>
                                             <div className="space-y-2 flex-1">

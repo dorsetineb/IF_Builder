@@ -2314,7 +2314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     };
 
-    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
+    const loadScene = (sceneId, transition = true, transitionType = null, transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
         let scene = findScene(sceneId);
         if (!scene) {
             const keys = Object.keys((gameData && gameData.cenas) || {});
@@ -2388,24 +2388,41 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.classList.remove('hidden');
         gameContainer.classList.remove('fade-out');
         
-        let effectiveTransition = gameData.gameImageTransitionType || 'fade';
+        let effectiveTransition = (transitionType && transitionType !== 'default')
+            ? transitionType
+            : (gameData.gameImageTransitionType || 'fade');
+        if (effectiveTransition === 'slide') effectiveTransition = 'slide-left';
         if (effectiveTransition === 'none') transition = false;
+
         let speed = 0.5;
-        const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
-        if (savedImageSpeedStr) {
-            const speedVal = parseInt(savedImageSpeedStr);
+        if (transitionSpeed !== null && transitionSpeed !== undefined && transitionSpeed !== '') {
+            const speedVal = Number(transitionSpeed);
             if (speedVal === 1) speed = 2.0;
             else if (speedVal === 2) speed = 1.0;
             else if (speedVal === 3) speed = 0.5;
             else if (speedVal === 4) speed = 0.2;
+            else if (speedVal === 200) speed = 0.2;
+            else if (speedVal === 500) speed = 0.5;
+            else if (speedVal === 1000) speed = 1.0;
+            else if (speedVal === 2000) speed = 2.0;
+            else if (speedVal > 0 && speedVal <= 10) speed = speedVal;
         } else {
-            const rawSpeed = gameData.gameImageSpeed;
-            const speedVal = rawSpeed !== undefined && rawSpeed !== null ? Number(rawSpeed) : 3;
-            if (speedVal === 1) speed = 2.0;
-            else if (speedVal === 2) speed = 1.0;
-            else if (speedVal === 3 || speedVal === 5) speed = 0.5;
-            else if (speedVal === 4) speed = 0.2;
-            else speed = 0.5;
+            const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
+            if (savedImageSpeedStr) {
+                const speedVal = parseInt(savedImageSpeedStr);
+                if (speedVal === 1) speed = 2.0;
+                else if (speedVal === 2) speed = 1.0;
+                else if (speedVal === 3) speed = 0.5;
+                else if (speedVal === 4) speed = 0.2;
+            } else {
+                const rawSpeed = gameData.gameImageSpeed;
+                const speedVal = rawSpeed !== undefined && rawSpeed !== null ? Number(rawSpeed) : 3;
+                if (speedVal === 1) speed = 2.0;
+                else if (speedVal === 2) speed = 1.0;
+                else if (speedVal === 3 || speedVal === 5) speed = 0.5;
+                else if (speedVal === 4) speed = 0.2;
+                else speed = 0.5;
+            }
         }
         if (typeof speed !== 'number' || isNaN(speed)) {
             speed = 0.5;
@@ -3233,7 +3250,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateTrackers(hotspot.trackerEffects);
                     }
 
-                    const effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
+                    let effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
+                    if (effectiveTrans === 'slide') effectiveTrans = 'slide-left';
 
                     if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId) {
                         const targetCard = cards.find(c => c.id === hotspot.targetCardId);
