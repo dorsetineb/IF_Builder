@@ -282,4 +282,87 @@ describe('Game Runtime evaluation in JSDOM', () => {
         const gameContainer = document.getElementById('game-container');
         expect(gameContainer?.classList.contains('hidden')).toBe(false);
     });
+
+    it('ensures overlay elements stay behind UI buttons and description text', () => {
+        const customData = {
+            ...initialGameData,
+            startScene: 'opening',
+            scenes: {
+                'opening': {
+                    id: 'opening',
+                    name: 'Abertura',
+                    description: 'Texto de abertura.',
+                    image: 'test.png',
+                    vignetteType: 'opening',
+                    vignetteButtonText: 'COMEÇAR',
+                    vignetteNextSceneId: 'scene1',
+                    overlayEffect: 'rain'
+                },
+                'scene1': {
+                    id: 'scene1',
+                    name: 'Cena 1',
+                    description: 'Texto da cena 1.',
+                    image: 'test1.png',
+                    overlayEffect: 'rain'
+                }
+            }
+        };
+        const engineData = prepareGameDataForEngine(customData as any);
+        (window as any).embeddedGameData = engineData;
+        (window as any).isPreview = true;
+        (window as any).isSceneTest = false;
+
+        document.body.innerHTML = `
+            <div id="game-container" class="game-container hidden">
+                <div class="image-panel">
+                    <div id="image-container" class="image-container">
+                        <img id="scene-image" src="" alt="Cena atual" class="scene-image">
+                        <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
+                        <div id="scene-overlay" class="scene-overlay"></div>
+                        <div id="scene-name-overlay" class="scene-name-overlay"></div>
+                    </div>
+                </div>
+                <div class="text-panel">
+                    <div id="scene-description" class="scene-description"></div>
+                    <div id="chances-container" class="chances-container"></div>
+                    <div class="action-bar" id="standard-action-bar">
+                        <div id="action-popup" class="action-popup hidden"></div>
+                        <div class="action-buttons"></div>
+                        <div class="input-area">
+                            <div id="verb-input" contenteditable="true"></div>
+                            <button id="submit-verb">Ação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="diary-modal" class="hidden"><div id="diary-log"></div><button id="export-pdf-button"></button></div>
+            <div id="notes-modal" class="hidden"><textarea id="notes-textarea"></textarea></div>
+            <div id="trackers-modal" class="hidden"><div id="trackers-content"></div></div>
+            <div id="item-modal" class="hidden"></div>
+            <div id="acquisition-modal" class="hidden"></div>
+            <div id="system-modal" class="hidden"></div>
+            <div id="start-screen" class="hidden"></div>
+        `;
+
+        const scriptFn = new Function(gameJS);
+        scriptFn();
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        // Check vignette overlay vs content z-index
+        const vignetteOverlay = document.getElementById('vignette-overlay');
+        const splashContent = document.querySelector('#vignette-screen .splash-content') as HTMLElement;
+        expect(vignetteOverlay).not.toBeNull();
+        expect(splashContent).not.toBeNull();
+        expect(vignetteOverlay?.style.zIndex).toBe('1');
+        expect(splashContent?.style.zIndex).toBe('10');
+
+        // Transition from vignette to standard scene
+        const vignetteButton = document.getElementById('vignette-continue-button');
+        vignetteButton?.click();
+
+        // Check standard scene overlay zIndex in applySceneOverlay
+        const sceneOverlay = document.getElementById('scene-overlay');
+        expect(sceneOverlay?.style.zIndex).toBe('5');
+    });
 });
+

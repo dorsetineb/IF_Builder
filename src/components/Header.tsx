@@ -112,7 +112,11 @@ const Header: React.FC<{
                   <button
                     onClick={isPreviewDisabled ? undefined : onTogglePreview}
                     disabled={isPreviewDisabled}
-                    className={`flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all text-xs shadow-sm uppercase tracking-wider ${isPreviewDisabled ? 'bg-muted text-muted-foreground cursor-not-allowed border border-muted-foreground/50' : 'bg-transparent text-primary border border-primary hover:bg-primary/15 active:scale-95'}`}
+                    className={`flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all text-xs shadow-sm uppercase tracking-wider ${
+                      isPreviewDisabled
+                        ? 'bg-muted text-muted-foreground cursor-not-allowed border border-muted-foreground/50'
+                        : 'bg-transparent text-primary border border-primary hover:bg-primary/15 active:scale-95'
+                    }`}
                     title={isPreviewDisabled ? t('header.previewDisabled', 'Adicione pelo menos 2 ramificações ou capítulos para usar o Preview.') : t('header.previewGame', 'Pré-visualizar Jogo')}
                   >
                     <Eye className="w-3.5 h-3.5 mr-2" /> {t('header.previewGameBtn', 'Pré-visualizar')}

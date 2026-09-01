@@ -603,7 +603,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 }
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
-.scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; box-shadow: none !important; }
+.scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 15; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; box-shadow: none !important; }
 .text-panel { flex: 1; display: flex; flex-direction: column; padding: 0 0 0 30px; position: relative; }
 .game-container.layout-horizontal { flex-direction: column; }
 .game-container.layout-horizontal .image-panel { flex-basis: 45%; max-width: none; width: 100%; border-right: none; border-bottom: 2px solid var(--border-color); }
@@ -1442,9 +1442,29 @@ export const OVERLAY_CSS = `
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 20;
+    z-index: 5;
     display: none;
     overflow: hidden;
+}
+
+/* Ensure overlays inside splash screens (vignettes, openings, endings) stay strictly behind UI text & buttons */
+.splash-screen .scene-overlay,
+#vignette-screen .scene-overlay,
+#vignette-overlay {
+    z-index: 1 !important;
+}
+.splash-screen .splash-content,
+#vignette-screen .splash-content,
+.splash-screen .splash-buttons,
+#vignette-screen .splash-buttons,
+.splash-screen .splash-text,
+#vignette-screen .splash-text {
+    position: relative;
+    z-index: 10 !important;
+}
+.splash-screen .vignette-credits,
+#vignette-screen .vignette-credits {
+    z-index: 15 !important;
 }
 
 /* FOG EFFECT */

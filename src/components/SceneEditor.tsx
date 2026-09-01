@@ -935,7 +935,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                               {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
                               {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
                               {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
-                              {localScene.overlayEffect === 'wiggate' && <WiggleOverlay />}
+                              {localScene.overlayEffect === 'wiggle' && <WiggleOverlay />}
                               {localScene.overlayEffect === 'fog' && (
                                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
                                   <FogOverlay />

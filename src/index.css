@@ -284,8 +284,8 @@
   --secondary-foreground: #7EE0A1;
 
   /* Muted */
-  --muted: #00273F;
-  --muted-foreground: #5FB580;
+  --muted: #002C45;
+  --muted-foreground: #7292A1;
 
   /* Accent */
   --accent: #5FB580;
@@ -850,8 +850,28 @@ select option {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 20;
+  z-index: 5;
   overflow: hidden;
+}
+
+/* Ensure overlays inside splash screens (vignettes, openings, endings) stay strictly behind UI text & buttons */
+.splash-screen .scene-overlay,
+#vignette-screen .scene-overlay,
+#vignette-overlay {
+  z-index: 1 !important;
+}
+.splash-screen .splash-content,
+#vignette-screen .splash-content,
+.splash-screen .splash-buttons,
+#vignette-screen .splash-buttons,
+.splash-screen .splash-text,
+#vignette-screen .splash-text {
+  position: relative;
+  z-index: 10 !important;
+}
+.splash-screen .vignette-credits,
+#vignette-screen .vignette-credits {
+  z-index: 15 !important;
 }
 
 /* --- CLIMATIC EFFECTS --- */
