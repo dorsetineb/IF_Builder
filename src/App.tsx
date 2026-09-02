@@ -1,13 +1,13 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Auth } from './components/Auth';
 import { ThemeProvider } from './components/ThemeProvider';
 import { TypographyProvider } from './components/TypographyProvider';
 import { ToastProvider } from './components/ToastContext';
 import Analytics from './components/Analytics';
 
 // Lazy load heavy components
+const Auth = lazy(() => import('./components/Auth').then((m) => ({ default: m.Auth })));
 const PlatformLayout = lazy(() => import('./components/layouts/PlatformLayout'));
 const Editor = lazy(() => import('./components/Editor'));
 const AboutProject = lazy(() => import('./pages/AboutProject'));

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { X, Monitor, Cloud, CircleHelp, Zap, Loader2 } from 'lucide-react';
-import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
 import { useTranslation } from 'react-i18next';
-import Preview from './Preview';
 import { getDitherColors } from '../utils/themeStyles';
+
+const NewProjectModal = lazy(() => import('./NewProjectModal').then(m => ({ default: m.NewProjectModal })));
+const Preview = lazy(() => import('./Preview'));
 
 interface WelcomePlaceholderProps {
     onCreateScene: (data?: Partial<GameData>) => void;
@@ -263,11 +264,15 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
             )}
 
             {/* NEW PROJECT MODAL */}
-            <NewProjectModal
-                isOpen={isNewProjectModalOpen}
-                onClose={() => setIsNewProjectModalOpen(false)}
-                onCreate={handleCreateProject}
-            />
+            {isNewProjectModalOpen && (
+                <Suspense fallback={null}>
+                    <NewProjectModal
+                        isOpen={isNewProjectModalOpen}
+                        onClose={() => setIsNewProjectModalOpen(false)}
+                        onCreate={handleCreateProject}
+                    />
+                </Suspense>
+            )}
 
             {/* Game Popup */}
             {isGamePopupOpen && (
@@ -304,14 +309,21 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                     <span className="font-mono text-sm uppercase tracking-widest animate-pulse">Loading data...</span>
                                 </div>
                             ) : demoData ? (
-                                <Preview 
-                                    gameData={demoData} 
-                                    basePath={i18n.language.startsWith('pt') 
-                                        ? "/fuja_da_masmorra" 
-                                        : i18n.language.startsWith('es') 
-                                        ? "/escapa_la_mazmorra" 
-                                        : "/escape_the_dungeon"} 
-                                />
+                                <Suspense fallback={
+                                    <div className="flex flex-col items-center gap-4 text-white">
+                                        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                                        <span className="font-mono text-sm uppercase tracking-widest animate-pulse">Loading preview...</span>
+                                    </div>
+                                }>
+                                    <Preview 
+                                        gameData={demoData} 
+                                        basePath={i18n.language.startsWith('pt') 
+                                            ? "/fuja_da_masmorra" 
+                                            : i18n.language.startsWith('es') 
+                                            ? "/escapa_la_mazmorra" 
+                                            : "/escape_the_dungeon"} 
+                                    />
+                                </Suspense>
                             ) : (
                                 <div className="text-white font-mono text-sm uppercase">Error loading demo.</div>
                             )}

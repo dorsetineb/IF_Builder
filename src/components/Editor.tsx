@@ -40,7 +40,6 @@ import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
 import SceneList from './SceneList';
 // import VignettesEditor from './VignettesEditor'; // Removed as integrated into SceneEditor
-import Preview from './Preview';
 import { LoadingOverlay } from './LoadingOverlay';
 import { APP_VERSION } from '../version';
 
@@ -56,18 +55,19 @@ const GlobalCommandsEditor = lazy(() => import('./GlobalCommandsEditor'));
 const HyperCardStackEditor = lazy(() =>
   import('./HyperCardEditor/HyperCardStackEditor').then((module) => ({ default: module.HyperCardStackEditor }))
 );
+const NewProjectModal = lazy(() =>
+  import('./NewProjectModal').then((module) => ({ default: module.NewProjectModal }))
+);
+const UserManualModal = lazy(() => import('./UserManualModal'));
+const NodeTypeModal = lazy(() => import('./NodeTypeModal'));
+const Preview = lazy(() => import('./Preview'));
 import { ConfirmationModal } from './ConfirmationModal';
-import { NewProjectModal } from './NewProjectModal';
 import { TransitionScreen } from './TransitionScreen';
 import { IFBuilderLogo } from './IFBuilderLogo';
-import UserManualModal from './UserManualModal';
-import NodeTypeModal from './NodeTypeModal';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Info, Settings as SettingsIcon, CircleHelp, X, Save, FileArchive, FileCode, Columns3, List } from 'lucide-react';
-import AboutProject from '../pages/AboutProject';
-import EditorInterface from '../pages/EditorInterface';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 declare let JSZip: any;
@@ -1369,7 +1369,9 @@ const Editor: React.FC = () => {
             onImport={handleImportClick}
             currentView={currentView}
           />
-          <Preview gameData={gameData} testSceneId={previewSceneId} />
+          <Suspense fallback={<LoadingOverlay message="Carregando Preview..." />}>
+            <Preview gameData={gameData} testSceneId={previewSceneId} />
+          </Suspense>
         </div>
       ) : (
         <div className="flex flex-col h-full w-full">
@@ -1981,18 +1983,30 @@ const Editor: React.FC = () => {
         confirmText={t('editor.confirmLeave', 'Sair sem salvar')}
         cancelText={t('editor.cancelLeave', 'Cancelar')}
       />
-      <NewProjectModal
-        isOpen={isNewProjectModalOpen}
-        onClose={() => setIsNewProjectModalOpen(false)}
-        onCreate={handleProjectCreated}
-      />
-      <NodeTypeModal
-        isOpen={isNodeTypeModalOpen}
-        onClose={() => setIsNodeTypeModalOpen(false)}
-        onSelect={handleAddNodeType}
-        hasOpeningVignette={hasOpeningVignette}
-      />
-      <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
+      {isNewProjectModalOpen && (
+        <Suspense fallback={null}>
+          <NewProjectModal
+            isOpen={isNewProjectModalOpen}
+            onClose={() => setIsNewProjectModalOpen(false)}
+            onCreate={handleProjectCreated}
+          />
+        </Suspense>
+      )}
+      {isNodeTypeModalOpen && (
+        <Suspense fallback={null}>
+          <NodeTypeModal
+            isOpen={isNodeTypeModalOpen}
+            onClose={() => setIsNodeTypeModalOpen(false)}
+            onSelect={handleAddNodeType}
+            hasOpeningVignette={hasOpeningVignette}
+          />
+        </Suspense>
+      )}
+      {isManualOpen && (
+        <Suspense fallback={null}>
+          <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 };

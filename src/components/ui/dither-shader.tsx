@@ -83,13 +83,17 @@ function parseColor(color: string): [number, number, number] {
     return [0, 0, 0];
 }
 
-function getLuminance(r: number, g: number, b: number): number {
-    return 0.299 * r + 0.587 * g + 0.114 * b;
+// Packs RGBA into 32-bit uint (Little-Endian standard for canvas ImageData: [R, G, B, A])
+function packColor32(r: number, g: number, b: number, a = 255): number {
+    return ((a & 0xff) << 24) | ((b & 0xff) << 16) | ((g & 0xff) << 8) | (r & 0xff);
 }
 
 function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
 }
+
+const TARGET_FPS = 60;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
 
 export const DitherShader: React.FC<DitherShaderProps> = ({
     src,
@@ -99,6 +103,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     invert = false,
     primaryColor = "#000000",
     secondaryColor = "#ffffff",
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     customPalette = ["#000000", "#ffffff"],
     brightness = 0,
     contrast = 1,
@@ -125,6 +130,10 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     const imageRef = useRef<HTMLImageElement | null>(null);
     const sourceDataRef = useRef<ImageData | null>(null);
 
+    // Persistent reusable buffer to eliminate GC pressure
+    const outputImageRef = useRef<ImageData | null>(null);
+    const outputBuf32Ref = useRef<Uint32Array | null>(null);
+
     const [dimensions, setDimensions] = useState<{
         width: number;
         height: number;
@@ -132,10 +141,10 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
 
     const parsedPrimaryColor = parseColor(primaryColor);
     const parsedSecondaryColor = parseColor(secondaryColor);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const parsedCustomPalette = customPalette.map(parseColor);
 
     useEffect(() => {
+        if (!enableHover) return;
+
         const updateMousePosition = (clientX: number, clientY: number) => {
             if (!containerRef.current) return;
             const rect = containerRef.current.getBoundingClientRect();
@@ -148,14 +157,10 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         };
 
         const handlePointer = (e: PointerEvent) => {
-            if (!enableHover) return;
-            
             const isTouch = e.pointerType === 'touch';
-            
             if (isTouch) {
                 const isDown = e.type === 'pointerdown' || e.type === 'pointermove';
                 const hasButtons = (e.buttons & 1) === 1;
-                
                 if (isDown && (e.type === 'pointerdown' || hasButtons)) {
                     updateMousePosition(e.clientX, e.clientY);
                     targetScaleRef.current = 1.0;
@@ -169,15 +174,14 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         };
 
         const handlePointerLeave = () => {
-            if (!enableHover) return;
             targetScaleRef.current = 0.0;
         };
 
-        window.addEventListener("pointermove", handlePointer);
-        window.addEventListener("pointerdown", handlePointer);
-        window.addEventListener("pointerup", handlePointer);
-        window.addEventListener("pointercancel", handlePointer);
-        window.addEventListener("pointerleave", handlePointerLeave);
+        window.addEventListener("pointermove", handlePointer, { passive: true });
+        window.addEventListener("pointerdown", handlePointer, { passive: true });
+        window.addEventListener("pointerup", handlePointer, { passive: true });
+        window.addEventListener("pointercancel", handlePointer, { passive: true });
+        window.addEventListener("pointerleave", handlePointerLeave, { passive: true });
 
         return () => {
             window.removeEventListener("pointermove", handlePointer);
@@ -188,17 +192,50 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         };
     }, [enableHover]);
 
+    // Precomputed Bayer threshold matrix
+    const thresholdMatrix = React.useMemo(() => {
+        const bayerMatrix = gridSize <= 4 ? BAYER_MATRIX_4x4 : BAYER_MATRIX_8x8;
+        const matrixSize = bayerMatrix.length;
+        const matrixScale = matrixSize * matrixSize;
+        const matrix: number[][] = [];
+
+        for (let my = 0; my < matrixSize; my++) {
+            matrix[my] = [];
+            for (let mx = 0; mx < matrixSize; mx++) {
+                const base = bayerMatrix[my][mx] / matrixScale;
+                matrix[my][mx] = base * (1 - threshold) + threshold * 0.5;
+            }
+        }
+        return { matrix, size: matrixSize };
+    }, [gridSize, threshold]);
+
+    // Precomputed 32-bit colors
+    const { darkColor32, lightColor32 } = React.useMemo(() => {
+        let dark: number;
+        let light: number;
+
+        if (colorMode === "duotone") {
+            dark = packColor32(parsedPrimaryColor[0], parsedPrimaryColor[1], parsedPrimaryColor[2]);
+            light = packColor32(parsedSecondaryColor[0], parsedSecondaryColor[1], parsedSecondaryColor[2]);
+        } else {
+            dark = packColor32(0, 0, 0);
+            light = packColor32(255, 255, 255);
+        }
+
+        return {
+            darkColor32: invert ? light : dark,
+            lightColor32: invert ? dark : light,
+        };
+    }, [colorMode, parsedPrimaryColor, parsedSecondaryColor, invert]);
+
     const renderLoop = useCallback(
         (ctx: CanvasRenderingContext2D, width: number, height: number, time: number, elapsedSeconds: number) => {
-            if (!sourceDataRef.current) return;
-
-            const bayerMatrix = gridSize <= 4 ? BAYER_MATRIX_4x4 : BAYER_MATRIX_8x8;
-            const matrixSize = bayerMatrix.length;
-            const matrixScale = matrixSize * matrixSize;
+            if (!sourceDataRef.current || !outputImageRef.current || !outputBuf32Ref.current) return;
 
             const sourceData = sourceDataRef.current.data;
-            const outputImage = ctx.createImageData(width, height);
-            const outputData = outputImage.data;
+            const srcWidth = sourceDataRef.current.width;
+            const srcHeight = sourceDataRef.current.height;
+            const outputBuf32 = outputBuf32Ref.current;
 
             const mouse = mouseRef.current;
             if (mouse) {
@@ -211,129 +248,104 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             hoverScaleRef.current += (targetScaleRef.current - hoverScaleRef.current) * 0.15;
 
             const currentPos = mouse || lastMousePosRef.current;
-            const internalMouseX = currentPos ? Math.floor(currentPos.x / Math.max(1, gridSize)) : -9999;
-            const internalMouseY = currentPos ? Math.floor(currentPos.y / Math.max(1, gridSize)) : -9999;
-            const internalHoverRadius = (hoverRadius / Math.max(1, gridSize)) * hoverScaleRef.current;
+            const effectiveGridSize = Math.max(1, gridSize);
+            const internalMouseX = currentPos ? Math.floor(currentPos.x / effectiveGridSize) : -9999;
+            const internalMouseY = currentPos ? Math.floor(currentPos.y / effectiveGridSize) : -9999;
+            const internalHoverRadius = (hoverRadius / effectiveGridSize) * hoverScaleRef.current;
             const hoverRadiusSq = internalHoverRadius * internalHoverRadius;
+            const invHoverRadius = internalHoverRadius > 0 ? 1.0 / internalHoverRadius : 0;
+            const hasHover = enableHover && internalMouseX !== -9999 && hoverScaleRef.current > 0.01;
+
+            // Precalculate scan parameters outside the loops (Zero per-pixel allocation)
+            const cycleDuration = scanDuration || 6.0;
+            const cycleProgress = (elapsedSeconds % cycleDuration) / cycleDuration;
+            const totalTravel = height * 2.0;
+            const currentScanY = (cycleProgress * totalTravel) - (height * 0.5);
+            const slantFactor = 0.2;
+            const thickness = height * 0.4;
+            const invThickness = thickness > 0 ? 1.0 / thickness : 0;
+
+            const bayerMatrix = thresholdMatrix.matrix;
+            const matrixSize = thresholdMatrix.size;
+            const isBayer = ditherMode === "bayer";
+
+            const hasColorAdjust = contrast !== 1 || brightness !== 0;
+            const brightnessOffset = 128 + brightness * 255;
+
+            let pixelIdx = 0;
 
             for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    const idx = (y * width + x) * 4;
-                    const srcX = Math.floor((x / width) * sourceDataRef.current.width);
-                    const srcY = Math.floor((y / height) * sourceDataRef.current.height);
-                    const srcIdx = (srcY * sourceDataRef.current.width + srcX) * 4;
+                const srcY = Math.floor((y / height) * srcHeight);
+                const srcRowOffset = srcY * srcWidth;
+                const scanBaseY = y - currentScanY;
+                const matrixY = y % matrixSize;
+                const bayerRow = bayerMatrix[matrixY];
+
+                for (let x = 0; x < width; x++, pixelIdx++) {
+                    const srcX = Math.floor((x / width) * srcWidth);
+                    const srcIdx = (srcRowOffset + srcX) << 2;
+
+                    const a = sourceData[srcIdx + 3];
+                    if (a === 0) {
+                        outputBuf32[pixelIdx] = 0;
+                        continue;
+                    }
 
                     let r = sourceData[srcIdx];
                     let g = sourceData[srcIdx + 1];
                     let b = sourceData[srcIdx + 2];
-                    const a = sourceData[srcIdx + 3];
 
-                    if (a === 0) {
-                        outputData[idx + 3] = 0;
-                        continue;
+                    if (hasColorAdjust) {
+                        r = clamp((r - 128) * contrast + brightnessOffset, 0, 255);
+                        g = clamp((g - 128) * contrast + brightnessOffset, 0, 255);
+                        b = clamp((b - 128) * contrast + brightnessOffset, 0, 255);
                     }
 
-                    if (contrast !== 1 || brightness !== 0) {
-                        r = clamp((r - 128) * contrast + 128 + brightness * 255, 0, 255);
-                        g = clamp((g - 128) * contrast + 128 + brightness * 255, 0, 255);
-                        b = clamp((b - 128) * contrast + 128 + brightness * 255, 0, 255);
-                    }
+                    let luminance = (0.299 * r + 0.587 * g + 0.114 * b) * 0.0039215686; // 1 / 255
 
-                    let luminance = getLuminance(r, g, b) / 255;
-
-                    if (isScanMode || enableHover) {
+                    if (isScanMode || hasHover) {
                         let scanMask = 0.0;
-                        let hoverMask = 0.0;
-                        
                         if (isScanMode) {
-                            // Wall-clock synchronized sweep (identical speed and period regardless of screen size/FPS)
-                            const cycleDuration = scanDuration || 6.0;
-                            const cycleProgress = (elapsedSeconds % cycleDuration) / cycleDuration;
-                            const totalTravel = height * 2.0;
-                            const currentScanY = (cycleProgress * totalTravel) - (height * 0.5);
-                            
-                            const slantFactor = 0.2;
-                            const dist = Math.abs(y + (x * slantFactor) - currentScanY);
-                            const thickness = height * 0.4;
-                            
-                            scanMask = 1.0 - (dist / thickness);
-                            if (scanMask < 0) scanMask = 0;
+                            const dist = Math.abs(scanBaseY + x * slantFactor);
+                            scanMask = Math.max(0.0, 1.0 - dist * invThickness);
                         }
 
-                        if (enableHover && internalMouseX !== -9999) {
+                        let hoverMask = 0.0;
+                        if (hasHover) {
                             const dx = x - internalMouseX;
                             const dy = y - internalMouseY;
                             const distSq = dx * dx + dy * dy;
                             if (distSq < hoverRadiusSq) {
-                                const dist = Math.sqrt(distSq);
-                                hoverMask = 1.0 - (dist / internalHoverRadius);
-                                if (hoverMask < 0) hoverMask = 0;
+                                hoverMask = Math.max(0.0, 1.0 - Math.sqrt(distSq) * invHoverRadius);
                             }
                         }
-                        
+
                         const combinedMask = Math.min(1.0, Math.max(scanMask, hoverMask));
-                        luminance = luminance * combinedMask;
+                        luminance *= combinedMask;
                     }
 
-                    let ditherThreshold = 0;
-                    const matrixX = x % matrixSize;
-                    const matrixY = y % matrixSize;
-
-                    switch (ditherMode) {
-                        case "bayer":
-                            ditherThreshold = bayerMatrix[matrixY][matrixX] / matrixScale;
-                            break;
-                        case "noise": {
-                            const noiseVal = Math.sin(x * 12.9898 + y * 78.233 + time * 100) * 43758.5453;
-                            ditherThreshold = noiseVal - Math.floor(noiseVal);
-                            break;
-                        }
-                        default:
-                            ditherThreshold = 0.5;
-                    }
-
-                    ditherThreshold = ditherThreshold * (1 - threshold) + threshold * 0.5;
-
-                    let outR = 0, outG = 0, outB = 0;
-
-                    if (colorMode === "duotone") {
-                        const dark = luminance < ditherThreshold;
-                        if (dark) {
-                            outR = parsedPrimaryColor[0];
-                            outG = parsedPrimaryColor[1];
-                            outB = parsedPrimaryColor[2];
-                        } else {
-                            outR = parsedSecondaryColor[0];
-                            outG = parsedSecondaryColor[1];
-                            outB = parsedSecondaryColor[2];
-                        }
+                    let ditherThreshold: number;
+                    if (isBayer) {
+                        ditherThreshold = bayerRow[x % matrixSize];
+                    } else if (ditherMode === "noise") {
+                        const noiseVal = Math.sin(x * 12.9898 + y * 78.233 + time * 100) * 43758.5453;
+                        const fract = noiseVal - Math.floor(noiseVal);
+                        ditherThreshold = fract * (1 - threshold) + threshold * 0.5;
                     } else {
-                        const dark = luminance < ditherThreshold;
-                        const c = dark ? 0 : 255;
-                        outR = c; outG = c; outB = c;
+                        ditherThreshold = 0.5;
                     }
 
-                    if (invert) {
-                        outR = 255 - outR;
-                        outG = 255 - outG;
-                        outB = 255 - outB;
-                    }
-
-                    outputData[idx] = outR;
-                    outputData[idx + 1] = outG;
-                    outputData[idx + 2] = outB;
-                    outputData[idx + 3] = 255;
+                    // Single 32-bit integer write per pixel
+                    outputBuf32[pixelIdx] = luminance < ditherThreshold ? darkColor32 : lightColor32;
                 }
             }
 
-            ctx.putImageData(outputImage, 0, 0);
+            ctx.putImageData(outputImageRef.current, 0, 0);
         },
         [
-            gridSize, ditherMode, colorMode, invert,
-            parsedPrimaryColor, parsedSecondaryColor,
-            brightness, contrast, threshold,
-            enableHover, hoverRadius, isScanMode,
-            scanDuration
+            gridSize, ditherMode, darkColor32, lightColor32,
+            brightness, contrast, threshold, thresholdMatrix,
+            enableHover, hoverRadius, isScanMode, scanDuration
         ]
     );
 
@@ -356,8 +368,9 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         const canvas = canvasRef.current;
         if (!canvas || dimensions.width === 0 || dimensions.height === 0) return;
 
-        const internalWidth = Math.floor(dimensions.width / Math.max(1, gridSize));
-        const internalHeight = Math.floor(dimensions.height / Math.max(1, gridSize));
+        const effectiveGridSize = Math.max(1, gridSize);
+        const internalWidth = Math.floor(dimensions.width / effectiveGridSize);
+        const internalHeight = Math.floor(dimensions.height / effectiveGridSize);
 
         canvas.width = internalWidth;
         canvas.height = internalHeight;
@@ -365,11 +378,14 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) return;
 
+        // Pre-allocate persistent ImageData and Uint32 view (Zero GC pressure)
+        outputImageRef.current = ctx.createImageData(internalWidth, internalHeight);
+        outputBuf32Ref.current = new Uint32Array(outputImageRef.current.data.buffer);
+
         const prepareSource = () => {
             if (!imageRef.current) return;
             const img = imageRef.current;
-            
-            if (img.naturalWidth === 0 || img.naturalHeight === 0) return; // Prevent empty draws
+            if (img.naturalWidth === 0 || img.naturalHeight === 0) return;
 
             const offscreen = document.createElement("canvas");
             let dw = internalWidth;
@@ -396,20 +412,40 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
 
         const startLoop = () => {
             let cancel = false;
+            let lastFrameTime = 0;
+
             const loop = (timestamp: number) => {
                 if (cancel) return;
-                timeRef.current += animationSpeed;
-                const elapsedSeconds = (timestamp || performance.now()) / 1000;
-                if (sourceDataRef.current) {
-                    renderLoop(ctx, internalWidth, internalHeight, timeRef.current, elapsedSeconds);
+
+                // Automatically pause loop when tab is in background to save CPU and battery
+                if (document.hidden) {
+                    animationRef.current = requestAnimationFrame(loop);
+                    return;
                 }
+
+                const now = timestamp || performance.now();
+                const delta = now - lastFrameTime;
+
+                if (delta >= FRAME_INTERVAL) {
+                    lastFrameTime = now - (delta % FRAME_INTERVAL);
+                    timeRef.current += animationSpeed;
+                    const elapsedSeconds = now / 1000;
+                    if (sourceDataRef.current) {
+                        renderLoop(ctx, internalWidth, internalHeight, timeRef.current, elapsedSeconds);
+                    }
+                }
+
                 if (animated || enableHover || isScanMode) {
                     animationRef.current = requestAnimationFrame(loop);
                 }
             };
+
             prepareSource();
             loop(performance.now());
-            return () => { cancel = true; if (animationRef.current) cancelAnimationFrame(animationRef.current); };
+            return () => {
+                cancel = true;
+                if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            };
         };
 
         const currentSrc = imageRef.current?.getAttribute('src') || imageRef.current?.src || '';
@@ -428,18 +464,15 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             img.onerror = () => {
                 console.error(`Failed to load dither image: ${src}`);
             };
-            
-            // Start loop immediately with previous sourceData to avoid black screen
+
             return startLoop();
         }
-
     }, [src, dimensions, gridSize, renderLoop, animated, animationSpeed, enableHover, objectFit, isScanMode]);
 
     return (
         <div
             ref={containerRef}
             className={cn("relative h-full w-full overflow-hidden", className)}
-        // onMouseLeave={handleMouseLeave} // Optional: keep if we want to reset on window leave, but for now user wants persistence
         >
             <canvas
                 ref={canvasRef}

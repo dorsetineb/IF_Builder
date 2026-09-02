@@ -1488,4 +1488,38 @@ const SceneMap: React.FC<SceneMapProps> = ({
   );
 };
 
-export default SceneMap;
+export default React.memo(SceneMap, (prevProps, nextProps) => {
+  if (prevProps.selectedSceneId !== nextProps.selectedSceneId) return false;
+  if (prevProps.startSceneId !== nextProps.startSceneId) return false;
+  if (prevProps.gameInteractionType !== nextProps.gameInteractionType) return false;
+  if (prevProps.gameTitle !== nextProps.gameTitle) return false;
+  if (prevProps.isSidebarOpen !== nextProps.isSidebarOpen) return false;
+  if (prevProps.isNarrativeMenuOpen !== nextProps.isNarrativeMenuOpen) return false;
+  if (prevProps.hasOpeningVignette !== nextProps.hasOpeningVignette) return false;
+  if (prevProps.vignettes !== nextProps.vignettes) return false;
+  if (prevProps.globalObjects !== nextProps.globalObjects) return false;
+
+  const prevKeys = Object.keys(prevProps.allScenesMap || {});
+  const nextKeys = Object.keys(nextProps.allScenesMap || {});
+  if (prevKeys.length !== nextKeys.length) return false;
+
+  for (let i = 0; i < nextKeys.length; i++) {
+    const key = nextKeys[i];
+    const prevScene = prevProps.allScenesMap[key];
+    const nextScene = nextProps.allScenesMap[key];
+    if (!prevScene || !nextScene) return false;
+
+    // Topology & position changes
+    if (prevScene.mapX !== nextScene.mapX || prevScene.mapY !== nextScene.mapY) return false;
+    if (prevScene.name !== nextScene.name || prevScene.image !== nextScene.image) return false;
+    if (prevScene.isEndingScene !== nextScene.isEndingScene) return false;
+    if (prevScene.vignetteNextSceneId !== nextScene.vignetteNextSceneId) return false;
+    if (prevScene.vignetteType !== nextScene.vignetteType) return false;
+    if (prevScene.removesChanceOnEntry !== nextScene.removesChanceOnEntry) return false;
+    if (prevScene.choices !== nextScene.choices) return false;
+    if (prevScene.interactions !== nextScene.interactions) return false;
+    if (prevScene.stackCards !== nextScene.stackCards) return false;
+  }
+
+  return true;
+});

@@ -6,10 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeProvider';
 import { useTypography, fontScales } from './TypographyProvider';
 import { GameData } from '../types';
-import Preview from './Preview';
 import { getDitherColors } from '../utils/themeStyles';
 import { APP_VERSION } from '../version';
 import { IFBuilderLogo } from './IFBuilderLogo';
+
+const Preview = React.lazy(() => import('./Preview'));
 
 type LandingView = 'landing' | 'about' | 'play';
 
@@ -259,15 +260,22 @@ export function Auth() {
                             <p className="animate-pulse font-mono text-xs uppercase tracking-widest">{t('common.loading', 'Carregando...')}</p>
                         </div>
                     ) : demoData ? (
-                        <Preview
-                            gameData={demoData}
-                            basePath={i18n.language.startsWith('pt')
-                                ? "/fuja_da_masmorra"
-                                : i18n.language.startsWith('es')
-                                ? "/escapa_la_mazmorra"
-                                : "/escape_the_dungeon"
-                            }
-                        />
+                        <React.Suspense fallback={
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary bg-black/40">
+                                <Loader2 className="w-8 h-8 animate-spin" />
+                                <p className="animate-pulse font-mono text-xs uppercase tracking-widest">{t('common.loading', 'Carregando...')}</p>
+                            </div>
+                        }>
+                            <Preview
+                                gameData={demoData}
+                                basePath={i18n.language.startsWith('pt')
+                                    ? "/fuja_da_masmorra"
+                                    : i18n.language.startsWith('es')
+                                    ? "/escapa_la_mazmorra"
+                                    : "/escape_the_dungeon"
+                                }
+                            />
+                        </React.Suspense>
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-red-500 font-mono text-xs uppercase tracking-widest">
                             ERROR: FAILED_TO_LOAD_DATA
@@ -306,12 +314,12 @@ export function Auth() {
                     primaryColor={ditherColors.primary}
                     secondaryColor={ditherColors.secondary}
                     invert={false}
-                    animated={true}
+                    animated={currentView !== 'play'}
                     animationSpeed={0.005}
                     className="w-full h-full"
                     objectFit="cover"
-                    enableHover={!isMobile}
-                    isScanMode={true}
+                    enableHover={!isMobile && currentView === 'landing'}
+                    isScanMode={currentView !== 'play'}
                     hoverRadius={433}
                     scanDuration={6.0}
                 />

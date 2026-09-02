@@ -230,10 +230,35 @@ export default defineConfig(({ mode }) => {
       drop: isProduction ? ['console', 'debugger'] : [],
     },
     build: {
-      chunkSizeWarningLimit: 2000,
+      chunkSizeWarningLimit: 1000,
       sourcemap: false,
       rollupOptions: {
-        external: [/^@tauri-apps\/.*/]
+        external: [/^@tauri-apps\/.*/],
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'vendor-react';
+              }
+              if (id.includes('i18next') || id.includes('react-i18next')) {
+                return 'vendor-i18n';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
+              if (id.includes('dompurify')) {
+                return 'vendor-dompurify';
+              }
+            }
+            if (
+              id.includes('src/components/gameJS') ||
+              id.includes('src/lib/gameDefaults') ||
+              id.includes('src/components/game-engine')
+            ) {
+              return 'game-engine-bundle';
+            }
+          }
+        }
       }
     }
   };
