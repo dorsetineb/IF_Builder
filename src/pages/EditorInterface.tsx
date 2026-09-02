@@ -140,7 +140,7 @@ export const EditorInterface: React.FC<{ hideHeader?: boolean }> = ({ hideHeader
                                 >
                                     <option value="Silkscreen">Silkscreen</option>
                                     <option value="Space Grotesk">Space Grotesk</option>
-                                    <option value="EB Garamond">EB Garamond</option>
+                                    <option value="Habibi">Habibi</option>
                                 </select>
                                 <p className="text-[10px] text-muted-foreground italic leading-relaxed">
                                     {t('editorInterface.readability.description', 'Ajuste o tamanho geral e selecione a fonte principal da interface.')}

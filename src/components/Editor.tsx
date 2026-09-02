@@ -61,6 +61,8 @@ const NewProjectModal = lazy(() =>
 const UserManualModal = lazy(() => import('./UserManualModal'));
 const NodeTypeModal = lazy(() => import('./NodeTypeModal'));
 const Preview = lazy(() => import('./Preview'));
+const AboutProject = lazy(() => import('../pages/AboutProject'));
+const EditorInterface = lazy(() => import('../pages/EditorInterface'));
 import { ConfirmationModal } from './ConfirmationModal';
 import { TransitionScreen } from './TransitionScreen';
 import { IFBuilderLogo } from './IFBuilderLogo';
@@ -1805,8 +1807,16 @@ const Editor: React.FC = () => {
               </Suspense>
             )}
 
-            {currentView === 'about' && <AboutProject hideHeader />}
-            {currentView === 'editor_interface' && <EditorInterface hideHeader />}
+            {currentView === 'about' && (
+              <Suspense fallback={<LoadingOverlay message="Carregando..." />}>
+                <AboutProject hideHeader />
+              </Suspense>
+            )}
+            {currentView === 'editor_interface' && (
+              <Suspense fallback={<LoadingOverlay message="Carregando..." />}>
+                <EditorInterface hideHeader />
+              </Suspense>
+            )}
           </main>
         </div>
       </div>

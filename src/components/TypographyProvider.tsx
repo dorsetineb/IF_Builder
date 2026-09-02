@@ -31,15 +31,17 @@ export const fontScales: Record<string, Record<string, number>> = {
     "Space Grotesk": {
         xs: 11, sm: 11, base: 13, lg: 13, xl: 15, "2xl": 17, "3xl": 19, "10px": 10
     },
-    "EB Garamond": {
-        xs: 13, sm: 13, base: 15, lg: 15, xl: 17, "2xl": 19, "3xl": 21, "10px": 12
+    "Habibi": {
+        xs: 11, sm: 11, base: 13, lg: 13, xl: 15, "2xl": 17, "3xl": 19, "10px": 10
     }
 }
 
 export function TypographyProvider({ children }: TypographyProviderProps) {
-    const [fontFamily, setFontFamily] = useState<string>(
-        () => localStorage.getItem("if-builder-font-family") || "Space Grotesk"
-    )
+    const [fontFamily, setFontFamily] = useState<string>(() => {
+        const saved = localStorage.getItem("if-builder-font-family");
+        if (saved === "EB Garamond" || saved === "Goudy Bookletter 1911") return "Habibi";
+        return saved || "Space Grotesk";
+    })
     const [fontSizeScale, setFontSizeScale] = useState<FontSizeScale>(
         () => (localStorage.getItem("if-builder-font-size") as FontSizeScale) || "medium"
     )

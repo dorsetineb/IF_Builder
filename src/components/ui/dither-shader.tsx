@@ -410,6 +410,12 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             }
         };
 
+        const renderSingleFrame = () => {
+            if (sourceDataRef.current) {
+                renderLoop(ctx, internalWidth, internalHeight, timeRef.current, performance.now() / 1000);
+            }
+        };
+
         const startLoop = () => {
             let cancel = false;
             let lastFrameTime = 0;
@@ -441,7 +447,10 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             };
 
             prepareSource();
-            loop(performance.now());
+            renderSingleFrame();
+            if (animated || enableHover || isScanMode) {
+                animationRef.current = requestAnimationFrame(loop);
+            }
             return () => {
                 cancel = true;
                 if (animationRef.current) cancelAnimationFrame(animationRef.current);
@@ -460,6 +469,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             img.onload = () => {
                 imageRef.current = img;
                 prepareSource();
+                renderSingleFrame();
             };
             img.onerror = () => {
                 console.error(`Failed to load dither image: ${src}`);
