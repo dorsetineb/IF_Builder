@@ -18,14 +18,39 @@ fn main() {
 
     // If running inside AppImage, route GStreamer to bundled plugins to prevent host ABI mismatches
     if let Ok(appdir) = std::env::var("APPDIR") {
-      let gst_plugins = format!("{}/usr/lib/x86_64-linux-gnu/gstreamer-1.0", appdir);
-      let gst_scanner = format!("{}/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner", appdir);
-      if std::path::Path::new(&gst_plugins).exists() {
-        std::env::set_var("GST_PLUGIN_SYSTEM_PATH_1_0", &gst_plugins);
-        std::env::set_var("GST_PLUGIN_PATH_1_0", &gst_plugins);
+      let candidate_plugin_dirs = [
+        format!("{}/usr/lib/x86_64-linux-gnu/gstreamer-1.0", appdir),
+        format!("{}/usr/lib/gstreamer-1.0", appdir),
+        format!("{}/usr/lib64/gstreamer-1.0", appdir),
+        format!("{}/usr/lib/gstreamer1.0", appdir),
+      ];
+
+      let mut found_plugins = Vec::new();
+      for dir in &candidate_plugin_dirs {
+        if std::path::Path::new(dir).is_dir() {
+          found_plugins.push(dir.clone());
+        }
       }
-      if std::path::Path::new(&gst_scanner).exists() {
-        std::env::set_var("GST_PLUGIN_SCANNER_1_0", &gst_scanner);
+
+      if !found_plugins.is_empty() {
+        let joined = found_plugins.join(":");
+        std::env::set_var("GST_PLUGIN_SYSTEM_PATH_1_0", &joined);
+        std::env::set_var("GST_PLUGIN_PATH_1_0", &joined);
+      }
+
+      let candidate_scanners = [
+        format!("{}/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner", appdir),
+        format!("{}/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner", appdir),
+        format!("{}/usr/libexec/gstreamer-1.0/gst-plugin-scanner", appdir),
+        format!("{}/usr/lib/x86_64-linux-gnu/gstreamer-1.0/gst-plugin-scanner", appdir),
+        format!("{}/usr/lib/gstreamer-1.0/gst-plugin-scanner", appdir),
+      ];
+
+      for scanner in &candidate_scanners {
+        if std::path::Path::new(scanner).is_file() {
+          std::env::set_var("GST_PLUGIN_SCANNER_1_0", scanner);
+          break;
+        }
       }
     }
   }
