@@ -89,10 +89,62 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <div className="space-y-6 lg:col-span-7 xl:col-span-8 transition-all duration-300">
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
                             <div>
-                                <div className="space-y-6 text-white leading-relaxed font-light text-sm mb-8">
-                                    <p>{t('about.project.p1', 'O IF Builder é um editor de ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
-                                    <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
-                                    <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
+                                <div className="space-y-6 mb-8">
+                                    <div className="space-y-4 text-zinc-200 leading-relaxed font-light text-sm">
+                                        <p>{t('about.project.p1', 'O IF Builder é um editor de ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
+                                        <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o usuário e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o usuário tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
+                                        <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                        <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col gap-1.5 shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                                                <h4 className="font-bold text-white text-xs tracking-wide uppercase">
+                                                    {t('about.project.bullet1Title', 'Mapa Narrativo')}
+                                                </h4>
+                                            </div>
+                                            <p className="text-zinc-400 text-xs leading-relaxed pl-4">
+                                                {t('about.project.bullet1Desc', 'Acompanhe o fluxo narrativo do seu projeto através de um mapa de ramificações.')}
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col gap-1.5 shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                                                <h4 className="font-bold text-white text-xs tracking-wide uppercase">
+                                                    {t('about.project.bullet2Title', 'Rastreadores')}
+                                                </h4>
+                                            </div>
+                                            <p className="text-zinc-400 text-xs leading-relaxed pl-4">
+                                                {t('about.project.bullet2Desc', 'Adicione rastreadores numéricos como vida, energia ou sanidade para moldar as consequências das decisões.')}
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col gap-1.5 shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                                                <h4 className="font-bold text-white text-xs tracking-wide uppercase">
+                                                    {t('about.project.bullet3Title', 'Interações por texto (PARSER) ou Escolha (IF)')}
+                                                </h4>
+                                            </div>
+                                            <p className="text-zinc-400 text-xs leading-relaxed pl-4">
+                                                {t('about.project.bullet3Desc', 'Avance nas histórias com descrições textuais (PARSER) ou botões de ação tradicionais (IF)')}
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col gap-1.5 shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                                                <h4 className="font-bold text-white text-xs tracking-wide uppercase">
+                                                    {t('about.project.bullet4Title', 'Exporte para .zip ou .html')}
+                                                </h4>
+                                            </div>
+                                            <p className="text-zinc-400 text-xs leading-relaxed pl-4">
+                                                {t('about.project.bullet4Desc', 'Gere arquivos independentes de internet. Carregue-os no IF Builder para editá-los, ou execute-os diretamente no navegador.')}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Desktop Installer Banner (Web vs Desktop App) */}

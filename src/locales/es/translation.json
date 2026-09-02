@@ -150,8 +150,16 @@
     },
     "project": {
       "p1": "IF Builder es un editor de ficciones interactivas - narrativas textuales donde quien juega decide qué pasará a continuación.",
-      "p2": "Aquí, las ficciones interactivas se escriben en ramificaciones. Es fácil visualizar a dónde lleva cada elección al jugador y cómo se cruzan los caminos. Si quieres que algo suceda solo si el jugador tiene un objeto específico o si ha tomado una decisión previa, el editor se encarga de eso.",
-      "p3": "Al terminar, el editor exporta un archivo .zip que funciona en cualquier navegador. Tu historia sale del editor y va directo a quien quiera jugar. Y si esa persona usa IF Builder, puede importar el archivo .zip en el editor y ver cómo creaste tu historia. ¿Quién sabe, tal vez hacer un remix?"
+      "p2": "Aquí, las ficciones interactivas se escriben en ramificaciones. Es fácil visualizar a dónde lleva cada elección al usuario y cómo se cruzan los caminos. Si quieres que algo suceda solo si el usuario tiene un objeto específico o si ha tomado una decisión previa, el editor se encarga de eso.",
+      "p3": "Al terminar, el editor exporta un archivo .zip que funciona en cualquier navegador. Tu historia sale del editor e va directo a quien quiera jugar. Y si esa persona usa IF Builder, puede importar el archivo .zip en el editor y ver cómo creaste tu historia. ¿Quién sabe, tal vez hacer un remix?",
+      "bullet1Title": "Mapa Narrativo",
+      "bullet1Desc": "Sigue el flujo narrativo de tu proyecto a través de un mapa de ramificaciones.",
+      "bullet2Title": "Rastreadores",
+      "bullet2Desc": "Añade rastreadores numéricos como vida, energía o cordura para moldear las consecuencias de las decisiones.",
+      "bullet3Title": "Interacciones por texto (PARSER) o Selección (IF)",
+      "bullet3Desc": "Avanza en las historias con descripciones textuales (PARSER) o botones de acción tradicionales (IF).",
+      "bullet4Title": "Exportar a .zip o .html",
+      "bullet4Desc": "Genera archivos independientes de internet. Cárgalos en IF Builder para editarlos, o ejecútalos directamente en el navegador."
     },
     "versions": {
       "desktopBannerTitle": "Descarga IFBuilder para Escritorio",

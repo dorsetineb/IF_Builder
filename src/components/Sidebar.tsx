@@ -218,20 +218,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
       <div className="mt-auto pt-2 pb-4 pl-3 pr-0 flex flex-col gap-1 relative border-t border-muted-foreground/50 bg-card z-20 flex-shrink-0">
         <button
-          onClick={() => onSetView('guide')}
-          className={getButtonClass('guide')}
-          title={isCollapsed ? t('sidebar.quickGuide', 'Guia Rápido') : undefined}
-        >
-          <div
-            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`}
-          />
-          <CircleHelp className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
-          )}
-        </button>
-
-        <button
           onClick={() => handleSetView('about')}
           className={getButtonClass('about')}
           title={isCollapsed ? t('sidebar.aboutProject', 'Sobre o Projeto') : undefined}
@@ -244,6 +230,20 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <span className="truncate relative z-10">
               {t('sidebar.aboutProject', 'Sobre o Projeto')}
             </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => onSetView('guide')}
+          className={getButtonClass('guide')}
+          title={isCollapsed ? t('sidebar.quickGuide', 'Guia Rápido') : undefined}
+        >
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`}
+          />
+          <CircleHelp className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
           )}
         </button>
 

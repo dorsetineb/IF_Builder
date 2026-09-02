@@ -153,7 +153,15 @@
     "project": {
       "p1": "O IF Builder é um editor de ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.",
       "p2": "Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o usuário e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o usuário tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.",
-      "p3": "Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?"
+      "p3": "Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?",
+      "bullet1Title": "Mapa Narrativo",
+      "bullet1Desc": "Acompanhe o fluxo narrativo do seu projeto através de um mapa de ramificações.",
+      "bullet2Title": "Rastreadores",
+      "bullet2Desc": "Adicione rastreadores numéricos como vida, energia ou sanidade para moldar as consequências das decisões.",
+      "bullet3Title": "Interações por texto (PARSER) ou Escolha (IF)",
+      "bullet3Desc": "Avance nas histórias com descrições textuais (PARSER) ou botões de ação tradicionais (IF)",
+      "bullet4Title": "Exporte para .zip ou .html",
+      "bullet4Desc": "Gere arquivos independentes de internet. Carregue-os no IF Builder para editá-los, ou execute-os diretamente no navegador."
     },
     "versions": {
       "desktopBannerTitle": "Baixe o IFBuilder para Desktop",

@@ -130,8 +130,16 @@
     },
     "project": {
       "p1": "IF Builder is an interactive fiction editor - textual narratives where the player decides what happens next.",
-      "p2": "Here, interactive fictions are written in branches. It's easy to visualize where each choice takes the player and how paths cross. If you want something to happen only if the player has a specific item or made a previous choice, the editor easily handles that.",
-      "p3": "When finished, the editor exports a .zip file that works in any browser. Your story leaves the editor and goes straight to whoever wants to play. And if that person uses IF Builder, they can import the .zip file into the editor and see how you created your story. Maybe even make a remix?"
+      "p2": "Here, interactive fictions are written in branches. It's easy to visualize where each choice takes the user and how paths cross. If you want something to happen only if the user has a specific item or made a previous choice, the editor easily handles that.",
+      "p3": "When finished, the editor exports a .zip file that works in any browser. Your story leaves the editor and goes straight to whoever wants to play. And if that person uses IF Builder, they can import the .zip file into the editor and see how you created your story. Maybe even make a remix?",
+      "bullet1Title": "Narrative Map",
+      "bullet1Desc": "Track the structure of your project graphically through the branch map.",
+      "bullet2Title": "Trackers",
+      "bullet2Desc": "Add numerical trackers like health, energy, or sanity to shape the consequences of choices.",
+      "bullet3Title": "Text (PARSER) or Choice (IF) Interactions",
+      "bullet3Desc": "Offer your players traditional action buttons or the freedom of a text interpreter (parser).",
+      "bullet4Title": "Export to .zip or .html",
+      "bullet4Desc": "Generate .zip files independent of internet or servers. Just extract and play directly in the browser."
     },
     "versions": {
       "desktopBannerTitle": "Download IFBuilder for Desktop",

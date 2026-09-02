@@ -100,117 +100,123 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                 />
             </div>
 
-            <div className="relative z-10 w-full max-w-6xl p-8 flex flex-col lg:flex-row items-center justify-between gap-12 text-left">
-                {/* Coluna Esquerda: Texto descritivo e bullet points */}
-                <div className="flex-1 max-w-2xl">
-                    <h2 className="text-2xl font-extrabold text-white mb-6 tracking-tight">
-                        {t('welcome.title', 'Bem-vindo ao IF Builder')}
-                    </h2>
-                    <p className="text-zinc-300 text-xs leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: t('welcome.description', 'Esta é uma ferramenta para autores criarem <strong>ficções interativas</strong> sem complicação. Crie narrativas ramificadas, controle as ações possíveis e compile histórias inteiras em um arquivo.') }} />
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <div>
-                                <h4 className="font-bold text-zinc-100 text-xs tracking-wide uppercase">
-                                    {t('welcome.bullet1Title', 'Mapa Narrativo')}
-                                </h4>
-                                <p className="text-zinc-400 text-[10px] mt-1 leading-normal">
-                                    {t('welcome.bullet1Desc', 'Acompanhe o fluxo narrativo do seu projeto através de um mapa de ramificações.')}
-                                </p>
-                            </div>
-                        </div>
+            <div className="relative z-10 w-full max-w-4xl px-4 py-8 flex flex-col items-center justify-center text-center">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+                    {t('welcome.title', 'Bem-vindo ao IF Builder')}
+                </h1>
+                <p className="text-zinc-300 text-xs sm:text-sm font-semibold mb-8">
+                    {t('welcome.subtitle', 'O que você quer fazer?')}
+                </p>
 
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <div>
-                                <h4 className="font-bold text-zinc-100 text-xs tracking-wide uppercase">
-                                    {t('welcome.bullet2Title', 'Rastreadores')}
-                                </h4>
-                                <p className="text-zinc-400 text-[10px] mt-1 leading-normal">
-                                    {t('welcome.bullet2Desc', 'Adicione rastreadores numéricos como vida, energia ou sanidade para moldar as consequências das decisões.')}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <div>
-                                <h4 className="font-bold text-zinc-100 text-xs tracking-wide uppercase">
-                                    {t('welcome.bullet3Title', 'Interações por texto (PARSER) ou Escolha (IF)')}
-                                </h4>
-                                <p className="text-zinc-400 text-[10px] mt-1 leading-normal">
-                                    {t('welcome.bullet3Desc', 'Avance nas histórias com descrições textuais (PARSER) ou botões de ação tradicionais (IF)')}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <div>
-                                <h4 className="font-bold text-zinc-100 text-xs tracking-wide uppercase">
-                                    {t('welcome.bullet4Title', 'Exporte para .zip ou .html')}
-                                </h4>
-                                <p className="text-zinc-400 text-[10px] mt-1 leading-normal">
-                                    {t('welcome.bullet4Desc', 'Gere arquivos independentes de internet. Carregue-os no IF Builder para editá-los, ou execute-os diretamente no navegador.')}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Coluna Direita: Botões */}
-                <div className="w-full lg:w-[400px] flex flex-col justify-center flex-shrink-0">
-                    <p className="text-white text-lg font-bold tracking-wide mb-6">
-                        {t('welcome.subtitle', 'O que você quer fazer?')}
-                    </p>
-                    <div className="grid grid-cols-2 gap-3 w-full">
-                        {/* Botão 1: Começar a Criar (Grande, no topo, ícone à esquerda) */}
-                        <button
-                            onClick={() => setIsNewProjectModalOpen(true)}
-                            className="group flex flex-row items-center justify-center gap-3 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20 col-span-2 w-full"
-                        >
-                            <div className="w-7 h-7 bg-primary group-hover:bg-white transition-colors flex-shrink-0" style={{ maskImage: 'url(/icons/criar.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/criar.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
-                        </button>
-
-                        {/* Botão 2: Jogar a Demo */}
-                        <button
-                            onClick={() => setIsGamePopupOpen(true)}
-                            className="group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
-                        >
-                            <div className="w-6 h-6 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/demo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/demo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('welcome.playDemo', 'Acesse a demo')}</span>
-                        </button>
-
-                        {/* Botão 3: Guia Rápido */}
-                        <button
-                            onClick={onGuidePage}
-                            className="group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full"
-                        >
-                            <CircleHelp className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
-                        </button>
-
-                        {/* Botão 4: Baixar Exemplo */}
-                        <button
-                            onClick={handleDownloadClick}
-                            className={`group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] rounded-xl border hover:scale-[1.02] transition-all duration-300 ${isFlashing
-                                ? 'bg-white border-white scale-[1.02]'
-                                : 'bg-black/40 backdrop-blur-sm border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50'
-                                }`}
-                        >
-                            <div className={`w-6 h-6 transition-colors ${isFlashing ? 'bg-white' : 'bg-primary group-hover:bg-white'}`} style={{ maskImage: 'url(/icons/exemplo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/exemplo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
-                            <span className={`font-bold text-sm uppercase tracking-wide transition-colors text-center ${isFlashing ? (theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
-                        </button>
-
-                        {/* Botão 5: Sobre o Projeto */}
+                <div className="flex flex-col items-center gap-4 w-full">
+                    {/* Linha 1: 2 botões (Sobre o Projeto e Guia Rápido) */}
+                    <div className="flex flex-wrap justify-center gap-4 w-full">
+                        {/* Botão: Sobre o Projeto */}
                         <button
                             onClick={onMeetProject}
-                            className="group flex flex-col items-center justify-center gap-2 p-4 min-h-[72px] bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full"
+                            className="group flex flex-col items-center justify-center gap-3 w-48 sm:w-56 h-32 sm:h-36 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20 p-5 cursor-pointer"
                         >
-                            <Zap className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
-                            <span className="font-bold text-zinc-200 text-sm uppercase tracking-wide group-hover:text-white transition-colors text-center">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                            <Zap className="w-7 h-7 text-primary group-hover:text-white transition-colors flex-shrink-0" />
+                            <span className="font-semibold text-zinc-200 text-sm tracking-wide group-hover:text-white transition-colors text-center px-2">
+                                {t('sidebar.aboutProject', 'Sobre o Projeto')}
+                            </span>
+                        </button>
+
+                        {/* Botão: Guia Rápido */}
+                        <button
+                            onClick={onGuidePage}
+                            className="group flex flex-col items-center justify-center gap-3 w-48 sm:w-56 h-32 sm:h-36 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20 p-5 cursor-pointer"
+                        >
+                            <CircleHelp className="w-7 h-7 text-primary group-hover:text-white transition-colors flex-shrink-0" />
+                            <span className="font-semibold text-zinc-200 text-sm tracking-wide group-hover:text-white transition-colors text-center px-2">
+                                {t('sidebar.quickGuide', 'Guia Rápido')}
+                            </span>
+                        </button>
+                    </div>
+
+                    {/* Linha 2: 3 botões (Crie uma ficção, Acesse a demo e Baixe um exemplo) */}
+                    <div className="flex flex-wrap justify-center gap-4 w-full">
+                        {/* Botão: Crie uma ficção */}
+                        <button
+                            onClick={() => setIsNewProjectModalOpen(true)}
+                            className="group flex flex-col items-center justify-center gap-3 w-48 sm:w-56 h-32 sm:h-36 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20 p-5 cursor-pointer"
+                        >
+                            <div
+                                className="w-7 h-7 bg-primary group-hover:bg-white transition-colors flex-shrink-0"
+                                style={{
+                                    maskImage: 'url(/icons/criar.svg)',
+                                    maskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                    WebkitMaskImage: 'url(/icons/criar.svg)',
+                                    WebkitMaskSize: 'contain',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                }}
+                            />
+                            <span className="font-semibold text-zinc-200 text-sm tracking-wide group-hover:text-white transition-colors text-center px-2">
+                                {t('welcome.createNew', 'Crie uma ficção')}
+                            </span>
+                        </button>
+
+                        {/* Botão: Jogar a Demo */}
+                        <button
+                            onClick={() => setIsGamePopupOpen(true)}
+                            className="group flex flex-col items-center justify-center gap-3 w-48 sm:w-56 h-32 sm:h-36 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20 p-5 cursor-pointer"
+                        >
+                            <div
+                                className="w-7 h-7 bg-primary group-hover:bg-white transition-colors flex-shrink-0"
+                                style={{
+                                    maskImage: 'url(/icons/demo.svg)',
+                                    maskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                    WebkitMaskImage: 'url(/icons/demo.svg)',
+                                    WebkitMaskSize: 'contain',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                }}
+                            />
+                            <span className="font-semibold text-zinc-200 text-sm tracking-wide group-hover:text-white transition-colors text-center px-2">
+                                {t('welcome.playDemo', 'Acesse a demo')}
+                            </span>
+                        </button>
+
+                        {/* Botão: Baixar Exemplo */}
+                        <button
+                            onClick={handleDownloadClick}
+                            className={`group flex flex-col items-center justify-center gap-3 w-48 sm:w-56 h-32 sm:h-36 rounded-xl border transition-all duration-300 shadow-lg shadow-black/20 p-5 cursor-pointer ${
+                                isFlashing
+                                    ? 'bg-white border-white scale-[1.02]'
+                                    : 'bg-black/40 backdrop-blur-sm border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02]'
+                            }`}
+                        >
+                            <div
+                                className={`w-7 h-7 transition-colors flex-shrink-0 ${
+                                    isFlashing ? 'bg-white' : 'bg-primary group-hover:bg-white'
+                                }`}
+                                style={{
+                                    maskImage: 'url(/icons/exemplo.svg)',
+                                    maskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                    WebkitMaskImage: 'url(/icons/exemplo.svg)',
+                                    WebkitMaskSize: 'contain',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                }}
+                            />
+                            <span
+                                className={`font-semibold text-sm tracking-wide transition-colors text-center px-2 ${
+                                    isFlashing
+                                        ? theme === 'terminal' || theme === 'dark'
+                                            ? 'text-primary-foreground'
+                                            : 'text-black'
+                                        : 'text-zinc-200 group-hover:text-white'
+                                }`}
+                            >
+                                {t('welcome.downloadExample', 'Baixe um exemplo')}
+                            </span>
                         </button>
                     </div>
                 </div>
