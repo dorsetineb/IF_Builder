@@ -6,24 +6,27 @@ import { APP_VERSION } from '../version';
 import { isDesktopApp, openExternalUrl } from '../utils/platform';
 import { DownloadInstallerModal } from '../components/DownloadInstallerModal';
 
-const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.10.6
+const DEVLOG_RELEASE_NOTES = `🚀 Atualizações e Melhorias da Versão v0.10.7
 
-• Correção Multimídia e Estabilidade do AppImage no Linux:
-  - Habilitação da flag nativa bundleMediaFramework no Tauri, garantindo que o plugin de áudio autoaudiosink (gst-plugins-good) e todas as dependências multimídia sejam empacotadas no .AppImage.
-  - Varredura dinâmica de diretórios e scanner de plugins do GStreamer no inicializador Rust, prevenindo travamentos (SIGABRT no MediaPlayerPrivateGStreamer) ao abrir o aplicativo ou iniciar demos.
-  - Atualização do CI no GitHub Actions com suporte completo a headers e plugins de áudio (incluindo pipewire e plugins-good-dev).
+• Otimizações Profundas de Performance e Carregamento:
+  - Redução de ~77% no bundle JavaScript inicial de carregamento (de 917 kB para 213 kB), acelerando drasticamente o início da aplicação.
+  - Implementação de Code-Splitting e carregamento sob demanda (lazy loading) para o motor de jogos, pré-visualizador e modais pesados (Novo Projeto, Manual do Usuário e Tipos de Nós).
+  - Eliminação de 16 fontes bloqueantes redundantes na inicialização do HTML, mantendo apenas as fontes da interface com carregamento swap não bloqueante.
+  - Desinstalação de 10 bibliotecas não utilizadas (Three.js, XYFlow, Quill, Express, GSAP), removendo 82 pacotes do repositório.
 
-• Camada de Efeitos Visuais (Overlays) nos Capítulos e Abertura:
-  - Reestruturação do empilhamento de camadas (z-index) para que efeitos como chuva, névoa, granulação, glitch, tv e outros ocorram estritamente sobre o painel de imagem/fundo.
-  - Textos narrativos, títulos e botões de interação (incluindo o botão "COMEÇAR" da vinheta de abertura) permanecem sempre em primeiro plano, garantindo máxima legibilidade.
+• Eficiência de CPU e Memória no Efeito Dither:
+  - Reutilização persistente de buffers de imagem em memória, eliminando por completo os picos de descarte no Garbage Collector (zero GC churn).
+  - Processamento e escrita direta de pixels em 32-bit (Uint32Array), acelerando os cálculos do canvas em até 4x.
+  - Resolução nativa 1:1 calibrada com o cursor, garantindo alinhamento pixel-perfect da lanterna com o mouse.
+  - Pausa automática do ciclo de renderização quando a aba ou janela estiver em segundo plano (document.hidden), economizando bateria e ciclos de processamento.
 
-• Transições por Interação e Controles Visuais:
-  - Suporte a transições personalizadas por interação (Fade, Slide, Zoom, etc.) com controle dedicado de tempo e velocidade.
-  - Ajuste de cores e contraste nos estados inativos do tema "Menta", comunicando com clareza botões desabilitados (como o botão de Pré-visualizar sem projeto).
-  - Ajustes de layout e espaçamento na barra lateral (Sidebar) para exibição sem truncamento.
+• Fluidez de Edição e Memoização de Grafos:
+  - Memoização do mapa de cenas (SceneMap) com comparador de topologia: a redação de textos, diálogos ou descrições no editor não recalcula mais os nós SVG nem a estrutura do grafo.
 
-• Testes e Confiabilidade:
-  - Cobertura de testes unitários expandida com 100% de sucesso na suíte do Vitest (33/33 testes aprovados).`;
+• Correções e Estabilidade do Editor:
+  - Correção da tela de boot e transição do Editor, garantindo inicialização imediata e suave.
+  - Correção do acionamento do modo Pré-visualizar (Preview) no cabeçalho do Editor com carregamento assíncrono resiliente.
+  - 100% de conformidade e aprovação nos testes automatizados do Vitest (33/33 testes aprovados).`;
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t, i18n } = useTranslation();
