@@ -1,20 +1,18 @@
-🚀 Atualizações e Melhorias da Versão v0.10.4
+🚀 Atualizações e Melhorias da Versão v0.10.6
 
-• Nova Identidade Visual e Logotipo Pixel-Art Vetorial:
-  - Implementação do novo logotipo com tipografia Spaceship e ícone retrô em SVG vetorial de alta definição (IFBuilderLogo, IFBuilderText, IFBuilderIcon).
-  - Atualização visual na tela de BIOS (logo 50% ampliado), tela de Início (com versionamento alinhado ao topo) e cabeçalho do editor.
-  - No cabeçalho do editor, exibe o logotipo textual completo quando expandido e o ícone de computador quando recolhido.
-  - Novos assets vetoriais de animação e identidade em src/assets/ (boi, humano, computador e logos).
+• Correção Multimídia e Estabilidade do AppImage no Linux:
+  - Habilitação da flag nativa bundleMediaFramework no Tauri, garantindo que o plugin de áudio autoaudiosink (gst-plugins-good) e todas as dependências multimídia sejam empacotadas no .AppImage.
+  - Varredura dinâmica de diretórios e scanner de plugins do GStreamer no inicializador Rust, prevenindo travamentos (SIGABRT no MediaPlayerPrivateGStreamer) ao abrir o aplicativo ou iniciar demos.
+  - Atualização do CI no GitHub Actions com suporte completo a headers e plugins de áudio (incluindo pipewire e plugins-good-dev).
 
-• Refinamentos de Layout e Interface do Usuário:
-  - Largura da barra lateral esquerda padronizada e compacta (w-48), eliminando espaços vazios.
-  - Botão inferior renomeado de "Interface do Editor" para "Interface" em todos os idiomas suportados.
-  - Correção no alinhamento e espaçamento inferior dos botões de interface nas ramificações exportadas.
-  - Correção no posicionamento e renderização imediata do painel de Sugestões nas ramificações.
-  - Padronização das notificações flutuantes (toasts), simplificando títulos e fornecendo mensagens contextuais claras.
+• Camada de Efeitos Visuais (Overlays) nos Capítulos e Abertura:
+  - Reestruturação do empilhamento de camadas (z-index) para que efeitos como chuva, névoa, granulação, glitch, tv e outros ocorram estritamente sobre o painel de imagem/fundo.
+  - Textos narrativos, títulos e botões de interação (incluindo o botão "COMEÇAR" da vinheta de abertura) permanecem sempre em primeiro plano, garantindo máxima legibilidade.
 
-• Internacionalização e Localização Completa (i18n):
-  - Guia Rápido: Tradução integral dos exemplos interativos, fluxograma narrativo do Mapa de Conexões, títulos de Temas, Efeitos visuais e avisos de segurança para Inglês e Espanhol.
-  - Rótulos e Mecânicas: Internacionalização dos campos e placeholders de Rolagem de Dados (Dice Roll Prefix, You rolled, Roll D6), tipos de dados e velocidades de transição.
-  - Abas de Pré-visualização: Sincronização dos seletores de visualização (Branches, Chapters, Main Menu).
-  - Editor de Cenários: Aba "Propriedades" devidamente localizada para todos os idiomas.
+• Transições por Interação e Controles Visuais:
+  - Suporte a transições personalizadas por interação (Fade, Slide, Zoom, etc.) com controle dedicado de tempo e velocidade.
+  - Ajuste de cores e contraste nos estados inativos do tema "Menta", comunicando com clareza botões desabilitados (como o botão de Pré-visualizar sem projeto).
+  - Ajustes de layout e espaçamento na barra lateral (Sidebar) para exibição sem truncamento.
+
+• Testes e Confiabilidade:
+  - Cobertura de testes unitários expandida com 100% de sucesso na suíte do Vitest (33/33 testes aprovados).

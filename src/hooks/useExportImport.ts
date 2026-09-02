@@ -970,12 +970,7 @@ DATE:        ${exportDate.toLocaleString()}
         cleanedScenes[id] = {
           ...cleanedScenes[id],
           objectIds: cleanedScenes[id].objectIds || [],
-          interactions: (cleanedScenes[id].interactions || []).map((inter: Interaction) => {
-            // Delete legacy custom transitions from interactions to ensure global settings are respected
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { transitionType, transitionSpeed, ...rest } = inter;
-            return rest;
-          }),
+          interactions: (cleanedScenes[id].interactions || []).map((inter: Interaction) => ({ ...inter })),
           mapX: undefined,
           mapY: undefined,
           isEndingScene: undefined,

@@ -11,6 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ColorInput } from '../UIEditor/ColorInput';
 import ImageUploadField from '../ui/ImageUploadField';
+import SceneSelectOptions from '../common/SceneSelectOptions';
 import {
   Sliders,
   MousePointerClick,
@@ -622,14 +623,13 @@ export const HotspotInspector: React.FC<HotspotInspectorProps> = ({
                 <select
                   value={hotspot.targetSceneId || ''}
                   onChange={(e) => handleFieldChange('targetSceneId', e.target.value)}
-                  className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+                  className="w-full bg-background border border-muted-foreground/30 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-colors [&>option]:bg-card [&>optgroup]:bg-card [&>optgroup]:font-bold [&>optgroup]:text-muted-foreground"
                 >
                   <option value="">{t('hypercard.selectScenePlaceholder', '-- Selecione a Cena no Mapa --')}</option>
-                  {allScenes.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({s.vignetteType && s.vignetteType !== 'none' ? 'Capítulo' : s.sceneType === 'hypercard_stack' ? 'Cenário' : 'Ramificação'})
-                    </option>
-                  ))}
+                  <SceneSelectOptions
+                    allScenes={allScenes}
+                    showId={true}
+                  />
                 </select>
               </div>
             )}

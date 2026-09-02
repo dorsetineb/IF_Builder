@@ -313,11 +313,16 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         <select
                                                             id="modalImageTransitionType"
                                                             value={imageTransitionType}
-                                                            onChange={(e) => setImageTransitionType(e.target.value as 'fade' | 'slide' | 'none')}
+                                                            onChange={(e) => setImageTransitionType(e.target.value as any)}
                                                             className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                         >
                                                             <option value="fade">{t('UIEditor.sistemas.transFade', 'Esmaecer (Fade)')}</option>
-                                                            <option value="slide">{t('UIEditor.sistemas.transSlide', 'Deslizar (Slide)')}</option>
+                                                            <option value="slide-left">{t('UIEditor.sistemas.transSlideLeft', 'Deslizar para Esquerda')}</option>
+                                                            <option value="slide-right">{t('UIEditor.sistemas.transSlideRight', 'Deslizar para Direita')}</option>
+                                                            <option value="slide-up">{t('UIEditor.sistemas.transSlideUp', 'Deslizar para Cima')}</option>
+                                                            <option value="slide-down">{t('UIEditor.sistemas.transSlideDown', 'Deslizar para Baixo')}</option>
+                                                            <option value="zoom">{t('UIEditor.sistemas.transZoom', 'Zoom In')}</option>
+                                                            <option value="blur">{t('UIEditor.sistemas.transBlur', 'Desfoque (Blur)')}</option>
                                                             <option value="none">{t('UIEditor.sistemas.transNone', 'Nenhuma')}</option>
                                                         </select>
                                                     </div>

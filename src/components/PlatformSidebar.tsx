@@ -29,12 +29,12 @@ const PlatformSidebar: React.FC = () => {
             <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isActive(to) ? 'translate-x-0' : ''}`} />
 
             <Icon size={isCollapsed ? 20 : 18} className={`flex-shrink-0 relative z-10 ${isActive(to) ? 'text-primary' : ''}`} />
-            {!isCollapsed && <span className="truncate relative z-10">{label}</span>}
+            {!isCollapsed && <span className="whitespace-nowrap relative z-10">{label}</span>}
         </Link>
     );
 
     return (
-        <aside className={`${isCollapsed ? 'w-20' : 'w-48'} bg-card border-r border-muted-foreground/50 flex flex-col h-full transition-all duration-300 relative`}>
+        <aside className={`${isCollapsed ? 'w-20' : 'w-56'} bg-card border-r border-muted-foreground/50 flex flex-col h-full transition-all duration-300 relative`}>
 
 
             {/* Logo aligned with Header - EXACT MATCH with Header.tsx */}
@@ -45,7 +45,7 @@ const PlatformSidebar: React.FC = () => {
                         <IFBuilderIcon className="w-5 h-5 text-foreground" />
                     </div>
                 ) : (
-                    <IFBuilderText className="h-3.5 w-auto max-w-[130px] text-foreground notranslate" />
+                    <IFBuilderText className="h-3.5 w-auto max-w-[150px] text-foreground notranslate" />
                 )}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
@@ -63,7 +63,7 @@ const PlatformSidebar: React.FC = () => {
                 >
                     <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-purple-500/20 to-transparent pointer-events-none" />
                     <Gamepad2 size={20} className="group-hover:scale-110 transition-transform text-primary relative z-10" />
-                    {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.openEditor', 'Abrir Editor')}</span>}
+                    {!isCollapsed && <span className="whitespace-nowrap relative z-10">{t('sidebar.openEditor', 'Abrir Editor')}</span>}
                 </Link>
 
                 {/* Dashboard Removed */}

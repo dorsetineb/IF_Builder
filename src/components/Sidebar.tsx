@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   return (
     <aside
-      className={`${isCollapsed ? 'w-20' : 'w-48'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
+      className={`${isCollapsed ? 'w-20' : 'w-56'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
     >
       <nav
         className={`flex flex-col flex-grow pl-3 pr-0 py-4 overflow-y-auto overflow-x-hidden`}
@@ -107,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <BookOpen className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <>
-                <span className="truncate relative z-10 flex-1 text-left">
+                <span className="whitespace-nowrap relative z-10 flex-1 text-left">
                   {t('sidebar.sceneEditor', 'Narrativa')}
                 </span>
                 {/* Arrow removed as requested */}
@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           />
           <SquareDashedMousePointer className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.mechanics', 'Mecânicas')}</span>
+            <span className="whitespace-nowrap relative z-10">{t('sidebar.mechanics', 'Mecânicas')}</span>
           )}
         </button>
 
@@ -146,7 +146,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           />
           <Palette className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.appearance', 'Estilo Visual')}</span>
+            <span className="whitespace-nowrap relative z-10">{t('sidebar.appearance', 'Estilo Visual')}</span>
           )}
         </button>
 
@@ -161,7 +161,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           />
           <Type className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.defaultTexts', 'Rótulos')}</span>
+            <span className="whitespace-nowrap relative z-10">{t('sidebar.defaultTexts', 'Rótulos')}</span>
           )}
         </button>
 
@@ -176,7 +176,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             />
             <Box className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
-              <span className="truncate relative z-10">{t('sidebar.objects', 'Objetos')}</span>
+              <span className="whitespace-nowrap relative z-10">{t('sidebar.objects', 'Objetos')}</span>
             )}
           </button>
         )}
@@ -193,7 +193,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             size={isCollapsed ? 20 : 16}
           />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.trackers', 'Rastreadores')}</span>
+            <span className="whitespace-nowrap relative z-10">{t('sidebar.trackers', 'Rastreadores')}</span>
           )}
         </button>
 
@@ -208,7 +208,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             />
             <MessageSquare className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
-              <span className="truncate relative z-10">
+              <span className="whitespace-nowrap relative z-10">
                 {t('sidebar.globalCommands', 'Verbos')}
               </span>
             )}
@@ -227,7 +227,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           />
           <Zap className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">
+            <span className="whitespace-nowrap relative z-10">
               {t('sidebar.aboutProject', 'Sobre o Projeto')}
             </span>
           )}
@@ -243,7 +243,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           />
           <CircleHelp className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+            <span className="whitespace-nowrap relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
           )}
         </button>
 
@@ -257,7 +257,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           />
           <Monitor className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.editorInterface', 'Interface')}</span>
+            <span className="whitespace-nowrap relative z-10">{t('sidebar.editorInterface', 'Interface')}</span>
           )}
         </button>
       </div>
