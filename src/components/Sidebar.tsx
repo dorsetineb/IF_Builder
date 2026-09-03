@@ -33,8 +33,6 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   isDirty?: boolean;
   theme?: string;
-  isNarrativeMenuOpen?: boolean;
-  onToggleNarrative?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
@@ -44,20 +42,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     onSetView,
     gameData,
     isCollapsed,
-    isNarrativeMenuOpen,
-    onToggleNarrative,
   } = props;
-
-  // Sync accordion state with current view
-  // Sync accordion state with current view
-  useEffect(() => {
-    // Only force collapse if we leave scenes/map view or the new three_panels view.
-    if (currentView !== 'scenes' && currentView !== 'map' && currentView !== 'three_panels') {
-      if (isNarrativeMenuOpen && onToggleNarrative) {
-          onToggleNarrative();
-      }
-    }
-  }, [currentView]); // Removed scenes.length dependency
 
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>

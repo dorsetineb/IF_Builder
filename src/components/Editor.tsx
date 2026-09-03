@@ -38,7 +38,6 @@ import SceneEditor from './SceneEditor';
 import { ErrorBoundary } from './ErrorBoundary';
 import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
-import SceneList from './SceneList';
 // import VignettesEditor from './VignettesEditor'; // Removed as integrated into SceneEditor
 import { LoadingOverlay } from './LoadingOverlay';
 import { APP_VERSION } from '../version';
@@ -851,7 +850,6 @@ const Editor: React.FC = () => {
 
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isNarrativeMenuOpen, setIsNarrativeMenuOpen] = useState(true);
 
   // Save Project States
   const [isSaving, setIsSaving] = useState(false);
@@ -884,23 +882,57 @@ const Editor: React.FC = () => {
 
   // BIOS Animation Sequence (runs once on mount)
   useEffect(() => {
-    // Play startup sound safely
-    try {
-      const startupSound = new Audio('/787576__nazarhk__pc-startup-sound.mp3');
-      startupSound.volume = 0.5;
-      startupSound.play().catch((e) => console.warn('BIOS sound autoplay blocked or failed:', e));
-    } catch (e) {
-      console.warn('BIOS sound playback skipped:', e);
-    }
+    // Play startup sound safely using Web Audio API + Blob fallback (handles Tauri protocols & lack of 206 partial content)
+    let audioCtx: AudioContext | null = null;
+    const playStartupSound = async () => {
+      try {
+        const response = await fetch('/787576__nazarhk__pc-startup-sound.mp3');
+        if (!response.ok) throw new Error('Fetch failed: ' + response.status);
+        const arrayBuffer = await response.arrayBuffer();
+
+        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+          if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+          }
+          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+          const source = audioCtx.createBufferSource();
+          const gainNode = audioCtx.createGain();
+          gainNode.gain.value = 0.5;
+          source.buffer = audioBuffer;
+          source.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          source.start(0);
+          return;
+        }
+      } catch (e) {
+        console.warn('Web Audio playback failed, trying Blob fallback:', e);
+      }
+
+      // Fallback to HTMLAudioElement with Blob URL
+      try {
+        const response = await fetch('/787576__nazarhk__pc-startup-sound.mp3');
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const startupSound = new Audio(blobUrl);
+        startupSound.volume = 0.5;
+        startupSound.play().catch((err) => console.warn('Blob audio play failed:', err));
+      } catch (e) {
+        console.warn('BIOS sound playback skipped:', e);
+      }
+    };
+
+    playStartupSound();
 
     const fullCommand = 'RUN IF-BUILDER.EXE';
 
-    // Step 1: Show prompt A:\> fast (0.5s)
+    // Step 1: Show prompt A:\> fast (0.3s)
     const timer1 = setTimeout(() => {
       setBiosStep(1);
-    }, 500);
+    }, 300);
 
-    // Step 2: Start typing command after 1.5s
+    // Step 2: Start typing command after 0.8s
     let typingInterval: ReturnType<typeof setInterval>;
     const timer2 = setTimeout(() => {
       setBiosStep(2);
@@ -912,18 +944,18 @@ const Editor: React.FC = () => {
         } else {
           clearInterval(typingInterval);
         }
-      }, 50); // Speed of typing: 50ms per char
-    }, 1500);
+      }, 45); // Speed of typing: 45ms per char (~800ms total)
+    }, 800);
 
-    // Step 3: Start fading out at 4s
+    // Step 3: Start fading out at 4.2s
     const timer3 = setTimeout(() => {
       setIsBiosFading(true);
-    }, 4000);
+    }, 4200);
 
-    // Finish: End animation after 5s (1s fade duration)
+    // Finish: End animation after 5.2s (1s fade duration)
     const timer4 = setTimeout(() => {
       setIsBiosFinished(true);
-    }, 5000);
+    }, 5200);
 
     return () => {
       clearTimeout(timer1);
@@ -931,6 +963,9 @@ const Editor: React.FC = () => {
       clearTimeout(timer3);
       clearTimeout(timer4);
       if (typingInterval) clearInterval(typingInterval);
+      if (audioCtx) {
+        try { audioCtx.close(); } catch (_) {}
+      }
     };
   }, []);
 
@@ -967,7 +1002,6 @@ const Editor: React.FC = () => {
     if (navData.type === 'scene') {
       setCurrentView('three_panels');
       setSelectedSceneId(navData.id);
-      setIsNarrativeMenuOpen(false);
       if (navData.tab) {
         setSidePanelTab(navData.tab);
       }
@@ -1106,7 +1140,6 @@ const Editor: React.FC = () => {
 
   const handleAddNodeType = (type: 'scene' | 'vignette' | 'hypercard_stack') => {
     setIsNodeTypeModalOpen(false);
-    setIsNarrativeMenuOpen(false);
     handleAddScene(type);
   };
 
@@ -1265,8 +1298,9 @@ const Editor: React.FC = () => {
       {/* Show BIOS animation as an overlay that fades out */}
       {!isBiosFinished && (
         <div 
-            className={`fixed inset-0 z-[10000] bg-black text-white font-['Silkscreen'] text-base md:text-lg p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}
+            className={`fixed inset-0 z-[10000] bg-black text-white text-base md:text-lg p-4 sm:p-8 flex flex-col justify-start overflow-y-auto selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}
             style={{
+                fontFamily: "'Silkscreen', 'Courier New', 'Lucida Console', 'Consolas', monospace",
                 "--text-base": "13px",
                 "--text-lg": "15px",
             } as React.CSSProperties}
@@ -1282,23 +1316,23 @@ const Editor: React.FC = () => {
                 `}</style>
           <div className="space-y-1 max-w-3xl">
             {/* Logo IFBUILDER */}
-            <div className="text-primary mb-8 pt-2">
-              <IFBuilderLogo className="w-full max-w-[630px] h-auto" />
+            <div className="text-primary mb-4 sm:mb-6 pt-1 sm:pt-2">
+              <IFBuilderLogo className="w-full max-w-[480px] sm:max-w-[540px] h-auto" />
             </div>
             <p>IF-BUILDER v.{APP_VERSION}</p>
-            <p className="mb-4">Copyright (C) 2026 @DORSETINEB</p>
+            <p className="mb-2 sm:mb-4">Copyright (C) 2026 @DORSETINEB</p>
 
             <p>System Memory: 640KB OK</p>
             <p>Extended Memory: 32MB OK</p>
             <p>Shadow RAM: Cached</p>
-            <br />
+            <div className="h-1.5" />
             <p>Detecting Primary Master ... IF_BUILDER_CORE</p>
             <p>Detecting Primary Slave ... USER_DATA</p>
-            <br />
+            <div className="h-1.5" />
             <p>Booting from Hard Disk...</p>
             <p>Loading interactive_fiction_engine.sys ... OK</p>
             <p>Mounting file system ... OK</p>
-            <br />
+            <div className="h-2" />
 
             {/* Prompt appears in Step 1 */}
             <div className={`flex items-center ${biosStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
@@ -1392,7 +1426,6 @@ const Editor: React.FC = () => {
             onHome={() => attemptNavigation({ type: 'action', action: () => {
               setCurrentView('welcome');
               setSelectedSceneId(null);
-              setIsNarrativeMenuOpen(false);
             }})}
             currentView={currentView}
           />
@@ -1417,8 +1450,6 @@ const Editor: React.FC = () => {
               }}
               isCollapsed={sidebarCollapsed}
               onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-              isNarrativeMenuOpen={isNarrativeMenuOpen}
-              onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
               isDirty={isDirty}
               theme={appTheme}
             />
@@ -1601,181 +1632,110 @@ const Editor: React.FC = () => {
                         gameInteractionType={gameData.gameInteractionType || 'parser'}
                         onAddNode={handleAddNodeType}
                         hasOpeningVignette={hasOpeningVignette}
-                        isSidebarOpen={isNarrativeMenuOpen}
+                        isSidebarOpen={!!selectedScene}
                         gameTitle={gameData.gameTitle}
-                        isNarrativeMenuOpen={isNarrativeMenuOpen}
-                        onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
                         selectedSceneId={selectedSceneId}
                         onDeleteScene={handleDeleteScene}
                       />
                     </Suspense>
                   </div>
-
-                  {/* Painel Direito: Navegador de Narrativas / Editor de Cena Contextual */}
+                                   {/* Painel Direito: Editor de Cena Contextual */}
                   <div 
                     className={`h-full bg-background border-l border-muted-foreground/50 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 overflow-hidden flex flex-col ${
-                      isNarrativeMenuOpen 
-                        ? 'w-1/3'
-                        : selectedScene
-                          ? selectedScene.sceneType === 'hypercard_stack' && isScenarioEditing
-                            ? 'w-full border-l-0'
-                            : isSidePanelExpanded ? 'w-1/2 min-w-[550px]' : 'w-1/3'
-                          : 'w-0 border-l-0'
+                      selectedScene
+                        ? selectedScene.sceneType === 'hypercard_stack' && isScenarioEditing
+                          ? 'w-full border-l-0'
+                          : isSidePanelExpanded ? 'w-1/2 min-w-[550px]' : 'w-1/3'
+                        : 'w-0 border-l-0'
                     }`}
                   >
-                    {((isNarrativeMenuOpen || selectedScene) && !isScenarioEditing) && (
-                        <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/50 shadow-md px-4 py-4 flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (isNarrativeMenuOpen) {
-                                    setIsNarrativeMenuOpen(false);
-                                  } else {
-                                    setIsNarrativeMenuOpen(true);
-                                  }
-                                }}
-                                className={`flex items-center gap-2 px-1 py-1 transition-colors group relative z-50 ${isNarrativeMenuOpen ? 'text-primary' : 'text-zinc-400 hover:text-white'}`}
-                                title={isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
-                              >
-                                <span className={`text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-current/30`}>
-                                  {isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
-                                </span>
-                              </button>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                                <button 
-                                  onClick={() => {
-                                    setIsNarrativeMenuOpen(false);
-                                    setSelectedSceneId(null);
-                                  }}
-                                  className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group flex items-center justify-center"
-                                  title={t('common.close', 'Fechar')}
-                                >
-                                  <X className="w-4 h-4 transition-transform group-hover:scale-110" />
-                                </button>
-                            </div>
-                        </div>
-                      )}
-
                     <div className="flex-1 overflow-y-auto">
-                      {isNarrativeMenuOpen ? (
-                        <div className="h-full flex flex-col pt-4 pb-2 transition-all">
-                          <SceneList
-                          scenes={scenesList}
-                          startSceneId={gameData.startScene}
-                          selectedSceneId={selectedSceneId}
-                          onSelectScene={(id) => {
-                            handleSelectScene(id);
-                            setIsNarrativeMenuOpen(false);
-                          }}
-                          onAddScene={() => setIsNodeTypeModalOpen(true)}
-                          onDeleteScene={handleDeleteScene}
-                          onReorderScenes={handleReorderScenes}
-                          isDirty={hasUnsavedTabChanges}
-                          theme={appTheme}
-                          currentView={currentView}
-                          isLateralMenu={true}
-                          onAddNode={handleAddNodeType}
-                          hasOpeningVignette={hasOpeningVignette}
-                          onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
-                          isNarrativeMenuOpen={isNarrativeMenuOpen}
-                          onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
-                        />
-                      </div>
-                    ) : selectedScene ? (
-                      <Suspense fallback={<LoadingOverlay message="Carregando Editor..." />}>
-                        <ErrorBoundary fallbackTitle="Erro ao carregar o Editor">
-                          {selectedScene.sceneType === 'hypercard_stack' ? (
-                            <HyperCardStackEditor
-                              key={`stack-editor-${selectedScene.id}`}
-                              scene={selectedScene}
-                              allScenes={scenesList}
-                              globalObjects={gameData.globalObjects}
-                              consequenceTrackers={consequenceTrackers}
-                              onUpdateScene={handleUpdateScene}
-                              onCopyScene={handleCopyScene}
-                              onCreateGlobalObject={handleCreateGlobalObject}
-                              onLinkObjectToScene={handleLinkObjectToScene}
-                              onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-                              onUpdateGlobalObject={handleUpdateGlobalObject}
-                              onTabChange={setSidePanelTab}
-                              onPreviewScene={(scene) => {
-                                setPreviewSceneId(scene.id);
-                                setIsPreviewing(true);
-                              }}
-                              isDirty={isDirty}
-                              onSetDirty={setIsDirty}
-                              onClose={() => {
-                                setIsScenarioEditing(false);
-                                setSelectedSceneId(null);
-                              }}
-                              isExpanded={isScenarioEditing}
-                              onToggleExpand={setIsScenarioEditing}
-                              onNavigateToTrackers={() => {
-                                setIsScenarioEditing(false);
-                                attemptNavigation({ type: 'view', view: 'trackers' });
-                              }}
-                              onViewMap={() => {
-                                setIsScenarioEditing(false);
-                                attemptNavigation({ type: 'view', view: 'map' });
-                              }}
-                            />
-                          ) : (
-                            <SceneEditor
-                              key={`side-editor-${selectedScene.id}`}
-                              scene={selectedScene}
-                              allScenes={scenesList}
-                              globalObjects={gameData.globalObjects}
-                              onUpdateScene={handleUpdateScene}
-                              onCopyScene={handleCopyScene}
-                              onCreateGlobalObject={handleCreateGlobalObject}
-                              onLinkObjectToScene={handleLinkObjectToScene}
-                              onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-                              onUpdateGlobalObject={handleUpdateGlobalObject}
-                              enableChances={
-                                (gameData.enableChances ?? detectedActiveSystems.chances) ||
-                                gameData.gameSystemEnabled === 'chances'
-                              }
-                              gameSystemEnabled={gameData.gameSystemEnabled}
-                              onPreviewScene={(scene) => {
-                                setPreviewSceneId(scene.id);
-                                setIsPreviewing(true);
-                              }}
-                              onSelectScene={handleSelectScene}
-                              isDirty={hasUnsavedTabChanges}
-                              onSetDirty={setHasUnsavedTabChanges}
-                              layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                              consequenceTrackers={consequenceTrackers}
-                              isStartScene={selectedScene.id === gameData.startScene}
-                              gameInteractionType={gameData.gameInteractionType || 'parser'}
-                              vignettes={gameData.vignettes || []}
-                              enableDiceRoll={gameData.enableDiceRoll ?? false}
-                              diceType={gameData.diceType || 'd20'}
-                              onViewMap={() => {}} // Redundant in three_panels
-                              globalSplashButtonText={gameData.gameSplashButtonText || ''}
-                              onUpdateGlobalSplashButtonText={(text) =>
-                                handleUpdateGameData('gameSplashButtonText', text)
-                              }
-                              isSidePanel={true}
-                              onClose={() => setSelectedSceneId(null)}
-                              onTabChange={setSidePanelTab}
-                              isNarrativeMenuOpen={isNarrativeMenuOpen}
-                              onToggleNarrative={() => {
-                                setIsNarrativeMenuOpen(true);
-                              }}
-                            />
-                          )}
-                        </ErrorBoundary>
-                      </Suspense>
-                    ) : null}
+                      {selectedScene ? (
+                        <Suspense fallback={<LoadingOverlay message="Carregando Editor..." />}>
+                          <ErrorBoundary fallbackTitle="Erro ao carregar o Editor">
+                            {selectedScene.sceneType === 'hypercard_stack' ? (
+                              <HyperCardStackEditor
+                                key={`stack-editor-${selectedScene.id}`}
+                                scene={selectedScene}
+                                allScenes={scenesList}
+                                globalObjects={gameData.globalObjects}
+                                consequenceTrackers={consequenceTrackers}
+                                onUpdateScene={handleUpdateScene}
+                                onCopyScene={handleCopyScene}
+                                onCreateGlobalObject={handleCreateGlobalObject}
+                                onLinkObjectToScene={handleLinkObjectToScene}
+                                onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                                onUpdateGlobalObject={handleUpdateGlobalObject}
+                                onTabChange={setSidePanelTab}
+                                onPreviewScene={(scene) => {
+                                  setPreviewSceneId(scene.id);
+                                  setIsPreviewing(true);
+                                }}
+                                isDirty={isDirty}
+                                onSetDirty={setIsDirty}
+                                onClose={() => {
+                                  setIsScenarioEditing(false);
+                                  setSelectedSceneId(null);
+                                }}
+                                isExpanded={isScenarioEditing}
+                                onToggleExpand={setIsScenarioEditing}
+                                onNavigateToTrackers={() => {
+                                  setIsScenarioEditing(false);
+                                  attemptNavigation({ type: 'view', view: 'trackers' });
+                                }}
+                                onViewMap={() => {
+                                  setIsScenarioEditing(false);
+                                  attemptNavigation({ type: 'view', view: 'map' });
+                                }}
+                              />
+                            ) : (
+                              <SceneEditor
+                                key={`side-editor-${selectedScene.id}`}
+                                scene={selectedScene}
+                                allScenes={scenesList}
+                                globalObjects={gameData.globalObjects}
+                                onUpdateScene={handleUpdateScene}
+                                onCopyScene={handleCopyScene}
+                                onCreateGlobalObject={handleCreateGlobalObject}
+                                onLinkObjectToScene={handleLinkObjectToScene}
+                                onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                                onUpdateGlobalObject={handleUpdateGlobalObject}
+                                enableChances={
+                                  (gameData.enableChances ?? detectedActiveSystems.chances) ||
+                                  gameData.gameSystemEnabled === 'chances'
+                                }
+                                gameSystemEnabled={gameData.gameSystemEnabled}
+                                onPreviewScene={(scene) => {
+                                  setPreviewSceneId(scene.id);
+                                  setIsPreviewing(true);
+                                }}
+                                onSelectScene={handleSelectScene}
+                                isDirty={hasUnsavedTabChanges}
+                                onSetDirty={setHasUnsavedTabChanges}
+                                layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                                consequenceTrackers={consequenceTrackers}
+                                isStartScene={selectedScene.id === gameData.startScene}
+                                gameInteractionType={gameData.gameInteractionType || 'parser'}
+                                vignettes={gameData.vignettes || []}
+                                enableDiceRoll={gameData.enableDiceRoll ?? false}
+                                diceType={gameData.diceType || 'd20'}
+                                onViewMap={() => {}} // Redundant in three_panels
+                                globalSplashButtonText={gameData.gameSplashButtonText || ''}
+                                onUpdateGlobalSplashButtonText={(text) =>
+                                  handleUpdateGameData('gameSplashButtonText', text)
+                                }
+                                isSidePanel={true}
+                                onClose={() => setSelectedSceneId(null)}
+                                onTabChange={setSidePanelTab}
+                              />
+                            )}
+                          </ErrorBoundary>
+                        </Suspense>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {currentView === 'trackers' && (
               <Suspense fallback={<LoadingOverlay message="Carregando Rastreadores..." />}>

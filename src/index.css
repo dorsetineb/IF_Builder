@@ -4,6 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Silkscreen-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Silkscreen-Bold.woff2') format('woff2');
+}
+
 @theme {
   --font-sans: var(--app-font-family, "Space Grotesk"), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--app-font-family, "Space Grotesk"), "DotGothic16", monospace;

@@ -122,7 +122,10 @@ export function Auth() {
                     {isMobile ? (
                         <div className="text-base text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                             <p>{t('auth.sidebar.mobile.line1', 'Por uma fresta, você enxerga uma caverna escura.')}</p>
-                            <p className="text-primary font-bold mt-2">
+                            <p 
+                                className="text-primary font-bold mt-2"
+                                style={{ fontWeight: 700, WebkitTextStroke: '0.35px currentColor' }}
+                            >
                                 &gt; {t('auth.sidebar.mobile.line2', 'ACESSO NEGADO DEVIDO A SMARTPHONE.')}
                             </p>
                             <p className="mt-2 opacity-50">{t('auth.sidebar.mobile.line3', 'Ache um computador com uma tela maior, e tente novamente.')}</p>
@@ -131,7 +134,12 @@ export function Auth() {
                         <>
                             <p>{t(activeBg.line1Key, activeBg.defaultLine1)}</p>
                             <p>{t(activeBg.line2Key, activeBg.defaultLine2)}</p>
-                            <p className={`text-primary font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                            <p 
+                                className="text-primary font-bold mt-2 drop-shadow-md"
+                                style={{ fontWeight: 700, WebkitTextStroke: '0.35px currentColor' }}
+                            >
+                                &gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}
+                            </p>
                         </>
                     )}
                 </div>
@@ -147,7 +155,16 @@ export function Auth() {
                                 e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
                                 e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                             }}
-                            onClick={() => navigate('/editor')}
+                            onClick={() => {
+                                try {
+                                    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+                                    if (AudioContextClass) {
+                                        const ctx = new AudioContextClass();
+                                        ctx.resume().then(() => ctx.close()).catch(() => {});
+                                    }
+                                } catch (_) {}
+                                navigate('/editor');
+                            }}
                             className={`w-fit flex items-center justify-start gap-3 px-5 py-3 rounded-xl font-bold text-base transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}
                         >
                             <div
@@ -161,7 +178,7 @@ export function Auth() {
                         </button>
 
                         {/* Secret Hint Text */}
-                        <div className="text-base text-white/80 leading-relaxed text-left space-y-1 pt-4 opacity-50 drop-shadow-md">
+                        <div className="text-base text-white/80 leading-relaxed text-left space-y-1 pt-4 drop-shadow-md">
                             <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                             <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                         </div>
@@ -322,6 +339,7 @@ export function Auth() {
                     isScanMode={currentView !== 'play'}
                     hoverRadius={433}
                     scanDuration={6.0}
+                    scanThickness={0.85}
                 />
             </div>
 

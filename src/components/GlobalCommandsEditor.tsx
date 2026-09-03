@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FixedVerb, GameData } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Plus, Trash2, Search, Command, MessageSquare, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { Plus, Trash2, Search, Command, MessageSquare, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, RotateCcw, Save } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 
 const COMMAND_ICONS = [
@@ -224,51 +224,16 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
             </div>
 
             {/* RIGHT MAIN PANEL */}
-            <div className="flex-1 overflow-y-auto relative bg-background px-4 pb-4">
-                {/* Header with Save/Undo actions */}
-                <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
-                    {/* Solid background shield to perfectly hide scrolled content */}
-                    <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
-                    
-                    <div className="flex justify-between items-center p-4 bg-card rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
-                        <div className="text-muted-foreground text-xs font-medium space-y-1">
-                            <p>{t('globalCommandsEditor.headerDesc1', 'Configure os verbos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
-                            <p>
-                                <Trans i18nKey="globalCommandsEditor.headerDesc2">
-                                    Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
-                                </Trans>
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3 shrink-0 pl-4">
-                            {isDirty && (
-                                <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                                    {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
-                                </div>
-                            )}
-                            <button
-                                onClick={handleUndo}
-                                disabled={!isDirty}
-                                className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
-                            >
-                                {t('globalObjectsEditor.undoBtn', 'Desfazer')}
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                disabled={!isDirty}
-                                className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
-                            >
-                                {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
-                            </button>
-                        </div>
-                    </div>
-                    {/* Soft gradient transition */}
-                    <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-                </div>
-
-                <div className="mt-4">
+            <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-background">
+                <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4">
                     <div key={selectedVerb?.id || 'empty'} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {selectedVerb ? (
-                            <div className="flex flex-col gap-8">
+                            <div className="flex flex-col gap-6">
+                                <div className="bg-muted/20 border border-muted-foreground/30 rounded-lg p-3 text-[11px] text-muted-foreground leading-relaxed">
+                                    <Trans i18nKey="globalCommandsEditor.headerDesc2">
+                                        Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
+                                    </Trans>
+                                </div>
                                 {/* Left Column: Logic */}
                                 <div className="space-y-6">
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
@@ -362,6 +327,41 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                 <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('globalCommandsEditor.noCommandSelected', 'Selecione um verbo para editar')}</h4>
                             </div>
                         )}
+                    </div>
+                </div>
+
+                {/* Sticky Footer: Canto Inferior Direito */}
+                <div className="sticky bottom-0 left-0 right-0 bg-background px-4 pb-4 pt-2 flex flex-col gap-3 z-50">
+                    {/* Gradient transition below footer */}
+                    <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+
+                    <div className="flex w-full items-center justify-end">
+                        <div className="flex items-center gap-2">
+                            {isDirty && (
+                                <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                                    {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
+                                </div>
+                            )}
+                            <button
+                                onClick={handleUndo}
+                                disabled={!isDirty}
+                                className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none shrink-0"
+                                title={t('sceneEditor.undoBtn', 'Desfazer')}
+                            >
+                                <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                                <span className="hidden sm:inline-block">{t('sceneEditor.undoBtn', 'Desfazer')}</span>
+                            </button>
+
+                            <button
+                                onClick={handleSave}
+                                disabled={!isDirty}
+                                className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shrink-0 shadow-lg"
+                                title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
+                            >
+                                <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                                <span className="hidden sm:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

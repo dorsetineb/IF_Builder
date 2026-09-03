@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vDiv.className = 'splash-screen hidden';
     // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
     const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
-    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '"></button></div></div>';
+    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay" style="z-index: 1;"></div><div class="splash-content" style="z-index: 10; position: relative;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons" style="position: relative; z-index: 10;"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '"></button></div></div>';
     document.body.appendChild(vDiv);
     vignetteScreen = vDiv;
 
@@ -296,6 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const playSound = (src) => {
         if (src && soundEffectAudio) {
             getAudioSrc(src).then(resolvedSrc => {
+                try {
+                    soundEffectAudio.pause();
+                    soundEffectAudio.currentTime = 0;
+                } catch (_) {}
                 soundEffectAudio.src = resolvedSrc;
                 soundEffectAudio.play().catch((e) => console.warn("playSound failed:", e));
             });
@@ -321,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearInterval(bgmFadeInterval);
                     bgmAudio.pause();
                     bgmAudio.volume = 0;
+                    try { bgmAudio.currentTime = 0; } catch (_) {}
                     callback();
                 } else {
                     bgmAudio.volume = Math.max(0, vol);
@@ -331,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fadeIn = () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             bgmAudio.volume = 0;
+            try { bgmAudio.currentTime = 0; } catch (_) {}
             bgmAudio.play().catch(() => {});
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
@@ -344,10 +350,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 50);
         };
 
+        const applyNewBgm = (resolvedSrc) => {
+            try {
+                bgmAudio.pause();
+                bgmAudio.currentTime = 0;
+            } catch (_) {}
+            bgmAudio.src = resolvedSrc;
+            const onMeta = () => {
+                try { bgmAudio.currentTime = 0; } catch (_) {}
+                bgmAudio.removeEventListener('loadedmetadata', onMeta);
+            };
+            bgmAudio.addEventListener('loadedmetadata', onMeta);
+            fadeIn();
+        };
+
         let targetSrc = src;
         currentBgmSrc = src;
         if (!src) {
             fadeOut(() => {
+                try {
+                    bgmAudio.pause();
+                    bgmAudio.currentTime = 0;
+                } catch (_) {}
                 bgmAudio.src = "";
             });
             return;
@@ -357,15 +381,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fadeOut(() => {
                 getAudioSrc(targetSrc).then(resolvedSrc => {
                     if (currentBgmSrc !== targetSrc) return;
-                    bgmAudio.src = resolvedSrc;
-                    fadeIn();
+                    applyNewBgm(resolvedSrc);
                 });
             });
         } else {
             getAudioSrc(targetSrc).then(resolvedSrc => {
                 if (currentBgmSrc !== targetSrc) return;
-                bgmAudio.src = resolvedSrc;
-                fadeIn();
+                applyNewBgm(resolvedSrc);
             });
         }
     };
@@ -1446,6 +1468,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameStartTime = Date.now();
         gameEndTime = null;
 
+        if (bgmAudio) {
+            try {
+                bgmAudio.pause();
+                bgmAudio.currentTime = 0;
+            } catch (_) {}
+        }
+        currentBgmSrc = null;
+
         // Hide retrospective button on restart
         if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
@@ -2030,7 +2060,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // CRITICAL FIX: If the game starts with a vignette (opening), 
                 // we must NOT fade out the vignette screen, or it will be skipped.
-                const nextScene = gameData.cenas[currentSceneId];
+                const nextScene = findScene(currentSceneId);
                 const isNextVignette = nextScene && nextScene.vignetteType && nextScene.vignetteType !== 'none';
                 
                 if (!isNextVignette) {
@@ -2048,7 +2078,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else if (scene.vignetteNextSceneId) {
                 const nextSceneId = scene.vignetteNextSceneId;
-                const nextScene = gameData.cenas[nextSceneId];
+                const nextScene = findScene(nextSceneId);
                 
                 if (nextScene) {
                     const isNextVignette = nextScene.vignetteType && nextScene.vignetteType !== 'none';
@@ -2316,7 +2346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     };
 
-    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
+    const loadScene = (sceneId, transition = true, transitionType = null, transitionSpeed = null, successPrefix = null, inputEchoText = null) => {
         let scene = findScene(sceneId);
         if (!scene) {
             const keys = Object.keys((gameData && gameData.cenas) || {});
@@ -2390,24 +2420,41 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.classList.remove('hidden');
         gameContainer.classList.remove('fade-out');
         
-        let effectiveTransition = gameData.gameImageTransitionType || 'fade';
+        let effectiveTransition = (transitionType && transitionType !== 'default')
+            ? transitionType
+            : (gameData.gameImageTransitionType || 'fade');
+        if (effectiveTransition === 'slide') effectiveTransition = 'slide-left';
         if (effectiveTransition === 'none') transition = false;
+
         let speed = 0.5;
-        const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
-        if (savedImageSpeedStr) {
-            const speedVal = parseInt(savedImageSpeedStr);
+        if (transitionSpeed !== null && transitionSpeed !== undefined && transitionSpeed !== '') {
+            const speedVal = Number(transitionSpeed);
             if (speedVal === 1) speed = 2.0;
             else if (speedVal === 2) speed = 1.0;
             else if (speedVal === 3) speed = 0.5;
             else if (speedVal === 4) speed = 0.2;
+            else if (speedVal === 200) speed = 0.2;
+            else if (speedVal === 500) speed = 0.5;
+            else if (speedVal === 1000) speed = 1.0;
+            else if (speedVal === 2000) speed = 2.0;
+            else if (speedVal > 0 && speedVal <= 10) speed = speedVal;
         } else {
-            const rawSpeed = gameData.gameImageSpeed;
-            const speedVal = rawSpeed !== undefined && rawSpeed !== null ? Number(rawSpeed) : 3;
-            if (speedVal === 1) speed = 2.0;
-            else if (speedVal === 2) speed = 1.0;
-            else if (speedVal === 3 || speedVal === 5) speed = 0.5;
-            else if (speedVal === 4) speed = 0.2;
-            else speed = 0.5;
+            const savedImageSpeedStr = window.isPreview ? null : localStorage.getItem('if_builder_settings_image_speed');
+            if (savedImageSpeedStr) {
+                const speedVal = parseInt(savedImageSpeedStr);
+                if (speedVal === 1) speed = 2.0;
+                else if (speedVal === 2) speed = 1.0;
+                else if (speedVal === 3) speed = 0.5;
+                else if (speedVal === 4) speed = 0.2;
+            } else {
+                const rawSpeed = gameData.gameImageSpeed;
+                const speedVal = rawSpeed !== undefined && rawSpeed !== null ? Number(rawSpeed) : 3;
+                if (speedVal === 1) speed = 2.0;
+                else if (speedVal === 2) speed = 1.0;
+                else if (speedVal === 3 || speedVal === 5) speed = 0.5;
+                else if (speedVal === 4) speed = 0.2;
+                else speed = 0.5;
+            }
         }
         if (typeof speed !== 'number' || isNaN(speed)) {
             speed = 0.5;
@@ -2647,11 +2694,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const centerBar = document.getElementById('hypercard-center-bar');
             if (centerBar) {
-                if (standardActionBar) {
-                    if (actionPopup) {
+                centerBar.remove();
+            }
+
+            if (standardActionBar) {
+                if (actionPopup) {
+                    if (actionPopup.parentElement !== standardActionBar) {
                         standardActionBar.insertBefore(actionPopup, standardActionBar.firstChild);
                     }
-                    if (actionButtons) {
+                    actionPopup.style.removeProperty('left');
+                    actionPopup.style.removeProperty('transform');
+                    actionPopup.style.removeProperty('top');
+                }
+                if (actionButtons) {
+                    if (actionButtons.parentElement !== standardActionBar) {
                         const inputArea = standardActionBar.querySelector('.input-area') || standardActionBar.querySelector('.choices-container');
                         if (inputArea) {
                             standardActionBar.insertBefore(actionButtons, inputArea);
@@ -2659,8 +2715,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             standardActionBar.appendChild(actionButtons);
                         }
                     }
+                    actionButtons.style.margin = '';
+                    actionButtons.style.position = '';
+                    actionButtons.style.display = '';
                 }
-                centerBar.remove();
             }
 
             const topBar = document.getElementById('hypercard-top-bar');
@@ -2788,7 +2846,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 textPanel.style.display = '';
                 textPanel.style.padding = '';
             }
-            if (standardActionBar) standardActionBar.classList.remove('hidden');
+            if (standardActionBar) {
+                standardActionBar.classList.remove('hidden');
+                if (actionButtons && actionButtons.parentElement === standardActionBar) {
+                    actionButtons.style.margin = '';
+                    actionButtons.style.position = '';
+                    actionButtons.style.display = '';
+                }
+            }
             
             // Remove text-scene-header and hypercard stage if present
             const textSceneHeader = document.getElementById('text-scene-header');
@@ -3217,7 +3282,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateTrackers(hotspot.trackerEffects);
                     }
 
-                    const effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
+                    let effectiveTrans = hotspot.transition || gameData.gameImageTransitionType || 'fade';
+                    if (effectiveTrans === 'slide') effectiveTrans = 'slide-left';
 
                     if (hotspot.actionType === 'navigate_card' && hotspot.targetCardId) {
                         const targetCard = cards.find(c => c.id === hotspot.targetCardId);
@@ -3327,7 +3393,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sceneOverlay) return;
         sceneOverlay.className = 'scene-overlay'; // Reset
         sceneOverlay.style.opacity = '1';
-        sceneOverlay.style.zIndex = '20';
+        sceneOverlay.style.zIndex = '5';
         sceneOverlay.style.pointerEvents = 'none';
 
         // Clear previous effect DOM
@@ -3815,7 +3881,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputLower = input.toLowerCase().trim();
         const echo = document.createElement('p'); echo.className = 'verb-echo'; echo.textContent = '> ' + input; sceneDescription.appendChild(echo);
         sceneDescription.scrollTop = sceneDescription.scrollHeight; actionLog.push({ type: 'input', text: '> ' + input });
-        const scene = gameData.cenas[currentSceneId]; 
+        const scene = findScene(currentSceneId) || (gameData.cenas && gameData.cenas[currentSceneId]) || (gameData.scenes && gameData.scenes[currentSceneId]) || {}; 
         const sceneObjects = getObjectsForScene(currentSceneId); 
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
         if (gameData.enableDiceRoll) {
@@ -4119,21 +4185,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showSuggestions = () => {
-        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
-        const currentSceneData = gameData.cenas[currentSceneId];
+        actionPopup.classList.remove('hidden'); 
+        actionPopup.innerHTML = '';
+        const currentSceneData = findScene(currentSceneId) || (gameData.cenas && gameData.cenas[currentSceneId]) || (gameData.scenes && gameData.scenes[currentSceneId]) || {};
         const sceneSuggestions = currentSceneData.suggestions || [];
         
-        const container = document.createElement('div'); container.className = 'action-popup-container';
+        const container = document.createElement('div'); 
+        container.className = 'action-popup-container';
         
         if (sceneSuggestions.length === 0) {
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            const row1 = document.createElement('div'); 
+            row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
             row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
             container.appendChild(row1);
         } else {
-
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
+            const row1 = document.createElement('div'); 
+            row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
             sceneSuggestions.forEach(v => { 
-                const btn = document.createElement('button'); btn.textContent = v; 
+                const btn = document.createElement('button'); 
+                btn.textContent = v; 
                 btn.addEventListener('click', () => { 
                     verbInput.textContent = v.toLowerCase() + ' '; 
                     verbInput.focus(); 
@@ -4152,6 +4222,19 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(row1); 
         }
         actionPopup.appendChild(container);
+
+        const suggBtn = document.getElementById('suggestions-button');
+        const actionBtns = document.querySelector('.action-buttons');
+        if (suggBtn && actionBtns && document.getElementById('hypercard-center-bar')) {
+            const centerOffset = suggBtn.offsetLeft + (suggBtn.offsetWidth / 2);
+            actionPopup.style.setProperty('left', centerOffset + 'px', 'important');
+            actionPopup.style.setProperty('transform', 'translateX(-50%)', 'important');
+            actionPopup.style.setProperty('top', 'calc(100% + 8px)', 'important');
+        } else {
+            actionPopup.style.removeProperty('left');
+            actionPopup.style.removeProperty('transform');
+            actionPopup.style.removeProperty('top');
+        }
     };
     const showInventory = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; 

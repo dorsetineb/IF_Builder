@@ -1004,46 +1004,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="z-40 bg-background flex flex-col pt-4 pb-0 gap-3 px-4">
-                {/* Solid background shield to perfectly hide scrolled content */}
-                <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
-                {/* Soft gradient transition */}
-                <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-                {/* Header with Save/Undo actions */}
-                <div className="flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50 bg-card shadow-sm relative z-10">
-                    <p className="text-muted-foreground text-xs font-medium">
-                        {activeTab === 'sistemas'
-                            ? t('UIEditor.tabs.sistemasDesc', 'Personalize as mecânicas, sistemas e controles de decisão da sua ficção.')
-                            : activeTab === 'aparencia'
-                            ? t('UIEditor.tabs.aparenciaDesc', 'Personalize a paleta de cores, tipografia, molduras e layout visual da sua ficção.')
-                            : t('UIEditor.tabs.textosDesc', 'Configure os rótulos de botões, mensagens do sistema e campos de ação.')}
-                    </p>
-                    <div className="flex items-center gap-3">
-                        {isDirty && (
-                            <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                                {t('UIEditor.header.unsavedChanges')}
-                            </div>
-                        )}
-                        <button
-                            onClick={handleUndo}
-                            disabled={!isDirty}
-                            className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
-                        >
-                            {t('UIEditor.header.undo')}
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            disabled={!isDirty}
-                            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed group"
-                        >
-                            <Save className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
-                            <span>{t('UIEditor.header.save')}</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex-1 flex overflow-hidden px-4 pb-0">
+            <div className="flex-1 flex overflow-hidden px-4 pb-0 pt-2">
                 <div className="w-full flex flex-col lg:grid lg:grid-cols-12 gap-8 h-full">
                     {/* LEFT COLUMN: Scrollable Form */}
                     <div className="col-span-1 lg:col-span-5 h-full overflow-y-auto custom-scrollbar pt-4 pr-2 pb-8">
@@ -1424,6 +1385,38 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         localActionButtonText={localActionButtonText}
                         localVerbInputPlaceholder={localVerbInputPlaceholder}
                     />
+                    </div>
+                </div>
+            </div>
+
+            {/* Sticky Footer: Canto Inferior Direito */}
+            <div className="sticky bottom-0 left-0 right-0 bg-background px-4 pb-4 pt-2 flex flex-col gap-3 z-50">
+                <div className="flex w-full items-center justify-end">
+                    <div className="flex items-center gap-2">
+                        {isDirty && (
+                            <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                                {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
+                            </div>
+                        )}
+                        <button
+                            onClick={handleUndo}
+                            disabled={!isDirty}
+                            className="flex items-center justify-center gap-1.5 px-3.5 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none shrink-0"
+                            title={t('sceneEditor.undoBtn', 'Desfazer')}
+                        >
+                            <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                            <span className="hidden sm:inline-block">{t('sceneEditor.undoBtn', 'Desfazer')}</span>
+                        </button>
+
+                        <button
+                            onClick={handleSave}
+                            disabled={!isDirty}
+                            className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shrink-0 shadow-lg"
+                            title={t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
+                        >
+                            <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                            <span className="hidden sm:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                        </button>
                     </div>
                 </div>
             </div>

@@ -14,9 +14,11 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://www.googletagmanager.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://*.googleapis.com; frame-src 'self' blob:; media-src 'self' blob: data:; worker-src 'self' blob:;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://www.googletagmanager.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://*.googleapis.com; frame-src 'self' blob:; media-src 'self' blob: data:; worker-src 'self' blob:;" />
   <title>IF Builder / Ficções Interativas</title>
 
+  <!-- Preload local pixel font for instant offline BIOS display -->
+  <link rel="preload" href="/fonts/Silkscreen-Regular.woff2" as="font" type="font/woff2" crossorigin>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">

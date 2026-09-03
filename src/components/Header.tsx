@@ -55,14 +55,19 @@ const Header: React.FC<{
       </div>
 
       <div className="flex-1 flex items-center justify-start gap-4 bg-card border-b border-muted-foreground/50 px-6">
-        {['about', 'guide', 'settings', 'editor_interface'].includes(currentView) && (
+        {['about', 'guide', 'settings', 'editor_interface', 'mechanics', 'appearance', 'default_texts', 'global_objects', 'trackers', 'global_commands', 'three_panels', 'scenes', 'map'].includes(currentView) && (
           <div className="flex items-center h-full">
             <div className="flex items-center">
               {/* Context-aware Sub-header Text */}
-              {currentView === 'guide' ? (
+              {(currentView === 'three_panels' || currentView === 'scenes' || currentView === 'map') ? (
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-white tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
-                  <p className="text-[10px] text-white/60 hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias ficções interativas.')}</p>
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.sceneEditor', 'Narrativa')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.narrativeDesc', 'Crie e conecte ramificações, capítulos e cenários no mapa interativo.')}</p>
+                </div>
+              ) : currentView === 'guide' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias ficções interativas.')}</p>
                 </div>
               ) : currentView === 'settings' ? (
                 <div className="flex flex-col">
@@ -71,13 +76,43 @@ const Header: React.FC<{
                 </div>
               ) : currentView === 'about' ? (
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-white tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
-                  <p className="text-[10px] text-white/60 hidden md:block">{t('header.aboutDesc', 'Saiba mais sobre o If Builder.')}</p>
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Saiba mais sobre o If Builder.')}</p>
                 </div>
               ) : currentView === 'editor_interface' ? (
                 <div className="flex flex-col">
                   <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.editorInterface', 'Interface')}</span>
                   <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.editorInterfaceDesc', 'Configure o idioma do sistema e personalize o tema visual do editor.')}</p>
+                </div>
+              ) : currentView === 'mechanics' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.mechanics', 'Mecânicas')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.mechanicsDesc', 'Personalize as mecânicas, sistemas e controles de decisão da sua ficção.')}</p>
+                </div>
+              ) : currentView === 'appearance' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.appearance', 'Estilo Visual')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.appearanceDesc', 'Personalize a paleta de cores, tipografia, molduras e layout visual da sua ficção.')}</p>
+                </div>
+              ) : currentView === 'default_texts' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.defaultTexts', 'Rótulos')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.labelsDesc', 'Configure os rótulos de botões, mensagens do sistema e campos de ação.')}</p>
+                </div>
+              ) : currentView === 'global_objects' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.objects', 'Objetos')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.objectsDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer ramificação.')}</p>
+                </div>
+              ) : currentView === 'trackers' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.trackers', 'Rastreadores')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.trackersDesc', 'Rastreadores permitem medir valores como vida, afeto ou dinheiro.')}</p>
+                </div>
+              ) : currentView === 'global_commands' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.globalCommands', 'Verbos')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.commandsDesc', 'Configure os verbos que estarão sempre disponíveis para o jogador.')}</p>
                 </div>
               ) : null}
             </div>

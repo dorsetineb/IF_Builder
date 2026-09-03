@@ -46,6 +46,8 @@ interface DitherShaderProps {
     isScanMode?: boolean;
     /** Duration in seconds for one full scan wave cycle (default: 6.0s) */
     scanDuration?: number;
+    /** Multiplier for scan wave thickness relative to height (default: 0.85) */
+    scanThickness?: number;
 }
 
 // 4x4 Bayer matrix
@@ -118,6 +120,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     className,
     isScanMode = false,
     scanDuration = 6.0,
+    scanThickness = 0.85,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -259,11 +262,13 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             // Precalculate scan parameters outside the loops (Zero per-pixel allocation)
             const cycleDuration = scanDuration || 6.0;
             const cycleProgress = (elapsedSeconds % cycleDuration) / cycleDuration;
-            const totalTravel = height * 2.0;
-            const currentScanY = (cycleProgress * totalTravel) - (height * 0.5);
             const slantFactor = 0.2;
-            const thickness = height * 0.4;
+            const thickness = height * (scanThickness ?? 0.85);
             const invThickness = thickness > 0 ? 1.0 / thickness : 0;
+            const startScanY = -thickness;
+            const endScanY = height + width * slantFactor + thickness;
+            const totalTravel = endScanY - startScanY;
+            const currentScanY = startScanY + cycleProgress * totalTravel;
 
             const bayerMatrix = thresholdMatrix.matrix;
             const matrixSize = thresholdMatrix.size;
@@ -345,7 +350,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         [
             gridSize, ditherMode, darkColor32, lightColor32,
             brightness, contrast, threshold, thresholdMatrix,
-            enableHover, hoverRadius, isScanMode, scanDuration
+            enableHover, hoverRadius, isScanMode, scanDuration, scanThickness
         ]
     );
 

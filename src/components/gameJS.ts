@@ -294,6 +294,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const playSound = (src) => {
         if (src && soundEffectAudio) {
             getAudioSrc(src).then(resolvedSrc => {
+                try {
+                    soundEffectAudio.pause();
+                    soundEffectAudio.currentTime = 0;
+                } catch (_) {}
                 soundEffectAudio.src = resolvedSrc;
                 soundEffectAudio.play().catch((e) => console.warn("playSound failed:", e));
             });
@@ -319,6 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearInterval(bgmFadeInterval);
                     bgmAudio.pause();
                     bgmAudio.volume = 0;
+                    try { bgmAudio.currentTime = 0; } catch (_) {}
                     callback();
                 } else {
                     bgmAudio.volume = Math.max(0, vol);
@@ -329,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fadeIn = () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             bgmAudio.volume = 0;
+            try { bgmAudio.currentTime = 0; } catch (_) {}
             bgmAudio.play().catch(() => {});
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
@@ -342,10 +348,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 50);
         };
 
+        const applyNewBgm = (resolvedSrc) => {
+            try {
+                bgmAudio.pause();
+                bgmAudio.currentTime = 0;
+            } catch (_) {}
+            bgmAudio.src = resolvedSrc;
+            const onMeta = () => {
+                try { bgmAudio.currentTime = 0; } catch (_) {}
+                bgmAudio.removeEventListener('loadedmetadata', onMeta);
+            };
+            bgmAudio.addEventListener('loadedmetadata', onMeta);
+            fadeIn();
+        };
+
         let targetSrc = src;
         currentBgmSrc = src;
         if (!src) {
             fadeOut(() => {
+                try {
+                    bgmAudio.pause();
+                    bgmAudio.currentTime = 0;
+                } catch (_) {}
                 bgmAudio.src = "";
             });
             return;
@@ -355,15 +379,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fadeOut(() => {
                 getAudioSrc(targetSrc).then(resolvedSrc => {
                     if (currentBgmSrc !== targetSrc) return;
-                    bgmAudio.src = resolvedSrc;
-                    fadeIn();
+                    applyNewBgm(resolvedSrc);
                 });
             });
         } else {
             getAudioSrc(targetSrc).then(resolvedSrc => {
                 if (currentBgmSrc !== targetSrc) return;
-                bgmAudio.src = resolvedSrc;
-                fadeIn();
+                applyNewBgm(resolvedSrc);
             });
         }
     };
@@ -1443,6 +1465,14 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameSessionActive = true;
         gameStartTime = Date.now();
         gameEndTime = null;
+
+        if (bgmAudio) {
+            try {
+                bgmAudio.pause();
+                bgmAudio.currentTime = 0;
+            } catch (_) {}
+        }
+        currentBgmSrc = null;
 
         // Hide retrospective button on restart
         if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');

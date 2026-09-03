@@ -133,15 +133,17 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     <div className="flex bg-muted rounded-lg p-1 border border-muted-foreground/50">
                         <button
                             onClick={() => setIsLinkMode(false)}
-                            className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${!isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`flex-1 py-1.5 flex flex-col items-center justify-center text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${!isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            {t('objectEditor.inThisScene', 'Nesta Ramificação ({{count}})', { count: objects.length })}
+                            <span>{t('objectEditor.activeObjects', 'Ativos')}</span>
+                            <span className="text-[9px] font-normal leading-tight opacity-80">({objects.length})</span>
                         </button>
                         <button
                             onClick={() => setIsLinkMode(true)}
-                            className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`flex-1 py-1.5 flex flex-col items-center justify-center text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            {t('objectEditor.linkOptions', 'Vincular ({{count}})', { count: availableObjectsToLink.length })}
+                            <span>{t('objectEditor.stockObjects', 'Estoque')}</span>
+                            <span className="text-[9px] font-normal leading-tight opacity-80">({availableObjectsToLink.length})</span>
                         </button>
                     </div>
 
