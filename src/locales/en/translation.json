@@ -190,8 +190,8 @@
     }
   },
   "welcome": {
-    "title": "Welcome to IF Builder",
-    "subtitle": "What do you want to do?",
+    "title": "> WHAT DO YOU WANT TO DO?",
+    "subtitle": "",
     "createNew": "Create a fiction",
     "downloadExample": "Download an example",
     "playDemo": "Play the demo",

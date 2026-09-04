@@ -4,7 +4,7 @@ import { GameData, View } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Eye, Plus, CircleHelp, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { IFBuilderText, IFBuilderIcon } from './IFBuilderLogo';
+import { IFBuilderMonoText, IFBuilderMonoShort } from './IFBuilderLogo';
 
 const Header: React.FC<{
   gameData: GameData;
@@ -35,11 +35,12 @@ const Header: React.FC<{
         <div
           onClick={onHome}
           className={`flex items-center cursor-pointer hover:opacity-80 transition-opacity ${sidebarCollapsed ? 'justify-center' : ''}`}
+          title="IF Builder"
         >
           {sidebarCollapsed ? (
-            <IFBuilderIcon className="w-7 h-7 text-foreground notranslate" />
+            <IFBuilderMonoShort className="text-[26px]" />
           ) : (
-            <IFBuilderText className="h-3.5 w-auto max-w-[170px] text-foreground notranslate" />
+            <IFBuilderMonoText className="text-[25px]" />
           )}
         </div>
 

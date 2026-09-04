@@ -6,8 +6,8 @@
     "aboutTitle": "IF Builder / Sobre el Proyecto"
   },
   "welcome": {
-    "title": "Bienvenido a IF Builder",
-    "subtitle": "¿Qué quieres hacer?",
+    "title": "> ¿QUÉ QUIERES HACER?",
+    "subtitle": "",
     "createNew": "Crear una ficción",
     "downloadExample": "Descargar un ejemplo",
     "playDemo": "Jugar la demo",

@@ -258,3 +258,36 @@ export const IFBuilderShort: React.FC<LogoProps> = ({ className = "w-auto h-5", 
         </svg>
     );
 };
+
+/**
+ * Modern IFBuilder Text Logo in Space Mono Italic (Regular 400, lowercase, reduced letter spacing)
+ */
+export const IFBuilderMonoText: React.FC<LogoProps> = ({ className = "text-[25px]", style }) => {
+    return (
+        <span
+            className={`font-space-mono italic font-normal tracking-[-0.06em] text-foreground select-none leading-none inline-block notranslate ${className}`}
+            style={{ fontFamily: "'Space Mono', monospace", ...style }}
+            aria-label="ifbuilder"
+            role="img"
+        >
+            ifbuilder
+        </span>
+    );
+};
+
+/**
+ * Modern IFBuilder Collapsed Monogram in Space Mono Italic (Bold 700, lowercase, reduced letter spacing)
+ */
+export const IFBuilderMonoShort: React.FC<LogoProps> = ({ className = "text-[26px]", style }) => {
+    return (
+        <span
+            className={`font-space-mono italic font-bold tracking-[-0.05em] text-foreground select-none leading-none inline-block notranslate ${className}`}
+            style={{ fontFamily: "'Space Mono', monospace", ...style }}
+            aria-label="if"
+            role="img"
+        >
+            if
+        </span>
+    );
+};
+

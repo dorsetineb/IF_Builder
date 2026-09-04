@@ -24,6 +24,7 @@
   --font-sans: var(--app-font-family, "Space Grotesk"), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--app-font-family, "Space Grotesk"), "DotGothic16", monospace;
   --font-body: var(--app-font-family, "Space Grotesk"), monospace;
+  --font-space-mono: "Space Mono", monospace;
 
   /* Adjust font sizes for Silkscreen */
   --text-xs: var(--app-text-xs, 9px);
