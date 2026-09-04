@@ -2,7 +2,7 @@ import React from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { useTheme } from './ThemeProvider';
 import { getDitherColors } from '../utils/themeStyles';
-import { IFBuilderLogo } from './IFBuilderLogo';
+import { IFBuilderPixelText } from './IFBuilderLogo';
 
 interface TransitionScreenProps {
     isVisible: boolean;
@@ -19,7 +19,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
         }
         const savedBg = localStorage.getItem('if-builder-bg-src');
         if (savedBg) setBgSrc(savedBg);
-    }, []);
+    }, [isVisible]);
 
     const ditherColors = getDitherColors(theme);
 
@@ -49,7 +49,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
 
             {/* Static IFBUILDER Logo - Bottom Right */}
             <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-10 opacity-20 text-primary">
-                <IFBuilderLogo className="w-96 sm:w-[480px] h-auto notranslate" />
+                <IFBuilderPixelText className="w-56 sm:w-72 h-auto" />
             </div>
         </div>
     );

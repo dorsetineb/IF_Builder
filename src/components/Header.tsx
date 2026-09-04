@@ -38,9 +38,9 @@ const Header: React.FC<{
           title="IF Builder"
         >
           {sidebarCollapsed ? (
-            <IFBuilderMonoShort className="text-[26px]" />
+            <IFBuilderMonoShort className="text-[26px] text-foreground" />
           ) : (
-            <IFBuilderMonoText className="text-[25px]" />
+            <IFBuilderMonoText className="text-[25px] text-foreground" />
           )}
         </div>
 

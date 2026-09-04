@@ -8,7 +8,7 @@ import { useTypography, fontScales } from './TypographyProvider';
 import { GameData } from '../types';
 import { getDitherColors } from '../utils/themeStyles';
 import { APP_VERSION } from '../version';
-import { IFBuilderLogo } from './IFBuilderLogo';
+import { IFBuilderPixelText } from './IFBuilderLogo';
 
 const Preview = React.lazy(() => import('./Preview'));
 
@@ -31,6 +31,31 @@ const BACKGROUNDS = [
     }
 ];
 
+function getSessionBgIndex(): number {
+    if (typeof window === 'undefined') return 0;
+    try {
+        // If this session already has a background assigned, maintain it
+        const sessionVal = sessionStorage.getItem('if-builder-session-bg-index');
+        if (sessionVal !== null) {
+            const parsed = parseInt(sessionVal, 10);
+            if (!isNaN(parsed) && parsed >= 0 && parsed < BACKGROUNDS.length) {
+                return parsed;
+            }
+        }
+
+        // New session: advance to the next background compared to the last session
+        const lastStored = localStorage.getItem('if-builder-last-session-bg');
+        const lastIndex = lastStored !== null ? parseInt(lastStored, 10) : -1;
+        const nextIndex = (!isNaN(lastIndex) && lastIndex >= 0) ? (lastIndex + 1) % BACKGROUNDS.length : Math.floor(Math.random() * BACKGROUNDS.length);
+
+        sessionStorage.setItem('if-builder-session-bg-index', nextIndex.toString());
+        localStorage.setItem('if-builder-last-session-bg', nextIndex.toString());
+        return nextIndex;
+    } catch (_) {
+        return 0;
+    }
+}
+
 export function Auth() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
@@ -39,22 +64,8 @@ export function Auth() {
     // Landing page view state
     const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
     const [currentView, setCurrentView] = useState<LandingView>('landing');
-    const [currentBgIndex] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const saved = sessionStorage.getItem('if-builder-bg-index');
-            if (saved !== null) {
-                const index = parseInt(saved, 10);
-                if (!isNaN(index) && index >= 0 && index < BACKGROUNDS.length) {
-                    return index;
-                }
-            }
-            const randomIndex = Math.floor(Math.random() * BACKGROUNDS.length);
-            sessionStorage.setItem('if-builder-bg-index', randomIndex.toString());
-            return randomIndex;
-        }
-        return Math.floor(Math.random() * BACKGROUNDS.length);
-    });
-    const activeBg = isMobile ? BACKGROUNDS[0] : BACKGROUNDS[currentBgIndex];
+    const [currentBgIndex] = useState(getSessionBgIndex);
+    const activeBg = isMobile ? BACKGROUNDS[0] : (BACKGROUNDS[currentBgIndex] || BACKGROUNDS[0]);
     const [demoData, setDemoData] = useState<GameData | null>(null);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
 
@@ -68,7 +79,9 @@ export function Auth() {
     }, []);
 
     React.useEffect(() => {
-        localStorage.setItem('if-builder-bg-src', activeBg.src);
+        try {
+            localStorage.setItem('if-builder-bg-src', activeBg.src);
+        } catch (_) {}
     }, [activeBg.src]);
 
     const { theme } = useTheme();
@@ -375,11 +388,11 @@ export function Auth() {
 
             {/* IF Logo - Bottom Right Group */}
             <div className="fixed bottom-10 right-10 z-10 select-none pointer-events-none opacity-45 text-primary">
-                <div className="relative w-80 sm:w-[420px]">
-                    <div className="absolute top-0 right-0 text-[10px] sm:text-xs font-mono text-foreground font-semibold leading-none tracking-wider notranslate" translate="no">
+                <div className="relative flex flex-col items-end">
+                    <div className="text-xs sm:text-sm font-mono text-foreground font-semibold leading-none tracking-wider notranslate mb-1" translate="no">
                         v.{APP_VERSION}
                     </div>
-                    <IFBuilderLogo className="w-full h-auto notranslate" />
+                    <IFBuilderPixelText className="w-56 sm:w-72 h-auto" />
                 </div>
             </div>
         </div>

@@ -64,7 +64,7 @@ const AboutProject = lazy(() => import('../pages/AboutProject'));
 const EditorInterface = lazy(() => import('../pages/EditorInterface'));
 import { ConfirmationModal } from './ConfirmationModal';
 import { TransitionScreen } from './TransitionScreen';
-import { IFBuilderLogo } from './IFBuilderLogo';
+import { IFBuilderPixelBull, IFBuilderPixelText } from './IFBuilderLogo';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1315,9 +1315,10 @@ const Editor: React.FC = () => {
                     }
                 `}</style>
           <div className="space-y-1 max-w-3xl">
-            {/* Logo IFBUILDER */}
-            <div className="text-primary mb-4 sm:mb-6 pt-1 sm:pt-2">
-              <IFBuilderLogo className="w-full max-w-[480px] sm:max-w-[540px] h-auto" />
+            {/* Logo IFBUILDER: Touro do lado esquerdo do título ifbuilder */}
+            <div className="text-primary mb-4 sm:mb-6 pt-1 sm:pt-2 flex items-center gap-1.5 sm:gap-2">
+              <IFBuilderPixelBull className="w-[170px] sm:w-[230px] h-auto flex-shrink-0" />
+              <IFBuilderPixelText className="w-[264px] sm:w-[336px] h-auto flex-shrink-0" />
             </div>
             <p>IF-BUILDER v.{APP_VERSION}</p>
             <p className="mb-2 sm:mb-4">Copyright (C) 2026 @DORSETINEB</p>

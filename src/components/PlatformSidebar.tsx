@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { LayoutDashboard, Users, Gamepad2, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { IFBuilderText, IFBuilderIcon } from './IFBuilderLogo';
+import { IFBuilderMonoText, IFBuilderMonoShort } from './IFBuilderLogo';
 
 const PlatformSidebar: React.FC = () => {
     const { t } = useTranslation();
@@ -41,11 +41,9 @@ const PlatformSidebar: React.FC = () => {
             <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-muted-foreground/50 relative h-[61px] ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                 <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
                 {isCollapsed ? (
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-foreground notranslate">
-                        <IFBuilderIcon className="w-5 h-5 text-foreground" />
-                    </div>
+                    <IFBuilderMonoShort className="text-[26px] text-foreground" />
                 ) : (
-                    <IFBuilderText className="h-3.5 w-auto max-w-[150px] text-foreground notranslate" />
+                    <IFBuilderMonoText className="text-[25px] text-foreground" />
                 )}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
