@@ -50,34 +50,43 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
     };
 
     useEffect(() => {
-        if (isGamePopupOpen && !demoData) {
-            const fetchDemoData = async () => {
+        let isMounted = true;
+        const fetchDemoData = async () => {
+            if (isGamePopupOpen) {
                 setIsLoadingDemo(true);
-                try {
-                    const demoFolderName = i18n.language.startsWith('pt')
-                        ? "fuja_da_masmorra"
-                        : i18n.language.startsWith('es')
-                        ? "escapa_la_mazmorra"
-                        : "escape_the_dungeon";
-                    
-                    const response = await fetch(`/${demoFolderName}/editor_data.json`);
-                    if (!response.ok) throw new Error("Failed to load demo data");
-                    const data = await response.json();
+            }
+            try {
+                const demoFolderName = i18n.language.startsWith('pt')
+                    ? "fuja_da_masmorra"
+                    : i18n.language.startsWith('es')
+                    ? "escapa_la_mazmorra"
+                    : "escape_the_dungeon";
+                
+                const response = await fetch(`/${demoFolderName}/editor_data.json`);
+                if (!response.ok) throw new Error("Failed to load demo data");
+                const data = await response.json();
+                if (isMounted) {
                     setDemoData(data);
-                } catch (error) {
-                    console.error("Error loading demo data:", error);
-                } finally {
+                }
+            } catch (error) {
+                console.error("Error loading demo data:", error);
+            } finally {
+                if (isMounted) {
                     setIsLoadingDemo(false);
                 }
-            };
-            fetchDemoData();
-        }
-    }, [isGamePopupOpen, i18n.language, demoData]);
-
-    // Reset demo data when language changes to ensure correct one is loaded
-    useEffect(() => {
-        setDemoData(null);
+            }
+        };
+        fetchDemoData();
+        return () => {
+            isMounted = false;
+        };
     }, [i18n.language]);
+
+    useEffect(() => {
+        if (isGamePopupOpen && !demoData) {
+            setIsLoadingDemo(true);
+        }
+    }, [isGamePopupOpen, demoData]);
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-zinc-950">

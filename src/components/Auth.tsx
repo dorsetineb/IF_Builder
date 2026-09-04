@@ -102,29 +102,43 @@ export function Auth() {
     };
 
     React.useEffect(() => {
-        if (currentView === 'play' && !demoData) {
-            const fetchDemoData = async () => {
+        let isMounted = true;
+        const fetchDemoData = async () => {
+            if (currentView === 'play') {
                 setIsLoadingDemo(true);
-                try {
-                    const demoFolderName = i18n.language.startsWith('pt')
-                        ? "fuja_da_masmorra"
-                        : i18n.language.startsWith('es')
-                        ? "escapa_la_mazmorra"
-                        : "escape_the_dungeon";
+            }
+            try {
+                const demoFolderName = i18n.language.startsWith('pt')
+                    ? "fuja_da_masmorra"
+                    : i18n.language.startsWith('es')
+                    ? "escapa_la_mazmorra"
+                    : "escape_the_dungeon";
 
-                    const response = await fetch(`/${demoFolderName}/editor_data.json`);
-                    if (!response.ok) throw new Error('Failed to fetch demo data');
-                    const data = await response.json();
+                const response = await fetch(`/${demoFolderName}/editor_data.json`);
+                if (!response.ok) throw new Error('Failed to fetch demo data');
+                const data = await response.json();
+                if (isMounted) {
                     setDemoData(data);
-                } catch (error) {
-                    console.error("Error loading demo data:", error);
-                } finally {
+                }
+            } catch (error) {
+                console.error("Error loading demo data:", error);
+            } finally {
+                if (isMounted) {
                     setIsLoadingDemo(false);
                 }
-            };
-            fetchDemoData();
+            }
+        };
+        fetchDemoData();
+        return () => {
+            isMounted = false;
+        };
+    }, [i18n.language]);
+
+    React.useEffect(() => {
+        if (currentView === 'play' && !demoData) {
+            setIsLoadingDemo(true);
         }
-    }, [currentView, demoData, i18n.language]);
+    }, [currentView, demoData]);
 
     // Sidebar Component (Left)
     const renderSidebar = () => (

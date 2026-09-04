@@ -273,39 +273,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const getTargetVolume = () => {
+        try {
+            const saved = window.isPreview ? null : localStorage.getItem('if_builder_settings_volume');
+            if (saved !== null && saved !== undefined) {
+                const v = parseFloat(saved) / 100;
+                if (!isNaN(v)) return Math.max(0, Math.min(1, v));
+            }
+        } catch (_) {}
+        return 1;
+    };
+
     const audioBlobCache = new Map();
+    const audioFetchingPromises = new Map();
+
     const getAudioSrc = async (src) => {
         if (!src) return "";
         if (src.startsWith('blob:') || src.startsWith('data:')) return src;
         if (audioBlobCache.has(src)) return audioBlobCache.get(src);
-        try {
-            const response = await fetch(src);
-            if (!response.ok) throw new Error('Audio fetch failed');
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            audioBlobCache.set(src, blobUrl);
-            return blobUrl;
-        } catch (e) {
-            console.warn('Failed to fetch audio as blob, falling back to original source:', e);
-            return src;
-        }
+        if (audioFetchingPromises.has(src)) return audioFetchingPromises.get(src);
+
+        const promise = (async () => {
+            try {
+                const response = await fetch(src);
+                if (!response.ok) throw new Error('Audio fetch failed');
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                audioBlobCache.set(src, blobUrl);
+                return blobUrl;
+            } catch (e) {
+                console.warn('Failed to fetch audio as blob, falling back to original source:', e);
+                return src;
+            } finally {
+                audioFetchingPromises.delete(src);
+            }
+        })();
+
+        audioFetchingPromises.set(src, promise);
+        return promise;
+    };
+
+    const preloadAudio = (src) => {
+        if (!src || src.startsWith('blob:') || src.startsWith('data:') || audioBlobCache.has(src)) return;
+        getAudioSrc(src).catch(() => {});
     };
 
     const playSound = (src) => {
         if (src && soundEffectAudio) {
-            getAudioSrc(src).then(resolvedSrc => {
+            const applySound = (resolvedSrc) => {
                 try {
                     soundEffectAudio.pause();
                     soundEffectAudio.currentTime = 0;
                 } catch (_) {}
                 soundEffectAudio.src = resolvedSrc;
                 soundEffectAudio.play().catch((e) => console.warn("playSound failed:", e));
-            });
+            };
+
+            if (audioBlobCache.has(src)) {
+                applySound(audioBlobCache.get(src));
+            } else {
+                getAudioSrc(src).then(applySound);
+            }
         }
     };
 
     let bgmFadeInterval = null;
-    const playBgm = (src) => {
+    const playBgm = (src, immediate = false) => {
         if (!bgmAudio) return;
         if (src === currentBgmSrc) {
             if (bgmAudio.paused && src) {
@@ -313,12 +346,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        
+
+        const targetVolume = getTargetVolume();
+
         const fadeOut = (callback) => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             let vol = bgmAudio.volume;
             bgmFadeInterval = setInterval(() => {
-                vol -= 0.1;
+                vol -= 0.15;
                 if (vol <= 0) {
                     clearInterval(bgmFadeInterval);
                     bgmAudio.pause();
@@ -328,38 +363,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     bgmAudio.volume = Math.max(0, vol);
                 }
-            }, 50);
+            }, 30);
         };
 
-        const fadeIn = () => {
+        const fadeIn = (forceImmediate = false) => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
+            if (forceImmediate || targetVolume === 0) {
+                bgmAudio.volume = targetVolume;
+                try { bgmAudio.currentTime = 0; } catch (_) {}
+                bgmAudio.play().catch((e) => console.warn("bgm play failed:", e));
+                return;
+            }
+
             bgmAudio.volume = 0;
             try { bgmAudio.currentTime = 0; } catch (_) {}
-            bgmAudio.play().catch(() => {});
+            bgmAudio.play().catch((e) => console.warn("bgm play failed:", e));
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
-                vol += 0.1;
-                if (vol >= 1) {
+                vol += 0.15;
+                if (vol >= targetVolume) {
                     clearInterval(bgmFadeInterval);
-                    bgmAudio.volume = 1;
+                    bgmAudio.volume = targetVolume;
                 } else {
-                    bgmAudio.volume = Math.min(1, vol);
+                    bgmAudio.volume = Math.min(targetVolume, vol);
                 }
-            }, 50);
+            }, 30);
         };
 
-        const applyNewBgm = (resolvedSrc) => {
+        const applyNewBgm = (resolvedSrc, forceImmediate = false) => {
             try {
                 bgmAudio.pause();
-                bgmAudio.currentTime = 0;
             } catch (_) {}
             bgmAudio.src = resolvedSrc;
-            const onMeta = () => {
-                try { bgmAudio.currentTime = 0; } catch (_) {}
-                bgmAudio.removeEventListener('loadedmetadata', onMeta);
+
+            // Only seek if non-zero to prevent unnecessary decoder pipeline flushes and audio stutter
+            try {
+                if (bgmAudio.currentTime !== 0) {
+                    bgmAudio.currentTime = 0;
+                }
+            } catch (_) {}
+
+            const ensureZero = () => {
+                if (bgmAudio.currentTime > 0.1) {
+                    try { bgmAudio.currentTime = 0; } catch (_) {}
+                }
             };
-            bgmAudio.addEventListener('loadedmetadata', onMeta);
-            fadeIn();
+            bgmAudio.addEventListener('loadedmetadata', ensureZero, { once: true });
+
+            fadeIn(forceImmediate);
         };
 
         let targetSrc = src;
@@ -370,22 +421,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     bgmAudio.pause();
                     bgmAudio.currentTime = 0;
                 } catch (_) {}
-                bgmAudio.src = "";
+                bgmAudio.removeAttribute('src');
+                bgmAudio.load();
             });
             return;
         }
 
-        if (bgmAudio.src && !bgmAudio.paused) {
+        const isFromSilence = !bgmAudio.src || bgmAudio.paused || bgmAudio.volume === 0;
+        const shouldBeImmediate = immediate || isFromSilence;
+
+        if (audioBlobCache.has(targetSrc)) {
+            const cachedSrc = audioBlobCache.get(targetSrc);
+            if (bgmAudio.src && !bgmAudio.paused && !isFromSilence) {
+                fadeOut(() => {
+                    if (currentBgmSrc !== targetSrc) return;
+                    applyNewBgm(cachedSrc, false);
+                });
+            } else {
+                applyNewBgm(cachedSrc, shouldBeImmediate);
+            }
+            return;
+        }
+
+        if (bgmAudio.src && !bgmAudio.paused && !isFromSilence) {
             fadeOut(() => {
                 getAudioSrc(targetSrc).then(resolvedSrc => {
                     if (currentBgmSrc !== targetSrc) return;
-                    applyNewBgm(resolvedSrc);
+                    applyNewBgm(resolvedSrc, false);
                 });
             });
         } else {
             getAudioSrc(targetSrc).then(resolvedSrc => {
                 if (currentBgmSrc !== targetSrc) return;
-                applyNewBgm(resolvedSrc);
+                applyNewBgm(resolvedSrc, shouldBeImmediate);
             });
         }
     };
@@ -883,6 +951,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const glitchEffect = new GlitchEffect();
 
     const init = () => {
+        // Preload key audio assets early so they start instantly on click
+        if (gameData.gameBackgroundMusic) preloadAudio(gameData.gameBackgroundMusic);
+        const startScn = (gameData.cenas && gameData.cenas[gameData.cena_inicial]);
+        if (startScn) {
+            if (startScn.backgroundMusic) preloadAudio(startScn.backgroundMusic);
+            if (startScn.vignetteNextSceneId && gameData.cenas[startScn.vignetteNextSceneId]?.backgroundMusic) {
+                preloadAudio(gameData.cenas[startScn.vignetteNextSceneId].backgroundMusic);
+            }
+        }
+
         const startAudioOnInteraction = () => {
             if (bgmAudio.paused && !isGameEnded && bgmAudio.src && bgmAudio.src !== window.location.href && bgmAudio.src !== "") {
                 bgmAudio.play().catch(() => {});
@@ -1471,6 +1549,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 bgmAudio.pause();
                 bgmAudio.currentTime = 0;
             } catch (_) {}
+            bgmAudio.removeAttribute('src');
+            bgmAudio.load();
         }
         currentBgmSrc = null;
 
@@ -1484,9 +1564,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const isStartVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
         if (startScene) {
             if (startScene.backgroundMusic) {
-                playBgm(startScene.backgroundMusic);
+                playBgm(startScene.backgroundMusic, true);
             } else if (!window.isSceneTest && (!startScene.vignetteType || startScene.vignetteType === 'none')) {
-                playBgm(gameData.gameBackgroundMusic || "");
+                playBgm(gameData.gameBackgroundMusic || "", true);
             } else {
                 playBgm(""); 
             }
@@ -2046,6 +2126,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
         }
+
+        // Preload next scene music while reading vignette screen
+        if (scene.vignetteNextSceneId) {
+            const nextScn = findScene(scene.vignetteNextSceneId);
+            if (nextScn && nextScn.backgroundMusic) {
+                preloadAudio(nextScn.backgroundMusic);
+            }
+        }
         
         // Handle button click
         const handleVignetteClick = () => {
@@ -2079,6 +2167,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nextScene = findScene(nextSceneId);
                 
                 if (nextScene) {
+                    // Synchronously trigger next scene audio immediately on click user gesture
+                    if (nextScene.backgroundMusic) {
+                        playBgm(nextScene.backgroundMusic, true);
+                    } else if (nextScene.stopBackgroundMusic) {
+                        playBgm("");
+                    }
+
                     const isNextVignette = nextScene.vignetteType && nextScene.vignetteType !== 'none';
                     
                     if (isNextVignette) {
@@ -2362,6 +2457,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (scene.stopBackgroundMusic) {
             playBgm("");
         }
+
+        // Preload audio for potential next scenes (choices & interactions)
+        (scene.choices || []).forEach(ch => {
+            if (ch.goToSceneId && gameData.cenas && gameData.cenas[ch.goToSceneId]?.backgroundMusic) {
+                preloadAudio(gameData.cenas[ch.goToSceneId].backgroundMusic);
+            }
+        });
+        (scene.interactions || []).forEach(inter => {
+            if (inter.goToSceneId && gameData.cenas && gameData.cenas[inter.goToSceneId]?.backgroundMusic) {
+                preloadAudio(gameData.cenas[inter.goToSceneId].backgroundMusic);
+            }
+        });
         const oldChances = chances;
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
