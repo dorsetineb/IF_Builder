@@ -297,7 +297,14 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch(src);
                 if (!response.ok) throw new Error('Audio fetch failed');
-                const blob = await response.blob();
+                const arrayBuffer = await response.arrayBuffer();
+                const lower = src.toLowerCase();
+                const mimeType = (lower.endsWith('.mpeg') || lower.endsWith('.mp3'))
+                    ? 'audio/mpeg'
+                    : lower.endsWith('.ogg')
+                    ? 'audio/ogg'
+                    : 'audio/wav';
+                const blob = new Blob([arrayBuffer], { type: mimeType });
                 const blobUrl = URL.createObjectURL(blob);
                 audioBlobCache.set(src, blobUrl);
                 return blobUrl;
@@ -341,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const playBgm = (src, immediate = false) => {
         if (!bgmAudio) return;
         if (src === currentBgmSrc) {
-            if (bgmAudio.paused && src) {
+            if (bgmAudio.paused && src && bgmAudio.src) {
                 bgmAudio.play().catch(() => {});
             }
             return;
@@ -358,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearInterval(bgmFadeInterval);
                     bgmAudio.pause();
                     bgmAudio.volume = 0;
-                    try { bgmAudio.currentTime = 0; } catch (_) {}
                     callback();
                 } else {
                     bgmAudio.volume = Math.max(0, vol);
@@ -370,13 +376,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             if (forceImmediate || targetVolume === 0) {
                 bgmAudio.volume = targetVolume;
-                try { bgmAudio.currentTime = 0; } catch (_) {}
                 bgmAudio.play().catch((e) => console.warn("bgm play failed:", e));
                 return;
             }
 
             bgmAudio.volume = 0;
-            try { bgmAudio.currentTime = 0; } catch (_) {}
             bgmAudio.play().catch((e) => console.warn("bgm play failed:", e));
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
@@ -395,21 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 bgmAudio.pause();
             } catch (_) {}
             bgmAudio.src = resolvedSrc;
-
-            // Only seek if non-zero to prevent unnecessary decoder pipeline flushes and audio stutter
-            try {
-                if (bgmAudio.currentTime !== 0) {
-                    bgmAudio.currentTime = 0;
-                }
-            } catch (_) {}
-
-            const ensureZero = () => {
-                if (bgmAudio.currentTime > 0.1) {
-                    try { bgmAudio.currentTime = 0; } catch (_) {}
-                }
-            };
-            bgmAudio.addEventListener('loadedmetadata', ensureZero, { once: true });
-
             fadeIn(forceImmediate);
         };
 
@@ -419,7 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fadeOut(() => {
                 try {
                     bgmAudio.pause();
-                    bgmAudio.currentTime = 0;
                 } catch (_) {}
                 bgmAudio.removeAttribute('src');
                 bgmAudio.load();
@@ -2167,13 +2155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nextScene = findScene(nextSceneId);
                 
                 if (nextScene) {
-                    // Synchronously trigger next scene audio immediately on click user gesture
-                    if (nextScene.backgroundMusic) {
-                        playBgm(nextScene.backgroundMusic, true);
-                    } else if (nextScene.stopBackgroundMusic) {
-                        playBgm("");
-                    }
-
                     const isNextVignette = nextScene.vignetteType && nextScene.vignetteType !== 'none';
                     
                     if (isNextVignette) {

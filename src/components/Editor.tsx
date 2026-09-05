@@ -963,9 +963,6 @@ const Editor: React.FC = () => {
       clearTimeout(timer3);
       clearTimeout(timer4);
       if (typingInterval) clearInterval(typingInterval);
-      if (audioCtx) {
-        try { audioCtx.close(); } catch (_) {}
-      }
     };
   }, []);
 
@@ -1298,7 +1295,7 @@ const Editor: React.FC = () => {
       {/* Show BIOS animation as an overlay that fades out */}
       {!isBiosFinished && (
         <div 
-            className={`fixed inset-0 z-[10000] bg-black text-white text-base md:text-lg p-4 sm:p-8 flex flex-col justify-start overflow-y-auto selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}
+            className={`fixed inset-0 z-[10000] bg-black text-white text-base md:text-lg p-4 sm:p-8 flex flex-col justify-start overflow-y-auto overflow-x-hidden selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}
             style={{
                 fontFamily: "'Silkscreen', 'Courier New', 'Lucida Console', 'Consolas', monospace",
                 "--text-base": "13px",
@@ -1314,9 +1311,9 @@ const Editor: React.FC = () => {
                         animation: hard-blink 0.5s step-end infinite;
                     }
                 `}</style>
-          <div className="space-y-1 max-w-4xl">
+          <div className="space-y-1 w-full">
             {/* Logo IFBUILDER: Arte ASCII */}
-            <div className="text-primary mb-6 sm:mb-8 pt-1 sm:pt-2">
+            <div className="text-primary mb-6 sm:mb-8 pt-1 sm:pt-2 w-full">
               <IFBuilderBiosAscii />
             </div>
             <p>IF-BUILDER v.{APP_VERSION}</p>

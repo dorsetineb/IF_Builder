@@ -183,13 +183,6 @@ export function Auth() {
                                 e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                             }}
                             onClick={() => {
-                                try {
-                                    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-                                    if (AudioContextClass) {
-                                        const ctx = new AudioContextClass();
-                                        ctx.resume().then(() => ctx.close()).catch(() => {});
-                                    }
-                                } catch (_) {}
                                 navigate('/editor');
                             }}
                             className={`w-fit flex items-center justify-start gap-3 px-5 py-3 rounded-xl font-bold text-base transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}

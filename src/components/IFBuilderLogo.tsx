@@ -430,19 +430,90 @@ export const IF_BUILDER_ASCII_LOGO = [
 ].join('\n');
 
 export const IFBuilderBiosAscii: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className = "", style }) => {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const contentRef = React.useRef<HTMLPreElement>(null);
+    const [scale, setScale] = React.useState<number>(1);
+    const [contentHeight, setContentHeight] = React.useState<number | undefined>(undefined);
+
+    const updateScale = React.useCallback(() => {
+        if (!containerRef.current || !contentRef.current) return;
+        const containerWidth = containerRef.current.clientWidth;
+        const contentWidth = contentRef.current.scrollWidth;
+        const rawHeight = contentRef.current.scrollHeight;
+
+        if (contentWidth > 0 && containerWidth > 0) {
+            const newScale = Math.min(1, containerWidth / contentWidth);
+            setScale(newScale);
+            setContentHeight(rawHeight);
+        }
+    }, []);
+
+    React.useLayoutEffect(() => {
+        updateScale();
+
+        if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+            const observer = new ResizeObserver(() => {
+                updateScale();
+            });
+            observer.observe(containerRef.current);
+            return () => observer.disconnect();
+        } else {
+            window.addEventListener('resize', updateScale);
+            return () => window.removeEventListener('resize', updateScale);
+        }
+    }, [updateScale]);
+
+    React.useEffect(() => {
+        if (typeof document !== 'undefined' && 'fonts' in document) {
+            document.fonts.ready.then(updateScale);
+        }
+    }, [updateScale]);
+
     return (
-        <pre
-            className={cn("font-mono text-[8px] sm:text-[10px] md:text-[12px] lg:text-[13px] leading-[1.15] select-none whitespace-pre overflow-x-auto notranslate", className)}
+        <div
+            ref={containerRef}
+            className={cn("bios-ascii-container w-full overflow-hidden select-none", className)}
             style={{
-                fontFamily: "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'Courier New', monospace",
-                ...style
+                overflow: 'hidden',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                ...style,
             }}
-            translate="no"
-            aria-label="ifbuilder ASCII logo"
-            role="img"
         >
-            {IF_BUILDER_ASCII_LOGO}
-        </pre>
+            <style>{`
+                .bios-ascii-container::-webkit-scrollbar,
+                .bios-ascii-container *::-webkit-scrollbar {
+                    display: none !important;
+                    width: 0 !important;
+                    height: 0 !important;
+                }
+            `}</style>
+            <div
+                style={{
+                    height: contentHeight && scale < 1 ? `${Math.ceil(contentHeight * scale)}px` : undefined,
+                    width: '100%',
+                    overflow: 'hidden',
+                    scrollbarWidth: 'none',
+                }}
+            >
+                <pre
+                    ref={contentRef}
+                    className="font-mono text-[11px] sm:text-[12px] md:text-[13px] leading-[1.15] select-none whitespace-pre notranslate origin-top-left w-max block m-0 p-0"
+                    style={{
+                        fontFamily: "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'Courier New', monospace",
+                        transform: scale < 1 ? `scale(${scale})` : undefined,
+                        transformOrigin: 'top left',
+                        overflow: 'hidden',
+                        scrollbarWidth: 'none',
+                    }}
+                    translate="no"
+                    aria-label="ifbuilder ASCII logo"
+                    role="img"
+                >
+                    {IF_BUILDER_ASCII_LOGO}
+                </pre>
+            </div>
+        </div>
     );
 };
 

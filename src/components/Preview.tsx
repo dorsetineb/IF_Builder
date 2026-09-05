@@ -409,6 +409,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 title="Pré-visualização do Jogo"
                 className="w-full h-full border-none"
                 sandbox="allow-scripts allow-same-origin allow-modals"
+                allow="autoplay"
             />
         </div>
     );
